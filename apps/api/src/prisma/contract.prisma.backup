@@ -1,0 +1,631 @@
+// use prisma-next
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum UserRole {
+  CLIENT
+  WORKER
+  ADMIN
+}
+
+enum ProfileType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  phone             String?    @unique
+  passwordHash      String
+  status            UserStatus @default(ACTIVE)
+  role              UserRole   @default(CLIENT)
+  emailVerified     Boolean    @default(false)
+  phoneVerified     Boolean    @default(false)
+  createdAt         TimestamptzString @default(now())
+  updatedAt         temporal.updatedAtString()
+
+  profile           Profile?
+  location          UserLocation?
+  tasks             Task[]
+  applications      Application[]
+  messages          Message[]
+}
+
+model Profile {
+  id                String      @id @default(uuid())
+  userId            String      @unique
+  type              ProfileType @default(INDIVIDUAL)
+  displayName       String
+  bio               String?
+  profilePhotoUrl   String?
+  websiteUrl        String?
+  yearsExperience   Int?
+  averageRating     Decimal?
+  totalReviews      Int         @default(0)
+  createdAt         TimestamptzString @default(now())
+  updatedAt         temporal.updatedAtString()
+
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model Country {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  currency    String
+  timezone    String
+
+  regions     Region[]
+  cities      City[]
+  userLocations UserLocation[]
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+
+model Region {
+  id          String   @id @default(uuid())
+  countryId   String
+  name        String
+
+  country     Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  cities      City[]
+  userLocations UserLocation[]
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@unique([countryId, name])
+}
+
+model City {
+  id          String   @id @default(uuid())
+  countryId   String
+  regionId    String?
+  name        String
+
+  country     Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  region      Region?  @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  userLocations UserLocation[]
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@unique([countryId, name])
+}
+
+model UserLocation {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  countryId   String
+  regionId    String?
+  cityId      String?
+  area        String?
+  latitude    Decimal?
+  longitude   Decimal?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country     Country  @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  region      Region?  @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  city        City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  active      Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  parentId    String?
+
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  tasks       Task[]
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@unique([parentId, name])
+  @@index([parentId])
+  @@index([active, sortOrder])
+}
+enum TaskType {
+  PHYSICAL
+  VIRTUAL
+}
+
+enum TaskDuration {
+  SHORT_TERM
+  LONG_TERM
+}
+
+enum TaskStatus {
+  DRAFT
+  PUBLISHED
+  RECEIVING_APPLICATIONS
+  WORKER_SELECTED
+  AWAITING_PAYMENT
+  FUNDED
+  IN_PROGRESS
+  SUBMITTED
+  AWAITING_APPROVAL
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  EXPIRED
+}
+enum ApplicationStatus {
+  SUBMITTED
+  VIEWED
+  SHORTLISTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  EXPIRED
+}
+model Task {
+  id                    String       @id @default(uuid())
+  clientId              String
+  categoryId            String
+  title                 String
+  description           String
+  type                  TaskType
+  duration              TaskDuration
+  status                TaskStatus   @default(DRAFT)
+  budgetMin             Decimal?
+  budgetMax             Decimal?
+  expectedCompletionAt  TimestamptzString?
+  locationDescription   String?
+  requirements          String?
+  createdAt             TimestamptzString @default(now())
+  updatedAt             temporal.updatedAtString()
+
+  client                User         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  category              Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  requirementsList      TaskRequirement[]
+  attachments           TaskAttachment[]
+  contract              Contract?
+  applications          Application[]
+
+  @@index([clientId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([type, duration])
+}
+model TaskRequirement {
+  id        String   @id @default(uuid())
+  taskId    String
+  name      String
+  value     String?
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([taskId])
+}
+
+model TaskAttachment {
+  id        String   @id @default(uuid())
+  taskId    String
+  fileUrl   String
+  fileName  String?
+  fileType  String?
+  fileSize  Int?
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([taskId])
+}
+model Application {
+  id                    String            @id @default(uuid())
+  taskId                String
+  workerId              String
+  proposedPrice         Decimal
+  estimatedCompletionAt TimestamptzString?
+  message               String?
+  qualifications        String?
+  questions             String?
+  status                ApplicationStatus @default(SUBMITTED)
+  createdAt             TimestamptzString @default(now())
+  updatedAt             temporal.updatedAtString()
+
+  task                  Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  worker                User              @relation(fields: [workerId], references: [id], onDelete: Restrict)
+  attachments           ApplicationAttachment[]
+
+  @@unique([taskId, workerId])
+  @@index([taskId])
+  @@index([workerId])
+  @@index([status])
+}
+model ApplicationAttachment {
+  id            String      @id @default(uuid())
+  applicationId String
+  fileUrl       String
+  fileName      String?
+  fileType      String?
+  fileSize      Int?
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  createdAt     TimestamptzString @default(now())
+  updatedAt     temporal.updatedAtString()
+
+  @@index([applicationId])
+}
+enum ContractStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+model Contract {
+  id          String         @id @default(uuid())
+  taskId      String         @unique
+  workerId    String
+  status      ContractStatus @default(ACTIVE)
+  agreedPrice Decimal
+  startedAt   TimestamptzString?
+  completedAt TimestamptzString?
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  task        Task           @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  worker      User           @relation(fields: [workerId], references: [id], onDelete: Restrict)
+
+  @@index([workerId])
+  @@index([status])
+}
+enum PaymentStatus {
+  PENDING
+  FUNDED
+  RELEASED
+  REFUNDED
+  FAILED
+  DISPUTED
+  CANCELLED
+}
+model Payment {
+  id          String        @id @default(uuid())
+  taskId      String
+  clientId    String
+  workerId    String?
+  amount      Decimal
+  currency    String
+  status      PaymentStatus @default(PENDING)
+  provider    String?
+  providerRef String?
+  fundedAt    TimestamptzString?
+  releasedAt  TimestamptzString?
+  refundedAt  TimestamptzString?
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  task        Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  client      User          @relation("ClientPayments", fields: [clientId], references: [id], onDelete: Restrict)
+  worker      User?         @relation("WorkerPayments", fields: [workerId], references: [id], onDelete: Restrict)
+
+  @@index([taskId])
+  @@index([clientId])
+  @@index([workerId])
+  @@index([status])
+}
+model TokenWallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+enum TokenTransactionType {
+  GRANT
+  PURCHASE
+  SPEND
+  REFUND
+  ADJUSTMENT
+  EXPIRY
+}
+
+model TokenTransaction {
+  id        String               @id @default(uuid())
+  userId    String
+  type      TokenTransactionType
+  amount    Int
+  balanceAfter Int
+  reference String?
+  note      String?
+
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  createdAt TimestamptzString @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+model TokenPackage {
+  id          String   @id @default(uuid())
+  name        String
+  tokenAmount Int
+  price       Decimal
+  currency    String
+  active      Boolean  @default(true)
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([active])
+}
+model Review {
+  id         String     @id @default(uuid())
+  contractId String
+  reviewerId String
+  revieweeId String
+  type       ReviewType
+  rating     Int
+  comment    String?
+  createdAt  TimestamptzString @default(now())
+
+  @@index([contractId])
+  @@index([reviewerId])
+  @@index([revieweeId])
+}
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  members   ConversationMember[]
+  messages  Message[]
+}
+model ConversationMember {
+  id             String       @id @default(uuid())
+  conversationId String
+  userId         String
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt      TimestamptzString @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  VOICE
+  LOCATION
+}
+enum ReviewType {
+  CLIENT_TO_WORKER
+  WORKER_TO_CLIENT
+}
+
+model Message {
+  id             String        @id @default(uuid())
+  conversationId String
+  senderId       String
+  location       MessageLocation?
+  type           MessageType   @default(TEXT)
+  content        String?
+  fileUrl        String?
+  fileName       String?
+  latitude       Decimal?
+  longitude      Decimal?
+
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User          @relation(fields: [senderId], references: [id], onDelete: Restrict)
+
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+
+}
+model MessageLocation {
+  id          String   @id @default(uuid())
+  messageId   String   @unique
+  latitude    Decimal
+  longitude   Decimal
+  expiresAt   TimestamptzString?
+
+  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt   TimestamptzString @default(now())
+}
+enum LedgerEntryType {
+  FUNDING
+  RELEASE
+  COMMISSION
+  REFUND
+  CANCELLATION_FEE
+  ADJUSTMENT
+}
+
+model LedgerEntry {
+  id          String           @id @default(uuid())
+  paymentId   String?
+  taskId      String?
+  userId      String?
+  type        LedgerEntryType
+  amount      Decimal
+  currency    String
+  description String?
+  reference   String?
+  createdAt   TimestamptzString @default(now())
+
+  @@index([paymentId])
+  @@index([taskId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+model Dispute {
+  id          String        @id @default(uuid())
+  taskId      String
+  paymentId   String?
+  raisedById  String
+  reason      String
+  description String
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([taskId])
+  @@index([paymentId])
+  @@index([raisedById])
+  @@index([status])
+}
+
+model DisputeEvidence {
+  id          String   @id @default(uuid())
+  disputeId   String
+  fileUrl     String?
+  description String?
+  createdAt   TimestamptzString @default(now())
+
+  @@index([disputeId])
+}
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+model Report {
+  id          String       @id @default(uuid())
+  reporterId  String
+  reportedUserId String?
+  taskId      String?
+  messageId   String?
+  reason      String
+  description String
+  status      ReportStatus @default(OPEN)
+  resolution  String?
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([taskId])
+  @@index([messageId])
+  @@index([status])
+}
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum VerificationType {
+  IDENTITY
+  PHONE
+  EMAIL
+  PAYMENT
+  ADDRESS
+  BUSINESS
+}
+
+model Verification {
+  id          String             @id @default(uuid())
+  userId      String
+  type        VerificationType
+  status      VerificationStatus @default(PENDING)
+  provider    String?
+  providerRef String?
+  verifiedAt  TimestamptzString?
+  expiresAt   TimestamptzString?
+  notes       String?
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+}
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  VERIFY
+  PAYMENT
+  REFUND
+  DISPUTE
+  REPORT
+  ADMIN_ACTION
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String?
+  action     AuditAction
+  entityType String
+  entityId   String?
+  details    String?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  TimestamptzString @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+}
+enum NotificationType {
+  MESSAGE
+  APPLICATION
+  CONTRACT
+  PAYMENT
+  REVIEW
+  DISPUTE
+  REPORT
+  VERIFICATION
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  readAt    TimestamptzString?
+  createdAt TimestamptzString @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([readAt])
+  @@index([createdAt])
+}
