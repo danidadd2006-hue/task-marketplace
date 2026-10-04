@@ -36,6 +36,22 @@ model User {
   applications      Application[]
   messages          Message[]
   refreshTokens     RefreshToken[]
+  roleAssignments   UserRoleAssignment[]
+}
+
+model UserRoleAssignment {
+  id        String   @id @default(uuid())
+  userId    String
+  role      UserRole
+  assignedBy String
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
 }
 
 model Profile {
