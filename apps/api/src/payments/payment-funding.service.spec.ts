@@ -10,8 +10,6 @@ const mocks = vi.hoisted(() => ({
   query: vi.fn(),
   contractFirst: vi.fn(),
   paymentFirst: vi.fn(),
-  locationFirst: vi.fn(),
-  countryFirst: vi.fn(),
   paymentCreate: vi.fn(),
   ledgerCreate: vi.fn(),
   auditCreate: vi.fn(),
@@ -51,6 +49,7 @@ const task = {
   id: 'task-id',
   clientId: 'client-id',
   status: 'WORKER_SELECTED',
+  currency: 'KES',
 };
 
 const contract = {
@@ -66,6 +65,7 @@ const payment = {
   taskId: 'task-id',
   clientId: 'client-id',
   workerId: 'worker-id',
+  contractId: 'contract-id',
   amount: '123.45',
   currency: 'KES',
   status: 'PENDING',
@@ -127,8 +127,6 @@ describe('PaymentFundingService.initiateFunding', () => {
     mocks.query.mockResolvedValueOnce([task]);
     mocks.contractFirst.mockResolvedValue(contract);
     mocks.paymentFirst.mockResolvedValue(undefined);
-    mocks.locationFirst.mockResolvedValue({ countryId: 'country-id' });
-    mocks.countryFirst.mockResolvedValue({ currency: 'KES' });
     mocks.provider.mockResolvedValue({
       status: 'PENDING',
       provider: null,
@@ -238,7 +236,7 @@ describe('PaymentFundingService.initiateFunding', () => {
     }));
   });
 
-  it('uses server-derived currency and leaves payment pending', async () => {
+  it('uses immutable task currency and leaves payment pending', async () => {
     const result = await makeService().initiateFunding(client, 'task-id');
 
     expect(mocks.paymentCreate).toHaveBeenCalledWith(expect.objectContaining({
@@ -301,11 +299,11 @@ describe('PaymentFundingService.initiateFunding', () => {
     expect(mocks.taskUpdate).not.toHaveBeenCalled();
   });
 
-  it('does not permit funding without a server-derived currency', async () => {
-    mocks.locationFirst.mockResolvedValueOnce(undefined);
+  it('uses Task.currency even if the clients current location would differ', async () => {
+    await makeService().initiateFunding(client, 'task-id');
 
-    await expect(makeService().initiateFunding(client, 'task-id'))
-      .rejects.toBeInstanceOf(BadRequestException);
-    expect(mocks.paymentCreate).not.toHaveBeenCalled();
+    expect(mocks.paymentCreate).toHaveBeenCalledWith(expect.objectContaining({
+      currency: 'KES',
+    }));
   });
 });
