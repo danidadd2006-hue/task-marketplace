@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
     id: 'task-id-column',
     clientId: 'task-client-id-column',
     status: 'task-status-column',
+    currency: 'task-currency-column',
   },
 }));
 
@@ -96,12 +97,6 @@ function setupTransaction() {
           Payment: {
             where: vi.fn(() => ({ first: mocks.paymentFirst })),
             create: mocks.paymentCreate,
-          },
-          UserLocation: {
-            where: vi.fn(() => ({ first: mocks.locationFirst })),
-          },
-          Country: {
-            where: vi.fn(() => ({ first: mocks.countryFirst })),
           },
           LedgerEntry: { create: mocks.ledgerCreate },
           AuditLog: { create: mocks.auditCreate },
