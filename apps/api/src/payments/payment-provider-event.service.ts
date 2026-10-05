@@ -14,6 +14,11 @@ import {
 
 type SqlError = { sqlState?: string; cause?: SqlError };
 
+function normalizeDecimal(value: string): string {
+  const [whole, fraction = ''] = value.trim().split('.');
+  return `${whole.replace(/^0+(?=\\d)/, '')}.${fraction.replace(/0+$/, '') || '0'}`;
+}
+
 function isUniqueViolation(error: unknown): boolean {
   let current: SqlError | undefined = error as SqlError | undefined;
   while (current) {
@@ -98,7 +103,10 @@ export class PaymentProviderEventService {
       if (payment.provider && payment.provider !== event.provider) {
         throw new BadRequestException('Payment provider does not match the event');
       }
-      if (payment.amount !== event.amount || payment.currency !== event.currency) {
+      if (
+        normalizeDecimal(payment.amount) !== normalizeDecimal(event.amount) ||
+        payment.currency !== event.currency
+      ) {
         throw new ConflictException(
           'Provider transaction amount or currency does not match the payment',
         );
