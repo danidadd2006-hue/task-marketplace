@@ -61,7 +61,7 @@ export class PaymentFundingService {
     return db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
       const taskPlan = tx.raw.sql`
-        SELECT "id", "clientId", "status"
+        SELECT "id", "clientId", "status", "currency"
         FROM "Task"
         WHERE "id" = ${taskId}
         FOR UPDATE
@@ -69,6 +69,7 @@ export class PaymentFundingService {
         id: taskTable.columns.id,
         clientId: taskTable.columns.clientId,
         status: taskTable.columns.status,
+        currency: taskTable.columns.currency,
       }).build();
 
       const tasks = await tx.query(taskPlan);
@@ -106,33 +107,19 @@ export class PaymentFundingService {
         throw new ConflictException('Funding has already been initiated for this task');
       }
 
-      const location = await tx.orm.public.UserLocation
-        .where({ userId: client.userId })
-        .first();
-
-      if (!location) {
-        throw new BadRequestException(
-          'Funding currency is unavailable for this client',
-        );
-      }
-
-      const country = await tx.orm.public.Country
-        .where({ id: location.countryId })
-        .first();
-
-      if (!country?.currency) {
-        throw new BadRequestException(
-          'Funding currency is unavailable for this client',
-        );
-      }
-
       const amount = contract.agreedPrice;
+      const currency = task.currency;
+      if (!currency) {
+        throw new BadRequestException(
+          'Funding currency is unavailable for this task',
+        );
+      }
       const commission = decimalTenPercent(amount);
       const paymentId = randomUUID();
       const providerResult = await this.paymentProvider.initiateFunding({
         paymentId,
         amount,
-        currency: country.currency,
+        currency,
       });
 
       let payment;
@@ -142,6 +129,7 @@ export class PaymentFundingService {
           taskId,
           clientId: client.userId,
           workerId: contract.workerId,
+          contractId: contract.id,
           amount,
           currency,
           status: 'PENDING',
@@ -163,7 +151,7 @@ export class PaymentFundingService {
         userId: client.userId,
         type: 'COMMISSION',
         amount: commission,
-        currency: country.currency,
+        currency,
         description: 'Marketplace commission for funding initiation',
         reference: contract.id,
       });
@@ -219,7 +207,7 @@ export class PaymentFundingService {
         commission: {
           rate: '10%',
           amount: commission,
-          currency: country.currency,
+          currency,
         },
         providerConfirmation: 'AWAITING',
       };
