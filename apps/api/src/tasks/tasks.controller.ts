@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
 import { RolesGuard } from '../auth/roles.guard.js';
 import { TaskLifecycleService } from './task-lifecycle.service.js';
+import { CreateTaskDto } from './dto/create-task.dto.js';
 import { TasksService } from './tasks.service.js';
 
 @Controller('api/v1/tasks')
@@ -16,7 +17,7 @@ export class TasksController {
   ) {}
 
   @Post()
-  createTask(@Req() request: { user: AuthenticatedUser }, body: Parameters<TasksService['createTask']>[1]) {
+  createTask(@Req() request: { user: AuthenticatedUser }, body: CreateTaskDto) {
     return this.tasksService.createTask(request.user, body);
   }
 
