@@ -143,7 +143,7 @@ export class PaymentFundingService {
           clientId: client.userId,
           workerId: contract.workerId,
           amount,
-          currency: country.currency,
+          currency,
           status: 'PENDING',
           provider: providerResult.provider,
           providerRef: providerResult.providerRef,
