@@ -37,6 +37,8 @@ const event = {
   type: 'FUNDING_SUCCEEDED' as const,
   paymentId: 'payment-id',
   providerRef: 'provider-payment-1',
+  amount: '100.00',
+  currency: 'USD',
   metadata: '{"source":"test"}',
 };
 
