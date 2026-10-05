@@ -141,6 +141,8 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
       providerRef:
         this.stringValue(verified['flw_ref']) ||
         this.stringValue(verified['id']),
+      amount: this.stringValue(verified['amount']) ?? '',
+      currency: this.stringValue(verified['currency']) ?? '',
       metadata: JSON.stringify({
         providerStatus: status,
         transactionId: verified['id'] ?? null,
