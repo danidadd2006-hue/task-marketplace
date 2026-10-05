@@ -117,7 +117,7 @@ describe('TaskLifecycleService', () => {
   it('uses the authenticated owner and stored status rather than client-supplied status or clientId', async () => {
     await service.transition(client, 'task-id', 'PUBLISHED');
 
-    expect(mocks.taskFirst).toHaveBeenCalledWith();
+    expect(mocks.taskFirst).toHaveBeenCalledWith({ id: 'task-id' });
     expect(mocks.taskUpdate).toHaveBeenCalledWith({ status: 'PUBLISHED' });
     expect(mocks.taskUpdate).not.toHaveBeenCalledWith(
       expect.objectContaining({ clientId: 'attacker-id', status: 'COMPLETED' }),
