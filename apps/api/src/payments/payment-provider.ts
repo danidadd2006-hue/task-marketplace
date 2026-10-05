@@ -16,15 +16,18 @@ export interface PaymentProvider {
     paymentId: string;
     amount: string;
     currency: string;
+    customerEmail?: string;
   }): Promise<{
     status: 'PENDING';
     provider: string | null;
     providerRef: string | null;
+    checkoutUrl: string | null;
   }>;
 
   normalizeWebhook(input: {
     body: unknown;
     headers: Record<string, string | string[] | undefined>;
+    rawBody?: string;
   }): Promise<NormalizedPaymentProviderEvent>;
 }
 
@@ -33,11 +36,13 @@ export class PendingPaymentProvider implements PaymentProvider {
     status: 'PENDING';
     provider: string | null;
     providerRef: string | null;
+    checkoutUrl: string | null;
   }> {
     return {
       status: 'PENDING',
       provider: null,
       providerRef: null,
+      checkoutUrl: null,
     };
   }
 
