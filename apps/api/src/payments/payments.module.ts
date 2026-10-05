@@ -6,8 +6,8 @@ import { PaymentProviderEventController } from './payment-provider-event.control
 import { PaymentProviderEventService } from './payment-provider-event.service.js';
 import {
   PAYMENT_PROVIDER,
-  PendingPaymentProvider,
 } from './payment-provider.js';
+import { FlutterwavePaymentProvider } from './flutterwave-payment-provider.js';
 
 @Module({
   imports: [AuthModule],
@@ -17,7 +17,7 @@ import {
     PaymentProviderEventService,
     {
       provide: PAYMENT_PROVIDER,
-      useClass: PendingPaymentProvider,
+      useClass: FlutterwavePaymentProvider,
     },
   ],
 })
