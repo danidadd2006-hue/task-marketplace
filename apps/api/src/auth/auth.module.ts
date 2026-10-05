@@ -24,6 +24,7 @@ import { RolesGuard } from './roles.guard.js';
     AuthService,
     JwtModule,
     PassportModule,
+    RolesGuard,
   ],
 })
 export class AuthModule {}
