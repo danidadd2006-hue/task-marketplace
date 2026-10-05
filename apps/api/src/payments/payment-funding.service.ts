@@ -27,14 +27,10 @@ function decimalTenPercent(value: string): string {
   const scale = fraction.length;
   const digits = BigInt(whole + fraction);
   const result = digits * COMMISSION_RATE_NUMERATOR / COMMISSION_RATE_DENOMINATOR;
-
-  if (scale === 0) {
-    return result.toString();
-  }
-
-  const raw = result.toString().padStart(scale + 1, '0');
-  const wholePart = raw.slice(0, -scale);
-  const fractionPart = raw.slice(-scale).replace(/0+$/, '');
+  const commissionScale = scale + 1;
+  const raw = result.toString().padStart(commissionScale + 1, '0');
+  const wholePart = raw.slice(0, -commissionScale);
+  const fractionPart = raw.slice(-commissionScale).replace(/0+$/, '');
 
   return fractionPart ? wholePart + '.' + fractionPart : wholePart;
 }
