@@ -170,8 +170,8 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
     await makeService().processNormalizedEvent(event);
 
     expect(mocks.query).toHaveBeenCalledTimes(2);
-    expect(mocks.query.mock.calls[0][0]).toContain?.('lock-plan');
-    expect(mocks.query.mock.calls[1][0]).toContain?.('lock-plan');
+    expect(mocks.query.mock.calls[0][0]).toBe('lock-plan');
+    expect(mocks.query.mock.calls[1][0]).toBe('lock-plan');
   });
 
   it('rejects a second event that targets a terminal payment', async () => {
