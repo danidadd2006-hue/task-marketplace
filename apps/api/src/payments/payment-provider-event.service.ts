@@ -76,6 +76,24 @@ export class PaymentProviderEventService {
       const payment = payments[0];
       if (!payment) throw new NotFoundException('Payment not found');
 
+      // Re-check after the payment row lock so concurrent delivery of the same
+      // provider event observes the committed idempotency record.
+      const committedEvent = await tx.orm.public.PaymentProviderEvent
+        .where({
+          provider: event.provider,
+          providerEventId: event.providerEventId,
+        })
+        .first();
+
+      if (committedEvent) {
+        return {
+          status: 'DUPLICATE' as const,
+          eventId: committedEvent.id,
+          paymentId: committedEvent.paymentId,
+          paymentStatus: 'UNCHANGED' as const,
+        };
+      }
+
       if (payment.provider && payment.provider !== event.provider) {
         throw new BadRequestException('Payment provider does not match the event');
       }
