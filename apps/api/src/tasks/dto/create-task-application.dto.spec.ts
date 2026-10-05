@@ -31,7 +31,9 @@ describe('CreateTaskApplicationDto', () => {
 
     expect(errors.some((error) => error.property === 'estimatedCompletionAt')).toBe(true);
     expect(errors.some((error) => error.property === 'message')).toBe(true);
-    expect(errors.some((error) => error.property === 'attachments')).toBe(false);
-    expect(errors.some((error) => error.property === 'attachments' && error.children?.length)).toBe(true);
+
+    const attachmentError = errors.find((error) => error.property === 'attachments');
+    expect(attachmentError).toBeDefined();
+    expect(attachmentError?.children?.length).toBeGreaterThan(0);
   });
 });

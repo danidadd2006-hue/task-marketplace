@@ -49,12 +49,12 @@ export class TaskApplicationService {
 
     return db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
-      const lockPlan = tx.raw.sql\`
+      const lockPlan = tx.raw.sql`
         SELECT "id", "clientId", "status"
         FROM "Task"
-        WHERE "id" = \${taskId}
+        WHERE "id" = ${taskId}
         FOR UPDATE
-      \`
+      `
         .returnsRow({
           id: taskTable.columns.id,
           clientId: taskTable.columns.clientId,
