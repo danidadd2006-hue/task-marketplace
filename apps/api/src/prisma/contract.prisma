@@ -196,6 +196,7 @@ model Task {
   type                  TaskType
   duration              TaskDuration
   status                TaskStatus   @default(DRAFT)
+  currency              String
   budgetMin             Decimal?
   budgetMax             Decimal?
   expectedCompletionAt  TimestamptzString?
@@ -320,6 +321,7 @@ model Payment {
   taskId      String
   clientId    String
   workerId    String?
+  contractId  String
   amount      Decimal
   currency    String
   status      PaymentStatus @default(PENDING)
@@ -334,8 +336,10 @@ model Payment {
   task        Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
   client      User          @relation("ClientPayments", fields: [clientId], references: [id], onDelete: Restrict)
   worker      User?         @relation("WorkerPayments", fields: [workerId], references: [id], onDelete: Restrict)
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
 
   @@index([taskId])
+  @@index([contractId])
   @@index([clientId])
   @@index([workerId])
   @@index([status])
