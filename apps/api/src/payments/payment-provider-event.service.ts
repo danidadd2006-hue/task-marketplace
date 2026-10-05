@@ -33,6 +33,7 @@ export class PaymentProviderEventService {
   async processWebhook(input: {
     body: unknown;
     headers: Record<string, string | string[] | undefined>;
+    rawBody?: string;
   }) {
     const event = await this.paymentProvider.normalizeWebhook(input);
     return this.processNormalizedEvent(event);
