@@ -127,6 +127,7 @@ describe('PaymentFundingService.initiateFunding', () => {
       status: 'PENDING',
       provider: null,
       providerRef: null,
+      checkoutUrl: null,
     });
     mocks.paymentCreate.mockResolvedValue(payment);
     mocks.ledgerCreate.mockResolvedValue({ id: 'ledger-id' });
