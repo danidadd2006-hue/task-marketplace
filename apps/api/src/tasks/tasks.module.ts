@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PaymentsModule } from '../payments/payments.module.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { PublicTasksController } from './public-tasks.controller.js';
 import { TaskDiscoveryService } from './task-discovery.service.js';
@@ -11,7 +12,7 @@ import { TasksController } from './tasks.controller.js';
 import { TasksService } from './tasks.service.js';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, PaymentsModule],
   controllers: [
     TasksController,
     PublicTasksController,
