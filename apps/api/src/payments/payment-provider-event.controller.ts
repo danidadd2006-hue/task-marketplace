@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Headers,
@@ -24,7 +25,7 @@ export class PaymentProviderEventController {
     const rawBody = request.rawBody?.toString('utf8');
 
     if (!rawBody) {
-      throw new Error('Raw provider webhook body is required');
+      throw new BadRequestException('Raw provider webhook body is required');
     }
 
     return this.paymentProviderEventService.processWebhook({
