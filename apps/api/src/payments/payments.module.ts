@@ -8,6 +8,7 @@ import {
   PAYMENT_PROVIDER,
 } from './payment-provider.js';
 import { FlutterwavePaymentProvider } from './flutterwave-payment-provider.js';
+import { PendingPaymentProvider } from './payment-provider.js';
 
 @Module({
   imports: [AuthModule],
@@ -17,7 +18,10 @@ import { FlutterwavePaymentProvider } from './flutterwave-payment-provider.js';
     PaymentProviderEventService,
     {
       provide: PAYMENT_PROVIDER,
-      useClass: FlutterwavePaymentProvider,
+      useFactory: () =>
+        process.env['PAYMENT_PROVIDER']?.toUpperCase() === 'FLUTTERWAVE'
+          ? new FlutterwavePaymentProvider()
+          : new PendingPaymentProvider(),
     },
   ],
 })
