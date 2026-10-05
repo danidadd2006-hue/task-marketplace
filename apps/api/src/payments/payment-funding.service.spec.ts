@@ -112,6 +112,7 @@ function setupTransaction() {
 function makeService() {
   return new PaymentFundingService({
     initiateFunding: mocks.provider,
+    normalizeWebhook: vi.fn(),
   });
 }
 

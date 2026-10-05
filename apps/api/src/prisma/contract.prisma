@@ -316,6 +316,31 @@ enum PaymentStatus {
   DISPUTED
   CANCELLED
 }
+
+enum PaymentProviderEventType {
+  FUNDING_SUCCEEDED
+  FUNDING_FAILED
+  FUNDING_CANCELLED
+}
+
+model PaymentProviderEvent {
+  id              String                    @id @default(uuid())
+  provider        String
+  providerEventId String
+  type            PaymentProviderEventType
+  paymentId       String
+  providerRef     String?
+  metadata        String?
+  processedAt     TimestamptzString         @default(now())
+  createdAt       TimestamptzString         @default(now())
+
+  payment         Payment                   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([paymentId])
+  @@index([type])
+  @@index([processedAt])
+}
 model Payment {
   id          String        @id @default(uuid())
   taskId      String
@@ -337,6 +362,7 @@ model Payment {
   client      User          @relation("ClientPayments", fields: [clientId], references: [id], onDelete: Restrict)
   worker      User?         @relation("WorkerPayments", fields: [workerId], references: [id], onDelete: Restrict)
   contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  providerEvents PaymentProviderEvent[]
 
   @@index([taskId])
   @@index([contractId])
