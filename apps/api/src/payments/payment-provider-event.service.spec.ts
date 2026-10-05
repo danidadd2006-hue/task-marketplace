@@ -159,6 +159,22 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
     expect(mocks.taskUpdate).not.toHaveBeenCalled();
   });
 
+  it('rejects a provider transaction with the wrong amount or currency', async () => {
+    await expect(makeService().processNormalizedEvent({
+      ...event,
+      amount: '99.00',
+    })).rejects.toThrow(
+      'Provider transaction amount or currency does not match the payment',
+    );
+
+    await expect(makeService().processNormalizedEvent({
+      ...event,
+      currency: 'KES',
+    })).rejects.toThrow(
+      'Provider transaction amount or currency does not match the payment',
+    );
+  });
+
   it('rejects a mismatched provider', async () => {
     await expect(makeService().processNormalizedEvent({
       ...event,
