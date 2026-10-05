@@ -15,8 +15,12 @@ import {
 type SqlError = { sqlState?: string; cause?: SqlError };
 
 function normalizeDecimal(value: string): string {
-  const [whole, fraction = ''] = value.trim().split('.');
-  return `${whole.replace(/^0+(?=\\d)/, '')}.${fraction.replace(/0+$/, '') || '0'}`;
+  const [wholeRaw, fractionRaw = ''] = value.trim().split('.');
+  let whole = wholeRaw;
+  let fraction = fractionRaw;
+  while (whole.length > 1 && whole.startsWith('0')) whole = whole.slice(1);
+  while (fraction.endsWith('0')) fraction = fraction.slice(0, -1);
+  return `${whole}.${fraction || '0'}`;
 }
 
 function isUniqueViolation(error: unknown): boolean {
