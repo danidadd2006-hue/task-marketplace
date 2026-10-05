@@ -217,6 +217,7 @@ describe('PaymentFundingService.initiateFunding', () => {
       workerId: 'worker-id',
       clientId: 'client-id',
       taskId: 'task-id',
+      contractId: 'contract-id',
     }));
   });
 
@@ -299,6 +300,14 @@ describe('PaymentFundingService.initiateFunding', () => {
 
     expect(mocks.paymentCreate).toHaveBeenCalledWith(expect.objectContaining({
       currency: 'KES',
+    }));
+  });
+
+  it('stores the selected Contract ID directly on Payment', async () => {
+    await makeService().initiateFunding(client, 'task-id');
+
+    expect(mocks.paymentCreate).toHaveBeenCalledWith(expect.objectContaining({
+      contractId: 'contract-id',
     }));
   });
 });
