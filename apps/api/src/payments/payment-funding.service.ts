@@ -120,6 +120,7 @@ export class PaymentFundingService {
         paymentId,
         amount,
         currency,
+        customerEmail: client.email,
       });
 
       let payment;
@@ -200,6 +201,7 @@ export class PaymentFundingService {
           status: payment.status,
           provider: payment.provider,
           providerRef: payment.providerRef,
+          checkoutUrl: providerResult.checkoutUrl,
           fundedAt: payment.fundedAt,
           createdAt: payment.createdAt,
           updatedAt: payment.updatedAt,
