@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHmac } from 'node:crypto';
+import { BadRequestException } from '@nestjs/common';
 import { FlutterwavePaymentProvider } from './flutterwave-payment-provider.js';
 
 describe('FlutterwavePaymentProvider', () => {
@@ -10,7 +11,8 @@ describe('FlutterwavePaymentProvider', () => {
   beforeEach(() => {
     process.env['FLUTTERWAVE_SECRET_KEY'] = 'test-secret';
     process.env['FLUTTERWAVE_WEBHOOK_SECRET_HASH'] = 'test-hash';
-    process.env['FLUTTERWAVE_REDIRECT_URL'] = 'https://example.test/payment-return';
+    process.env['FLUTTERWAVE_REDIRECT_URL'] =
+      'https://example.test/payment-return';
   });
 
   afterEach(() => {
@@ -20,21 +22,24 @@ describe('FlutterwavePaymentProvider', () => {
     process.env['FLUTTERWAVE_REDIRECT_URL'] = originalRedirect;
   });
 
-  it('creates a hosted checkout without exposing provider credentials', async () => {
+  it('creates a hosted checkout using the stable local Payment ID as tx_ref', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({
-        status: 'success',
-        data: {
-          tx_ref: 'payment-id',
-          link: 'https://checkout.flutterwave.com/example',
-        },
-      }), { status: 200 }),
+      new Response(
+        JSON.stringify({
+          status: 'success',
+          data: {
+            tx_ref: 'payment-id',
+            link: 'https://checkout.flutterwave.com/example',
+          },
+        }),
+        { status: 200 },
+      ),
     );
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await new FlutterwavePaymentProvider().initiateFunding({
       paymentId: 'payment-id',
-      amount: '100.00',
+      amount: '100',
       currency: 'KES',
       customerEmail: 'client@example.com',
     });
@@ -45,18 +50,45 @@ describe('FlutterwavePaymentProvider', () => {
       providerRef: 'payment-id',
       checkoutUrl: 'https://checkout.flutterwave.com/example',
     });
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.flutterwave.com/v3/payments',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer test-secret',
-        }),
-      }),
-    );
+
+    const request = fetchMock.mock.calls[0][1];
+    const body = JSON.parse(request.body);
+    expect(body.tx_ref).toBe('payment-id');
+    expect(body.currency).toBe('KES');
+    expect(body.amount).toBe(100);
+    expect(body.payment_options).toContain('card');
+    expect(body.payment_options).toContain('banktransfer');
+    expect(body.payment_options).toContain('mpesa');
+    expect(request.headers.Authorization).toBe('Bearer test-secret');
   });
 
-  it('verifies webhook signatures and re-verifies the transaction before normalising it', async () => {
+  it('does not silently round a decimal amount unsupported by the documented Standard endpoint', async () => {
+    await expect(
+      new FlutterwavePaymentProvider().initiateFunding({
+        paymentId: 'payment-id',
+        amount: '100.25',
+        currency: 'USD',
+        customerEmail: 'client@example.com',
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('rejects webhook signature failures before provider verification', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      new FlutterwavePaymentProvider().normalizeWebhook({
+        body: { data: { tx_ref: 'payment-id' } },
+        headers: { 'flutterwave-signature': 'wrong' },
+        rawBody: '{"data":{"tx_ref":"payment-id"}}',
+      }),
+    ).rejects.toThrow('Invalid Flutterwave webhook signature');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('verifies the raw webhook signature and re-verifies the transaction before normalising it', async () => {
     const rawBody = JSON.stringify({
       id: 'webhook-id',
       data: { id: 123, tx_ref: 'payment-id' },
@@ -66,17 +98,20 @@ describe('FlutterwavePaymentProvider', () => {
       .digest('base64');
 
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({
-        status: 'success',
-        data: {
-          id: 123,
-          tx_ref: 'payment-id',
-          flw_ref: 'FLW-123',
-          status: 'successful',
-          amount: 100,
-          currency: 'KES',
-        },
-      }), { status: 200 }),
+      new Response(
+        JSON.stringify({
+          status: 'success',
+          data: {
+            id: 123,
+            tx_ref: 'payment-id',
+            flw_ref: 'FLW-123',
+            status: 'successful',
+            amount: 100,
+            currency: 'KES',
+          },
+        }),
+        { status: 200 },
+      ),
     );
     vi.stubGlobal('fetch', fetchMock);
 
@@ -91,12 +126,19 @@ describe('FlutterwavePaymentProvider', () => {
       providerEventId: 'webhook-id',
       type: 'FUNDING_SUCCEEDED',
       paymentId: 'payment-id',
-      providerRef: 'FLW-123',
+      providerRef: 'payment-id',
+      amount: '100',
+      currency: 'KES',
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/transactions/verify_by_reference?tx_ref=payment-id'),
+      expect.stringContaining(
+        '/transactions/verify_by_reference?tx_ref=payment-id',
+      ),
       expect.objectContaining({
-        headers: { Authorization: 'Bearer test-secret', Accept: 'application/json' },
+        headers: {
+          Authorization: 'Bearer test-secret',
+          Accept: 'application/json',
+        },
       }),
     );
   });
