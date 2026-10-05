@@ -29,9 +29,20 @@ export class TasksService {
       throw new NotFoundException('Active category not found');
     }
 
+    const location = await db.orm.public.UserLocation.where({ userId: client.userId }).first();
+    if (!location) {
+      throw new BadRequestException('Task currency is unavailable for this client');
+    }
+
+    const country = await db.orm.public.Country.where({ id: location.countryId }).first();
+    if (!country?.currency) {
+      throw new BadRequestException('Task currency is unavailable for this client');
+    }
+
     return db.transaction(async (tx) => {
       const task = await tx.orm.public.Task.create({
         clientId: client.userId,
+        currency: country.currency,
         categoryId: dto.categoryId,
         title: dto.title,
         description: dto.description,
