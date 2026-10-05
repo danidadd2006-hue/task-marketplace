@@ -83,7 +83,7 @@ function setupTransaction() {
       raw: {
         sql: vi.fn(() => ({
           returnsRow: vi.fn(() => ({
-            build: vi.fn((name) => name),
+            build: vi.fn(() => 'task-lock-plan'),
           })),
         })),
       },
@@ -279,7 +279,7 @@ describe('PaymentFundingService.initiateFunding', () => {
   it('uses a task row lock before financial writes', async () => {
     await makeService().initiateFunding(client, 'task-id');
 
-    expect(mocks.query).toHaveBeenCalledWith(expect.any(String));
+    expect(mocks.query).toHaveBeenCalledWith('task-lock-plan');
   });
 
   it('represents transaction rollback when a later write fails', async () => {
