@@ -320,7 +320,13 @@ export class PaymentFundingService {
     } catch (error) {
       // A provider timeout or initiation failure must not roll back the local
       // payment intent. The same local Payment ID remains the retry identity.
-      if (error instanceof ServiceUnavailableException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException ||
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException ||
+        error instanceof ServiceUnavailableException
+      ) {
         throw error;
       }
       throw new ServiceUnavailableException(
