@@ -98,6 +98,11 @@ export class PaymentProviderEventService {
       if (payment.provider && payment.provider !== event.provider) {
         throw new BadRequestException('Payment provider does not match the event');
       }
+      if (payment.amount !== event.amount || payment.currency !== event.currency) {
+        throw new ConflictException(
+          'Provider transaction amount or currency does not match the payment',
+        );
+      }
       if (
         payment.providerRef &&
         event.providerRef &&
