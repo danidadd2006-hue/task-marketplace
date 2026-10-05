@@ -12,5 +12,5 @@ describe('RoleAssignmentService', () => {
  it('rejects duplicate role assignment', async () => { mocks.assignmentFirst.mockResolvedValue({ id:'existing', role:'WORKER' }); await expect(service.assign('admin','target-id','WORKER')).rejects.toBeInstanceOf(ConflictException); });
  it('rejects self-removal', async () => { await expect(service.remove('same','same','WORKER')).rejects.toBeInstanceOf(BadRequestException); });
  it('rejects removal of the final role', async () => { mocks.assignmentAll.mockResolvedValue([{id:'only',role:'CLIENT'}]); await expect(service.remove('admin','target-id','CLIENT')).rejects.toBeInstanceOf(BadRequestException); });
- it('removes WORKER and audits the change', async () => { await service.remove('admin','target-id','WORKER'); expect(mocks.assignmentDelete).toHaveBeenCalledWith({}); expect(mocks.auditLog).toHaveBeenCalledWith('admin','DELETE','UserRoleAssignment','worker-assignment',JSON.stringify({userId:'target-id',role:'WORKER'})); });
+ it('removes WORKER and audits the change', async () => { await service.remove('admin','target-id','WORKER'); expect(mocks.assignmentDelete).toHaveBeenCalledWith(); expect(mocks.auditLog).toHaveBeenCalledWith('admin','DELETE','UserRoleAssignment','worker-assignment',JSON.stringify({userId:'target-id',role:'WORKER'})); });
 });
