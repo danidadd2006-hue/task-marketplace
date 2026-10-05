@@ -8,6 +8,8 @@ export type NormalizedPaymentProviderEvent = {
   type: 'FUNDING_SUCCEEDED' | 'FUNDING_FAILED' | 'FUNDING_CANCELLED';
   paymentId: string;
   providerRef: string | null;
+  amount: string;
+  currency: string;
   metadata: string | null;
 };
 
