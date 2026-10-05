@@ -1,4 +1,12 @@
-import { Body, Controller, Headers, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  Post,
+  RawBodyRequest,
+  Req,
+} from '@nestjs/common';
+import type { Request } from 'express';
 import { PaymentProviderEventService } from './payment-provider-event.service.js';
 
 @Controller('api/v1/payments')
@@ -11,7 +19,18 @@ export class PaymentProviderEventController {
   receiveProviderEvent(
     @Body() body: unknown,
     @Headers() headers: Record<string, string | string[] | undefined>,
+    @Req() request: RawBodyRequest<Request>,
   ) {
-    return this.paymentProviderEventService.processWebhook({ body, headers });
+    const rawBody = request.rawBody?.toString('utf8');
+
+    if (!rawBody) {
+      throw new Error('Raw provider webhook body is required');
+    }
+
+    return this.paymentProviderEventService.processWebhook({
+      body,
+      headers,
+      rawBody,
+    });
   }
 }
