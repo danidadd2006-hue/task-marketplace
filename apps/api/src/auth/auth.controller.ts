@@ -6,7 +6,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { db } from '../prisma/db.js';
 import { AuthService } from './auth.service.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { RegisterDto } from './dto/register.dto.js';
@@ -19,17 +18,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() data: RegisterDto) {
-    const passwordHash = await this.authService.hashPassword(data.password);
-
-    const user = await db.orm.public.User.create({
-      email: data.email,
-      passwordHash,
-    });
-
-    return {
-      id: user.id,
-      email: user.email,
-    };
+    return this.authService.register(data.email, data.password);
   }
 
   @Post('login')

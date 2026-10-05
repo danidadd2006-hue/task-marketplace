@@ -120,6 +120,10 @@
       "model": "UserLocation",
       "namespace": "public"
     },
+    "userRoleAssignment": {
+      "model": "UserRoleAssignment",
+      "namespace": "public"
+    },
     "verification": {
       "model": "Verification",
       "namespace": "public"
@@ -4012,6 +4016,21 @@
                   "namespace": "public"
                 }
               },
+              "roleAssignments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "UserRoleAssignment",
+                  "namespace": "public"
+                }
+              },
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
@@ -4235,6 +4254,99 @@
               },
               "namespaceId": "public",
               "table": "userLocation"
+            }
+          },
+          "UserRoleAssignment": {
+            "fields": {
+              "assignedBy": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "UserRole",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "assignedBy": {
+                  "column": "assignedBy"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "role": {
+                  "column": "role"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "userRoleAssignment"
             }
           },
           "Verification": {
@@ -7446,6 +7558,107 @@
                 }
               ]
             },
+            "userRoleAssignment": {
+              "checks": [
+                {
+                  "expression": "\"role\" IN ('CLIENT', 'WORKER', 'ADMIN')",
+                  "name": "userRoleAssignment_role_check_d0236aa0",
+                  "prefix": "userRoleAssignment_role_check"
+                }
+              ],
+              "columns": {
+                "assignedBy": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "UserRole",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "userRoleAssignment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "role"
+                  ],
+                  "name": "userRoleAssignment_role_idx_2c1ddf83",
+                  "prefix": "userRoleAssignment_role_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "userRoleAssignment_userId_idx_a489d58a",
+                  "prefix": "userRoleAssignment_userId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "userId",
+                    "role"
+                  ]
+                }
+              ]
+            },
             "verification": {
               "checks": [
                 {
@@ -7774,10 +7987,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "87f699f1f965144a595925d179403eaf132f248df73ea87963bc9c38a6bb406b"
+    "storageHash": "5f0ba4fdf9bd12e24346c2eb86e2cb4a7268200aee2d9d8e3ab9d8df66deef29"
   },
   "execution": {
-    "executionHash": "8bf6f00f5c7135f5eafded9a496ce4f8ba78805875c79b91ca5e5b961b19eb2f",
+    "executionHash": "d4a29c63db1f8473a823c7ac3e2a7a41d7c02f4a16a6de5b5741984f32781376",
     "mutations": {
       "defaults": [
         {
@@ -8397,6 +8610,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "userLocation"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "userRoleAssignment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "userRoleAssignment"
           }
         },
         {
