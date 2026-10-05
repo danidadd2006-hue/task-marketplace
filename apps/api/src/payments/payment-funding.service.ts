@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
@@ -26,7 +27,8 @@ function decimalTenPercent(value: string): string {
   const [whole, fraction = ''] = normalized.split('.');
   const scale = fraction.length;
   const digits = BigInt(whole + fraction);
-  const result = digits * COMMISSION_RATE_NUMERATOR / COMMISSION_RATE_DENOMINATOR;
+  const result =
+    (digits * COMMISSION_RATE_NUMERATOR) / COMMISSION_RATE_DENOMINATOR;
   const commissionScale = scale + 1;
   const raw = result.toString().padStart(commissionScale + 1, '0');
   const wholePart = raw.slice(0, -commissionScale);
@@ -58,7 +60,9 @@ export class PaymentFundingService {
       throw new ForbiddenException('CLIENT role required');
     }
 
-    return db.transaction(async (tx) => {
+    // The database transaction creates the local payment intent first. No
+    // external provider call is made until this transaction has committed.
+    const intent = await db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
       const taskPlan = tx.raw.sql`
         SELECT "id", "clientId", "status", "currency"
@@ -79,9 +83,12 @@ export class PaymentFundingService {
       if (task.clientId !== client.userId) {
         throw new ForbiddenException('You do not own this task');
       }
-      if (task.status !== 'WORKER_SELECTED') {
+      if (
+        task.status !== 'WORKER_SELECTED' &&
+        task.status !== 'AWAITING_PAYMENT'
+      ) {
         throw new BadRequestException(
-          'Funding is only permitted for a WORKER_SELECTED task',
+          'Funding is only permitted for a selected worker task awaiting payment',
         );
       }
 
@@ -95,16 +102,13 @@ export class PaymentFundingService {
       if (contract.status !== 'ACTIVE') {
         throw new BadRequestException('Contract is not eligible for funding');
       }
-      if (contract.taskId !== taskId) {
-        throw new BadRequestException('Contract does not belong to this task');
-      }
 
       const existingPayment = await tx.orm.public.Payment
         .where({ taskId })
         .first();
 
-      if (existingPayment) {
-        throw new ConflictException('Funding has already been initiated for this task');
+      if (existingPayment?.status === 'FUNDED') {
+        throw new ConflictException('Payment has already been funded');
       }
 
       const amount = contract.agreedPrice;
@@ -114,14 +118,74 @@ export class PaymentFundingService {
           'Funding currency is unavailable for this task',
         );
       }
-      const commission = decimalTenPercent(amount);
+
+      if (existingPayment) {
+        if (
+          existingPayment.contractId !== contract.id ||
+          existingPayment.clientId !== client.userId ||
+          existingPayment.amount !== amount ||
+          existingPayment.currency !== currency
+        ) {
+          throw new ConflictException(
+            'Existing payment does not match the active task contract',
+          );
+        }
+
+        const shouldReopen =
+          existingPayment.status === 'FAILED' ||
+          existingPayment.status === 'CANCELLED';
+
+        const payment =
+          shouldReopen
+            ? await tx.orm.public.Payment.where({
+                id: existingPayment.id,
+                status: existingPayment.status,
+              }).update({
+                status: 'PENDING',
+                provider: null,
+                providerRef: null,
+                fundedAt: null,
+              })
+            : existingPayment;
+
+        if (!payment) {
+          throw new ConflictException('Payment changed before retry could start');
+        }
+
+        const updatedTask = await tx.orm.public.Task.where({
+          id: taskId,
+          clientId: client.userId,
+          status: task.status,
+        }).update({
+          status: 'AWAITING_PAYMENT',
+        });
+
+        if (!updatedTask && task.status !== 'AWAITING_PAYMENT') {
+          throw new ConflictException('Task changed before payment retry could start');
+        }
+
+        if (shouldReopen) {
+          await tx.orm.public.AuditLog.create({
+            userId: client.userId,
+            action: 'PAYMENT',
+            entityType: 'Payment',
+            entityId: existingPayment.id,
+            details: 'Payment retry reopened the existing payment intent',
+          });
+        }
+
+        return {
+          paymentId: existingPayment.id,
+          contractId: contract.id,
+          amount,
+          currency,
+          taskStatus: 'AWAITING_PAYMENT' as const,
+          isRetry: shouldReopen,
+        };
+      }
+
       const paymentId = randomUUID();
-      const providerResult = await this.paymentProvider.initiateFunding({
-        paymentId,
-        amount,
-        currency,
-        customerEmail: client.email,
-      });
+      const commission = decimalTenPercent(amount);
 
       let payment;
       try {
@@ -134,13 +198,11 @@ export class PaymentFundingService {
           amount,
           currency,
           status: 'PENDING',
-          provider: providerResult.provider,
-          providerRef: providerResult.providerRef,
         });
       } catch (error) {
         if (isUniqueViolation(error)) {
           throw new ConflictException(
-            'Funding has already been initiated for this task',
+            'Funding was initiated concurrently for this task',
           );
         }
         throw error;
@@ -162,7 +224,7 @@ export class PaymentFundingService {
         action: 'PAYMENT',
         entityType: 'Payment',
         entityId: payment.id,
-        details: `Funding initiated for contract ${contract.id}; payment awaiting provider confirmation`,
+        details: `Funding intent created for contract ${contract.id}; awaiting provider initiation`,
       });
 
       const updatedTask = await tx.orm.public.Task.where({
@@ -174,22 +236,68 @@ export class PaymentFundingService {
       });
 
       if (!updatedTask) {
-        throw new BadRequestException(
+        throw new ConflictException(
           'Task status changed before funding could be initiated',
         );
       }
 
       return {
+        paymentId,
+        contractId: contract.id,
+        amount,
+        currency,
+        taskStatus: 'AWAITING_PAYMENT' as const,
+        isRetry: false,
+      };
+    });
+
+    try {
+      const providerResult = await this.paymentProvider.initiateFunding({
+        paymentId: intent.paymentId,
+        amount: intent.amount,
+        currency: intent.currency,
+        customerEmail: client.email,
+      });
+
+      const updated = await db.transaction(async (tx) => {
+        const payment = await tx.orm.public.Payment
+          .where({
+            id: intent.paymentId,
+            status: 'PENDING',
+          })
+          .first();
+
+        if (!payment) {
+          return tx.orm.public.Payment.where({ id: intent.paymentId }).first();
+        }
+
+        return tx.orm.public.Payment.where({
+          id: intent.paymentId,
+          status: 'PENDING',
+        }).update({
+          provider: providerResult.provider,
+          providerRef: providerResult.providerRef,
+        });
+      });
+
+      const payment = updated ?? (await db.orm.public.Payment.where({
+        id: intent.paymentId,
+      }).first());
+
+      if (!payment) {
+        throw new NotFoundException('Payment disappeared after provider initiation');
+      }
+
+      return {
         task: {
           id: taskId,
-          status: 'AWAITING_PAYMENT',
+          status: payment.status === 'FUNDED' ? 'FUNDED' : 'AWAITING_PAYMENT',
         },
         contract: {
-          id: contract.id,
-          taskId: contract.taskId,
-          workerId: contract.workerId,
-          status: contract.status,
-          agreedPrice: contract.agreedPrice,
+          id: intent.contractId,
+          taskId,
+          status: 'ACTIVE',
+          agreedPrice: intent.amount,
         },
         payment: {
           id: payment.id,
@@ -206,13 +314,18 @@ export class PaymentFundingService {
           createdAt: payment.createdAt,
           updatedAt: payment.updatedAt,
         },
-        commission: {
-          rate: '10%',
-          amount: commission,
-          currency,
-        },
-        providerConfirmation: 'AWAITING',
+        providerConfirmation: payment.status === 'FUNDED' ? 'CONFIRMED' : 'AWAITING',
+        retryable: payment.status === 'PENDING',
       };
-    });
+    } catch (error) {
+      // A provider timeout or initiation failure must not roll back the local
+      // payment intent. The same local Payment ID remains the retry identity.
+      if (error instanceof ServiceUnavailableException) {
+        throw error;
+      }
+      throw new ServiceUnavailableException(
+        'Payment provider initiation failed; the payment can be retried safely',
+      );
+    }
   }
 }
