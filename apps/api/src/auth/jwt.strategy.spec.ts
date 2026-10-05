@@ -42,6 +42,20 @@ describe('JwtStrategy.validate', () => {
     expect(result.roles).toEqual(['CLIENT', 'WORKER']);
   });
 
+  it('uses database roles rather than role data supplied in the JWT payload', async () => {
+    const user = { id: 'user-id', email: 'user@example.com', status: 'ACTIVE' };
+    mocks.userFirst.mockResolvedValue(user);
+    mocks.roleAssignmentsAll.mockResolvedValue([{ id: 'role-1', userId: 'user-id', role: 'WORKER' }]);
+
+    const result = await strategy.validate({
+      sub: 'user-id',
+      email: 'user@example.com',
+      roles: ['ADMIN'],
+    } as never);
+
+    expect(result.roles).toEqual(['WORKER']);
+  });
+
   it('preserves multiple role assignments (CLIENT + WORKER)', async () => {
     const user = { id: 'user-id', email: 'user@example.com', status: 'ACTIVE' };
     const roles = [
