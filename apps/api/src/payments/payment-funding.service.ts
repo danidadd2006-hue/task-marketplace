@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db } from '../prisma/db.js';
 import {
@@ -131,8 +132,9 @@ export class PaymentFundingService {
 
       const amount = contract.agreedPrice;
       const commission = decimalTenPercent(amount);
+      const paymentId = randomUUID();
       const providerResult = await this.paymentProvider.initiateFunding({
-        paymentId: 'pending',
+        paymentId,
         amount,
         currency: country.currency,
       });
@@ -140,6 +142,7 @@ export class PaymentFundingService {
       let payment;
       try {
         payment = await tx.orm.public.Payment.create({
+          id: paymentId,
           taskId,
           clientId: client.userId,
           workerId: contract.workerId,
