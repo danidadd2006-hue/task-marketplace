@@ -12,24 +12,24 @@ import {
   type PaymentProvider,
 } from './payment-provider.js';
 
-type SqlError = { sqlState?: string; cause?: SqlError };
-
 function normalizeDecimal(value: string): string {
-  const [wholeRaw, fractionRaw = ''] = value.trim().split('.');
+  const normalized = value.trim();
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
+    throw new BadRequestException('Provider amount is not a valid decimal');
+  }
+
+  const [wholeRaw, fractionRaw = ''] = normalized.split('.');
   let whole = wholeRaw;
   let fraction = fractionRaw;
-  while (whole.length > 1 && whole.startsWith('0')) whole = whole.slice(1);
-  while (fraction.endsWith('0')) fraction = fraction.slice(0, -1);
-  return `${whole}.${fraction || '0'}`;
-}
 
-function isUniqueViolation(error: unknown): boolean {
-  let current: SqlError | undefined = error as SqlError | undefined;
-  while (current) {
-    if (current.sqlState === '23505') return true;
-    current = current.cause;
+  while (whole.length > 1 && whole.startsWith('0')) {
+    whole = whole.slice(1);
   }
-  return false;
+  while (fraction.endsWith('0')) {
+    fraction = fraction.slice(0, -1);
+  }
+
+  return `${whole}.${fraction || '0'}`;
 }
 
 @Injectable()
@@ -42,8 +42,10 @@ export class PaymentProviderEventService {
   async processWebhook(input: {
     body: unknown;
     headers: Record<string, string | string[] | undefined>;
-    rawBody?: string;
+    rawBody: string;
   }) {
+    // No payment mutation occurs before the provider adapter has verified the
+    // raw request and re-queried the provider for authoritative transaction data.
     const event = await this.paymentProvider.normalizeWebhook(input);
     return this.processNormalizedEvent(event);
   }
@@ -68,13 +70,22 @@ export class PaymentProviderEventService {
 
       const paymentTable = tx.sql.public.payment;
       const paymentPlan = tx.raw.sql`
-        SELECT "id", "taskId", "status", "amount", "currency", "provider", "providerRef"
+        SELECT
+          "id",
+          "taskId",
+          "contractId",
+          "status",
+          "amount",
+          "currency",
+          "provider",
+          "providerRef"
         FROM "Payment"
         WHERE "id" = ${event.paymentId}
         FOR UPDATE
       `.returnsRow({
         id: paymentTable.columns.id,
         taskId: paymentTable.columns.taskId,
+        contractId: paymentTable.columns.contractId,
         status: paymentTable.columns.status,
         amount: paymentTable.columns.amount,
         currency: paymentTable.columns.currency,
@@ -84,10 +95,13 @@ export class PaymentProviderEventService {
 
       const payments = await tx.query(paymentPlan);
       const payment = payments[0];
-      if (!payment) throw new NotFoundException('Payment not found');
 
-      // Re-check after the payment row lock so concurrent delivery of the same
-      // provider event observes the committed idempotency record.
+      if (!payment) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      // The payment lock serialises different terminal events for the same
+      // Payment. The second lookup also closes the duplicate-event race.
       const committedEvent = await tx.orm.public.PaymentProviderEvent
         .where({
           provider: event.provider,
@@ -105,22 +119,28 @@ export class PaymentProviderEventService {
       }
 
       if (payment.provider && payment.provider !== event.provider) {
-        throw new BadRequestException('Payment provider does not match the event');
+        throw new BadRequestException(
+          'Payment provider does not match the event',
+        );
       }
+
       if (
         normalizeDecimal(payment.amount) !== normalizeDecimal(event.amount) ||
-        payment.currency !== event.currency
+        payment.currency.toUpperCase() !== event.currency.trim().toUpperCase()
       ) {
         throw new ConflictException(
           'Provider transaction amount or currency does not match the payment',
         );
       }
+
       if (
         payment.providerRef &&
         event.providerRef &&
         payment.providerRef !== event.providerRef
       ) {
-        throw new BadRequestException('Payment provider reference does not match the event');
+        throw new BadRequestException(
+          'Payment provider reference does not match the event',
+        );
       }
 
       if (event.type === 'FUNDING_SUCCEEDED' && payment.status === 'FUNDED') {
@@ -153,13 +173,50 @@ export class PaymentProviderEventService {
       }
 
       if (event.type === 'FUNDING_SUCCEEDED') {
-        const task = await tx.orm.public.Task
-          .where({ id: payment.taskId, status: 'AWAITING_PAYMENT' })
-          .first();
+        const taskTable = tx.sql.public.task;
+        const taskPlan = tx.raw.sql`
+          SELECT "id", "status", "currency"
+          FROM "Task"
+          WHERE "id" = ${payment.taskId}
+          FOR UPDATE
+        `.returnsRow({
+          id: taskTable.columns.id,
+          status: taskTable.columns.status,
+          currency: taskTable.columns.currency,
+        }).build();
 
-        if (!task) {
+        const tasks = await tx.query(taskPlan);
+        const task = tasks[0];
+
+        if (!task || task.status !== 'AWAITING_PAYMENT') {
           throw new ConflictException(
             'Task is not awaiting payment confirmation',
+          );
+        }
+
+        if (task.currency !== payment.currency) {
+          throw new ConflictException(
+            'Payment currency does not match the task currency',
+          );
+        }
+
+        const contract = await tx.orm.public.Contract
+          .where({
+            id: payment.contractId,
+            taskId: payment.taskId,
+            status: 'ACTIVE',
+          })
+          .first();
+
+        if (!contract) {
+          throw new ConflictException(
+            'Payment contract is no longer eligible for funding',
+          );
+        }
+
+        if (contract.agreedPrice !== payment.amount) {
+          throw new ConflictException(
+            'Payment amount does not match the contract amount',
           );
         }
 
@@ -169,12 +226,14 @@ export class PaymentProviderEventService {
         }).update({
           status: 'FUNDED',
           provider: event.provider,
-          providerRef: event.providerRef,
+          providerRef: event.providerRef ?? payment.providerRef,
           fundedAt: new Date().toISOString(),
         });
 
         if (!updatedPayment) {
-          throw new ConflictException('Payment status changed before confirmation');
+          throw new ConflictException(
+            'Payment status changed before confirmation',
+          );
         }
 
         const updatedTask = await tx.orm.public.Task.where({
@@ -185,7 +244,9 @@ export class PaymentProviderEventService {
         });
 
         if (!updatedTask) {
-          throw new ConflictException('Task status changed before confirmation');
+          throw new ConflictException(
+            'Task status changed before confirmation',
+          );
         }
 
         await tx.orm.public.LedgerEntry.create({
@@ -202,7 +263,7 @@ export class PaymentProviderEventService {
           action: 'PAYMENT',
           entityType: 'Payment',
           entityId: payment.id,
-          details: `Payment funded from provider event ${event.providerEventId}`,
+          details: `Payment funded from verified provider event ${event.providerEventId}`,
         });
 
         await this.recordEvent(tx, event);
@@ -216,25 +277,29 @@ export class PaymentProviderEventService {
         };
       }
 
-      const nextStatus = event.type === 'FUNDING_FAILED' ? 'FAILED' : 'CANCELLED';
+      const nextStatus =
+        event.type === 'FUNDING_FAILED' ? 'FAILED' : 'CANCELLED';
+
       const updatedPayment = await tx.orm.public.Payment.where({
         id: payment.id,
         status: 'PENDING',
       }).update({
         status: nextStatus,
         provider: event.provider,
-        providerRef: event.providerRef,
+        providerRef: event.providerRef ?? payment.providerRef,
       });
 
       if (!updatedPayment) {
-        throw new ConflictException('Payment status changed before provider event processing');
+        throw new ConflictException(
+          'Payment status changed before provider event processing',
+        );
       }
 
       await tx.orm.public.AuditLog.create({
         action: 'PAYMENT',
         entityType: 'Payment',
         entityId: payment.id,
-        details: `Payment marked ${nextStatus} from provider event ${event.providerEventId}`,
+        details: `Payment marked ${nextStatus} from verified provider event ${event.providerEventId}`,
       });
 
       await this.recordEvent(tx, event);
@@ -248,21 +313,17 @@ export class PaymentProviderEventService {
     });
   }
 
-  private async recordEvent(tx: any, event: NormalizedPaymentProviderEvent) {
-    try {
-      return await tx.orm.public.PaymentProviderEvent.create({
-        provider: event.provider,
-        providerEventId: event.providerEventId,
-        type: event.type,
-        paymentId: event.paymentId,
-        providerRef: event.providerRef,
-        metadata: event.metadata,
-      });
-    } catch (error) {
-      if (isUniqueViolation(error)) {
-        throw new ConflictException('Provider event was processed concurrently');
-      }
-      throw error;
-    }
+  private async recordEvent(
+    tx: any,
+    event: NormalizedPaymentProviderEvent,
+  ) {
+    return tx.orm.public.PaymentProviderEvent.create({
+      provider: event.provider,
+      providerEventId: event.providerEventId,
+      type: event.type,
+      paymentId: event.paymentId,
+      providerRef: event.providerRef,
+      metadata: event.metadata,
+    });
   }
 }
