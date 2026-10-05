@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PublicTaskFeedQueryDto } from './dto/public-task-feed-query.dto.js';
 
 const mocks = vi.hoisted(() => ({
   where: vi.fn(),
@@ -56,7 +57,6 @@ describe('TaskDiscoveryService', () => {
     const result = await service.discoverTasks({});
 
     expect(result.items).toEqual([{ id: 'published', status: 'PUBLISHED' }]);
-    expect(mocks.where).toHaveBeenCalled();
   });
 
   it('returns receiving-applications tasks', async () => {
@@ -67,14 +67,34 @@ describe('TaskDiscoveryService', () => {
     expect(result.items).toEqual([{ id: 'open', status: 'RECEIVING_APPLICATIONS' }]);
   });
 
-  it('enforces public statuses in the database query', async () => {
+  it('excludes DRAFT and every later/private/terminal status at the database predicate', async () => {
     await service.discoverTasks({});
 
     const predicate = mocks.where.mock.calls[0]?.[0];
     expect(predicate).toEqual(expect.any(Function));
+
     const statusField = { in: vi.fn() };
     predicate(statusField);
-    expect(statusField.in).toHaveBeenCalledWith(['PUBLISHED', 'RECEIVING_APPLICATIONS']);
+
+    expect(statusField.in).toHaveBeenCalledWith([
+      'PUBLISHED',
+      'RECEIVING_APPLICATIONS',
+    ]);
+    for (const excluded of [
+      'DRAFT',
+      'WORKER_SELECTED',
+      'AWAITING_PAYMENT',
+      'FUNDED',
+      'IN_PROGRESS',
+      'SUBMITTED',
+      'AWAITING_APPROVAL',
+      'COMPLETED',
+      'CANCELLED',
+      'DISPUTED',
+      'EXPIRED',
+    ]) {
+      expect(statusField.in.mock.calls[0][0]).not.toContain(excluded);
+    }
   });
 
   it('uses bounded deterministic pagination', async () => {
@@ -147,7 +167,10 @@ describe('TaskDiscoveryService', () => {
     const statusField = { in: vi.fn() };
     predicate(statusField);
 
-    expect(statusField.in).toHaveBeenCalledWith(['PUBLISHED', 'RECEIVING_APPLICATIONS']);
+    expect(statusField.in).toHaveBeenCalledWith([
+      'PUBLISHED',
+      'RECEIVING_APPLICATIONS',
+    ]);
     expect(mocks.where).toHaveBeenCalledTimes(2);
   });
 });
