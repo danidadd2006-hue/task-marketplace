@@ -1,7 +1,12 @@
+import { GUARDS_METADATA } from '@nestjs/common/constants.js';
 import { describe, expect, it, vi } from 'vitest';
 import { PublicTasksController } from './public-tasks.controller.js';
 
 describe('PublicTasksController', () => {
+  it('does not require guards for public discovery', () => {
+    expect(Reflect.getMetadata(GUARDS_METADATA, PublicTasksController)).toBeUndefined();
+  });
+
   it('delegates feed discovery without role guards', async () => {
     const discovery = {
       discoverTasks: vi.fn().mockResolvedValue({ items: [], page: 1, pageSize: 20, hasMore: false }),
