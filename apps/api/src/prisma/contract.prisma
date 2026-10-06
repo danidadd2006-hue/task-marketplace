@@ -36,6 +36,22 @@ model User {
   applications      Application[]
   messages          Message[]
   refreshTokens     RefreshToken[]
+  roleAssignments   UserRoleAssignment[]
+}
+
+model UserRoleAssignment {
+  id        String   @id @default(uuid())
+  userId    String
+  role      UserRole
+  assignedBy String
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
 }
 
 model Profile {
@@ -180,6 +196,7 @@ model Task {
   type                  TaskType
   duration              TaskDuration
   status                TaskStatus   @default(DRAFT)
+  currency              String
   budgetMin             Decimal?
   budgetMax             Decimal?
   expectedCompletionAt  TimestamptzString?
@@ -299,11 +316,37 @@ enum PaymentStatus {
   DISPUTED
   CANCELLED
 }
+
+enum PaymentProviderEventType {
+  FUNDING_SUCCEEDED
+  FUNDING_FAILED
+  FUNDING_CANCELLED
+}
+
+model PaymentProviderEvent {
+  id              String                    @id @default(uuid())
+  provider        String
+  providerEventId String
+  type            PaymentProviderEventType
+  paymentId       String
+  providerRef     String?
+  metadata        String?
+  processedAt     TimestamptzString         @default(now())
+  createdAt       TimestamptzString         @default(now())
+
+  payment         Payment                   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([paymentId])
+  @@index([type])
+  @@index([processedAt])
+}
 model Payment {
   id          String        @id @default(uuid())
   taskId      String
   clientId    String
   workerId    String?
+  contractId  String
   amount      Decimal
   currency    String
   status      PaymentStatus @default(PENDING)
@@ -318,8 +361,11 @@ model Payment {
   task        Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
   client      User          @relation("ClientPayments", fields: [clientId], references: [id], onDelete: Restrict)
   worker      User?         @relation("WorkerPayments", fields: [workerId], references: [id], onDelete: Restrict)
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  providerEvents PaymentProviderEvent[]
 
   @@index([taskId])
+  @@index([contractId])
   @@index([clientId])
   @@index([workerId])
   @@index([status])

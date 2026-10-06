@@ -30,6 +30,15 @@ export class AuthService {
     });
   }
 
+  async register(email: string, password: string) {
+    const passwordHash = await this.hashPassword(password);
+    return db.transaction(async (tx) => {
+      const user = await tx.orm.public.User.create({ email, passwordHash });
+      await tx.orm.public.UserRoleAssignment.create({ userId: user.id, role: 'CLIENT', assignedBy: user.id });
+      return { id: user.id, email: user.email };
+    });
+  }
+
   private async createRefreshToken(userId: string): Promise<string> {
     const refreshToken = randomBytes(64).toString('hex');
     const tokenHash = this.hashRefreshToken(refreshToken);
@@ -55,6 +64,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
+    if (user.status !== 'ACTIVE') throw new UnauthorizedException('User account is not active');
 
     const passwordValid = await this.verifyPassword(
       password,
@@ -80,43 +90,32 @@ export class AuthService {
 
   async refresh(refreshToken: string) {
     const tokenHash = this.hashRefreshToken(refreshToken);
+    return db.transaction(async (tx) => {
+      const storedToken = await tx.orm.public.RefreshToken.where({ tokenHash }).first();
+      if (!storedToken) throw new UnauthorizedException('Invalid refresh token');
+      if (storedToken.revokedAt) throw new UnauthorizedException('Refresh token has been revoked');
+      if (new Date(storedToken.expiresAt) <= new Date()) throw new UnauthorizedException('Refresh token has expired');
 
-    const storedToken = await db.orm.public.RefreshToken
-      .where({ tokenHash })
-      .first();
+      const user = await tx.orm.public.User.where({ id: storedToken.userId }).first();
+      if (!user) throw new UnauthorizedException('User not found');
+      if (user.status !== 'ACTIVE') throw new UnauthorizedException('User account is not active');
 
-    if (!storedToken) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+      const revokedAt = new Date().toISOString();
+      const revokePlan = tx.sql.public.refreshToken
+        .update({ revokedAt })
+        .where((fields, functions) => functions.eq(fields.id, storedToken.id))
+        .where((fields, functions) => functions.eq(fields.revokedAt, null))
+        .build();
+      const revoked = await tx.execute(revokePlan);
+      if (revoked.affectedRows !== 1) throw new UnauthorizedException('Refresh token has been revoked');
 
-    if (storedToken.revokedAt) {
-      throw new UnauthorizedException('Refresh token has been revoked');
-    }
-
-    if (new Date(storedToken.expiresAt) <= new Date()) {
-      throw new UnauthorizedException('Refresh token has expired');
-    }
-
-    const user = await db.orm.public.User
-      .where({ id: storedToken.userId })
-      .first();
-
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    const newAccessToken = await this.createAccessToken(user);
-    const newRefreshToken = await this.createRefreshToken(user.id);
-
-    await db.orm.public.RefreshToken
-      .where({ id: storedToken.id })
-      .update({
-        revokedAt: new Date().toISOString(),
-      });
-
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
+      const newRefreshToken = randomBytes(64).toString('hex');
+      const newTokenHash = this.hashRefreshToken(newRefreshToken);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+      await tx.orm.public.RefreshToken.create({ userId: user.id, tokenHash: newTokenHash, expiresAt: expiresAt.toISOString(), revokedAt: null });
+      const accessToken = await this.createAccessToken(user);
+      return { accessToken, refreshToken: newRefreshToken };
+    });
   }
 }
