@@ -35,7 +35,11 @@ Ordinary operational notifications may be preference-controlled. Security, accou
 ## Delivery attempts
 NotificationDeliveryAttempt records notification, recipient, channel, attempt number, status, started/completed timestamps, provider/provider reference, provider outcome, error classification, uncertainty information, and creation timestamp.
 Statuses: PENDING, PROCESSING, SUCCEEDED, FAILED, UNKNOWN.
-Retries are not implemented in Step 5.5A; the unique notificationId + channel + attemptNumber constraint establishes their future idempotency boundary.
+Step 5.5E hardens the server-authoritative lifecycle: PENDING may only enter PROCESSING; PROCESSING may only enter a terminal state; terminal states cannot transition backwards. Conditional updates make terminal-state races fail closed.
+Attempt number 1 is the initial authoritative attempt. Step 5.5E provides an explicit bounded subsequent-attempt foundation with a deterministic maximum of 3 attempts. A later attempt is a new durable row and never overwrites earlier history. UNKNOWN outcomes are not retryable through this foundation without trusted reconciliation, and no automatic retry execution exists.
+When the provider boundary supplies a supported classification, errorClass is normalized to a durable category such as PERMANENT_FAILURE, TRANSIENT_FAILURE, UNKNOWN, SUPPRESSED, or NO_DESTINATION while providerOutcome retains the provider/local outcome detail. Local/no-op providers do not fabricate external delivery success.
+Preference suppression is durable as a failed attempt with SUPPRESSED classification; later preference changes do not delete or rewrite the notification or historical attempts. Future explicit eligibility may create a subsequent attempt.
+Expired or non-active notifications are not dispatched and remain durable for reconstruction. Inactive recipients are treated as having no eligible destination for ordinary delivery.
 Notification delivery failure must never become authoritative financial state.
 
 ## Push devices
@@ -53,4 +57,4 @@ Pre-migration live row count: notification = 0.
 Step 5.5A introduced only additive database operations. No existing notification rows were deleted or rewritten.
 
 ## Deferred
-NotificationService, controllers/UI, domain-event dispatching, email providers, FCM/APNs, SMS, provider adapters, retries, queues, Redis/Kafka, WebSocket notification delivery, Step 5.5B and later.
+Notification UI, external email providers, FCM/APNs, SMS, provider adapters, automatic retry execution, queues, Redis/Kafka, WebSocket notification delivery, transactional outbox, and Step 5.6.

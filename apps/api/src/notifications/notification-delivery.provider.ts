@@ -1,6 +1,12 @@
 import type { NotificationChannel, NotificationType } from './notification.service.js';
 
 export type NotificationDeliveryOutcomeStatus = 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
+export type NotificationDeliveryFailureClass =
+  | 'PERMANENT_FAILURE'
+  | 'TRANSIENT_FAILURE'
+  | 'UNKNOWN'
+  | 'SUPPRESSED'
+  | 'NO_DESTINATION';
 
 export interface NotificationDeliveryNotification {
   id: string;

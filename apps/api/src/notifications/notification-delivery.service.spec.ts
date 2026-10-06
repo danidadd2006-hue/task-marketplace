@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   userFirst: vi.fn(),
   pushDeviceAll: vi.fn(),
   attemptFirst: vi.fn(),
+  attemptAll: vi.fn(),
   attemptCreate: vi.fn(),
   attemptUpdate: vi.fn(),
   preferenceAll: vi.fn(),
@@ -39,9 +40,10 @@ vi.mock('../prisma/db.js', () => ({
           }),
         },
         NotificationDeliveryAttempt: {
-          where: () => ({
+          where: (filters: Record<string, unknown>) => ({
             first: mocks.attemptFirst,
-            update: mocks.attemptUpdate,
+            all: mocks.attemptAll,
+            update: (input: Record<string, unknown>) => mocks.attemptUpdate(filters, input),
           }),
           create: mocks.attemptCreate,
         },
@@ -110,9 +112,12 @@ function makeProvider(
   channel: NotificationDeliveryProvider['channel'],
   outcome: NotificationDeliveryProvider extends never ? never : { status: 'SUCCEEDED' | 'FAILED' | 'UNKNOWN' },
 ) {
+  const normalized = outcome.status === 'SUCCEEDED'
+    ? { ...outcome, provider: `test.${channel.toLowerCase()}`, providerOutcome: 'accepted' }
+    : outcome;
   return {
     channel,
-    deliver: vi.fn().mockResolvedValue(outcome),
+    deliver: vi.fn().mockResolvedValue(normalized),
   } as unknown as NotificationDeliveryProvider;
 }
 
@@ -149,15 +154,18 @@ describe('NotificationDeliveryService', () => {
       },
     ]);
     mocks.attemptFirst.mockImplementation(async () => currentAttempt);
+    mocks.attemptAll.mockResolvedValue([]);
+    mocks.attemptAll.mockImplementation(async () => currentAttempt ? [currentAttempt] : []);
     mocks.attemptCreate.mockImplementation(async (input: Record<string, unknown>) => {
       currentAttempt = {
         ...baseAttempt,
         ...input,
-        id: 'attempt-1',
+        id: `attempt-${input.attemptNumber}`,
       };
       return currentAttempt;
     });
-    mocks.attemptUpdate.mockImplementation(async (input: Record<string, unknown>) => {
+    mocks.attemptUpdate.mockImplementation(async (filters: Record<string, unknown>, input: Record<string, unknown>) => {
+      if (!currentAttempt || (filters.status && currentAttempt.status !== filters.status)) return 0;
       currentAttempt = { ...currentAttempt, ...input };
       return 1;
     });
@@ -182,7 +190,7 @@ describe('NotificationDeliveryService', () => {
     expect(mocks.attemptCreate).not.toHaveBeenCalled();
   });
 
-  it('does not create or dispatch an attempt when preference policy disables the channel', async () => {
+  it('persists a suppressed attempt when preference policy disables the channel', async () => {
     const email = makeProvider('EMAIL', { status: 'SUCCEEDED' });
     const service = makeService({ email });
 
@@ -190,8 +198,13 @@ describe('NotificationDeliveryService', () => {
 
     expect(result.eligible).toBe(false);
     expect(result.reason).toBe('CHANNEL_DISABLED_BY_NOTIFICATION_POLICY');
-    expect(result.attempt).toBeNull();
-    expect(mocks.attemptCreate).not.toHaveBeenCalled();
+    expect(result.attempt).toMatchObject({
+      status: 'FAILED',
+      attemptNumber: 1,
+      errorClass: 'SUPPRESSED',
+      provider: null,
+      providerOutcome: 'channel_suppressed_by_notification_policy',
+    });
     expect(email.deliver).not.toHaveBeenCalled();
   });
 
@@ -311,15 +324,12 @@ describe('NotificationDeliveryService', () => {
       };
       return currentAttempt;
     });
-    mocks.attemptFirst
-      .mockResolvedValueOnce(null)
-      .mockImplementation(async () => currentAttempt);
-
     currentAttempt = {
       ...baseAttempt,
       id: 'db-winner',
       status: 'PENDING',
     };
+    mocks.attemptFirst.mockImplementation(async () => currentAttempt);
 
     const service = new NotificationDeliveryService(
       new InAppNotificationDeliveryProvider(),

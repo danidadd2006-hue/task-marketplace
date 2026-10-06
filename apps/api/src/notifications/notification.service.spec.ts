@@ -134,6 +134,37 @@ describe('NotificationService', () => {
     expect(mocks.notificationCreate).not.toHaveBeenCalled();
   });
 
+  it('handles concurrent domain-event notification creation through the database idempotency boundary', async () => {
+    let notificationReads = 0;
+    let creates = 0;
+    const concurrentRow = row({ eventId: 'concurrent-event' });
+
+    mocks.notificationFirst.mockImplementation(async () => {
+      notificationReads += 1;
+      return notificationReads <= 2 ? null : concurrentRow;
+    });
+    mocks.notificationCreate.mockImplementation(async (input: Record<string, unknown>) => {
+      creates += 1;
+      if (creates === 2) throw { sqlState: '23505' };
+      return row(input);
+    });
+
+    const input = {
+      eventId: 'concurrent-event', eventType: 'application.created', aggregateType: 'Application', aggregateId: 'a1',
+      notificationType: 'APPLICATION' as const, applicationId: 'a1', recipientUserId: 'u-client',
+      titleKey: 'application.created', messageKey: 'application.created',
+    };
+    mocks.applicationFirst.mockResolvedValue({ id: 'a1', taskId: 't1', workerId: 'u-worker' });
+    mocks.taskFirst.mockResolvedValue({ id: 't1', clientId: 'u-client' });
+
+    const results = await Promise.all([service.createFromDomainEvent(input), service.createFromDomainEvent(input)]);
+
+    expect(results).toHaveLength(2);
+    expect(results[0].eventId).toBe('concurrent-event');
+    expect(results[1].eventId).toBe('concurrent-event');
+    expect(notificationReads).toBe(3);
+  });
+
   it('converts a database uniqueness collision into reuse of the concurrent notification', async () => {
     mocks.applicationFirst.mockResolvedValue({ id: 'a1', taskId: 't1', workerId: 'u-worker' });
     mocks.taskFirst.mockResolvedValue({ id: 't1', clientId: 'u-client' });

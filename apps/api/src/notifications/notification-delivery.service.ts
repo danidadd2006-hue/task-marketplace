@@ -7,6 +7,7 @@ import {
 import { db } from '../prisma/db.js';
 import type { NotificationChannel, NotificationType } from './notification.service.js';
 import type {
+  NotificationDeliveryFailureClass,
   NotificationDeliveryInstructions,
   NotificationDeliveryNotification,
   NotificationDeliveryOutcome,
@@ -60,6 +61,14 @@ type DeliveryResult = {
 
 const SUPPORTED_CHANNELS = new Set<NotificationChannel>(['IN_APP', 'EMAIL', 'PUSH']);
 const TERMINAL_STATES = new Set<DeliveryAttemptStatus>(['SUCCEEDED', 'FAILED', 'UNKNOWN']);
+const MAX_DELIVERY_ATTEMPTS = 3;
+const FAILURE_CLASSES = new Set<NotificationDeliveryFailureClass>([
+  'PERMANENT_FAILURE',
+  'TRANSIENT_FAILURE',
+  'UNKNOWN',
+  'SUPPRESSED',
+  'NO_DESTINATION',
+]);
 
 function isSupportedChannel(value: string): value is NotificationChannel {
   return SUPPORTED_CHANNELS.has(value as NotificationChannel);
@@ -78,13 +87,47 @@ function isUniqueViolation(error: unknown): boolean {
   return false;
 }
 
-function outcomeFields(outcome: NotificationDeliveryOutcome) {
+function normalizeFailureClass(errorClass: string | undefined): string | null {
+  if (!errorClass) return null;
+  if (FAILURE_CLASSES.has(errorClass as NotificationDeliveryFailureClass)) return errorClass;
+  if (errorClass === 'INVALID_INSTRUCTION') return 'PERMANENT_FAILURE';
+  return errorClass;
+}
+
+function normalizeOutcome(outcome: NotificationDeliveryOutcome): NotificationDeliveryOutcome {
+  if (outcome.status === 'SUCCEEDED') {
+    if (!outcome.provider?.trim() || !outcome.providerOutcome?.trim()) {
+      throw new ConflictException('Successful delivery requires a trusted provider outcome');
+    }
+    return {
+      ...outcome,
+      errorClass: undefined,
+      uncertaintyInfo: undefined,
+    };
+  }
+
+  if (outcome.status === 'UNKNOWN') {
+    return {
+      ...outcome,
+      errorClass: 'UNKNOWN',
+      uncertaintyInfo: outcome.uncertaintyInfo?.trim() || 'Delivery outcome is uncertain and requires trusted reconciliation.',
+    };
+  }
+
   return {
-    provider: outcome.provider ?? null,
-    providerRef: outcome.providerRef ?? null,
-    providerOutcome: outcome.providerOutcome ?? null,
-    errorClass: outcome.errorClass ?? null,
-    uncertaintyInfo: outcome.uncertaintyInfo ?? null,
+    ...outcome,
+    errorClass: normalizeFailureClass(outcome.errorClass) ?? 'UNKNOWN',
+  };
+}
+
+function outcomeFields(outcome: NotificationDeliveryOutcome) {
+  const normalized = normalizeOutcome(outcome);
+  return {
+    provider: normalized.provider ?? null,
+    providerRef: normalized.providerRef ?? null,
+    providerOutcome: normalized.providerOutcome ?? null,
+    errorClass: normalized.errorClass ?? null,
+    uncertaintyInfo: normalized.uncertaintyInfo ?? null,
   };
 }
 
@@ -113,31 +156,79 @@ export class NotificationDeliveryService {
       throw new BadRequestException('Unsupported notification delivery channel');
     }
 
-    if (!channelEligible) {
-      return {
-        notificationId,
-        channel,
-        eligible: false,
-        attempt: null,
-        reason: 'CHANNEL_DISABLED_BY_NOTIFICATION_POLICY',
-      };
-    }
-
+    const supportedChannel = channel as NotificationChannel;
     const notification = await this.loadNotification(notificationId);
+
     if (notification.status !== 'ACTIVE') {
       return {
         notificationId,
-        channel,
+        channel: supportedChannel,
         eligible: true,
         attempt: null,
         reason: 'NOTIFICATION_NOT_ACTIVE',
       };
     }
 
-    if (notification.expiresAt && new Date(notification.expiresAt).getTime() <= Date.now()) {
+    if (this.isExpired(notification)) {
       return {
         notificationId,
-        channel,
+        channel: supportedChannel,
+        eligible: true,
+        attempt: null,
+        reason: 'NOTIFICATION_EXPIRED',
+      };
+    }
+
+    const attempt = await this.getLatestOrCreateInitialAttempt(notification, supportedChannel);
+    const currentAttempt = await this.getAttempt(attempt.id);
+
+    if (isTerminalState(currentAttempt.status)) {
+      return {
+        notificationId,
+        channel: supportedChannel,
+        eligible: channelEligible,
+        attempt: this.projectAttempt(currentAttempt),
+        reason: channelEligible ? undefined : 'CHANNEL_DISABLED_BY_NOTIFICATION_POLICY',
+      };
+    }
+
+    if (!channelEligible) {
+      if (currentAttempt.status === 'PROCESSING') {
+        throw new ConflictException('Notification delivery attempt is already processing');
+      }
+      if (currentAttempt.status !== 'PENDING') {
+        throw new ConflictException('Notification delivery attempt is not deliverable');
+      }
+
+      await this.transitionAttemptStatus(currentAttempt.id, 'PROCESSING');
+      const suppressed = await this.transitionAttemptStatus(currentAttempt.id, 'FAILED', {
+        status: 'FAILED',
+        providerOutcome: 'channel_suppressed_by_notification_policy',
+        errorClass: 'SUPPRESSED',
+      });
+      return {
+        notificationId,
+        channel: supportedChannel,
+        eligible: false,
+        attempt: this.projectAttempt(suppressed),
+        reason: 'CHANNEL_DISABLED_BY_NOTIFICATION_POLICY',
+      };
+    }
+
+    if (notification.status !== 'ACTIVE') {
+      return {
+        notificationId,
+        channel: supportedChannel,
+        eligible: true,
+        attempt: null,
+        reason: 'NOTIFICATION_NOT_ACTIVE',
+      };
+    }
+
+    if (this.isExpired(notification)) {
+      return {
+        notificationId,
+        channel: supportedChannel,
         eligible: true,
         attempt: null,
         reason: 'NOTIFICATION_EXPIRED',
@@ -146,18 +237,6 @@ export class NotificationDeliveryService {
 
     const recipient = await db.orm.public.User.where({ id: notification.userId }).first();
     if (!recipient) throw new NotFoundException('Notification recipient not found');
-
-    const attempt = await this.getOrCreateInitialAttempt(notification, channel as NotificationChannel);
-    const currentAttempt = await this.getAttempt(attempt.id);
-
-    if (isTerminalState(currentAttempt.status)) {
-      return {
-        notificationId,
-        channel: channel as NotificationChannel,
-        eligible: true,
-        attempt: this.projectAttempt(currentAttempt),
-      };
-    }
 
     if (currentAttempt.status === 'PROCESSING') {
       throw new ConflictException('Notification delivery attempt is already processing');
@@ -172,31 +251,121 @@ export class NotificationDeliveryService {
 
     let outcome: NotificationDeliveryOutcome;
     try {
-      if (recipient.status !== 'ACTIVE') {
+      const processingNotification = await this.loadNotification(notificationId);
+      if (processingNotification.status !== 'ACTIVE') {
         outcome = {
           status: 'FAILED',
-          providerOutcome: 'recipient_account_inactive',
-          errorClass: 'NO_DESTINATION',
+          providerOutcome: 'notification_not_active',
+          errorClass: 'SUPPRESSED',
+        };
+      } else if (this.isExpired(processingNotification)) {
+        outcome = {
+          status: 'FAILED',
+          providerOutcome: 'notification_expired',
+          errorClass: 'SUPPRESSED',
         };
       } else {
-        const instructions = await this.buildInstructions(notification, recipient, channel as NotificationChannel);
-        outcome = await this.dispatch(notification, instructions);
+        const processingRecipient = await db.orm.public.User.where({ id: processingNotification.userId }).first();
+        if (!processingRecipient || processingRecipient.status !== 'ACTIVE') {
+          outcome = {
+            status: 'FAILED',
+            providerOutcome: 'recipient_account_inactive',
+            errorClass: 'NO_DESTINATION',
+          };
+        } else {
+          const instructions = await this.buildInstructions(
+            processingNotification,
+            processingRecipient,
+            supportedChannel,
+          );
+          outcome = normalizeOutcome(await this.dispatch(processingNotification, instructions));
+        }
       }
     } catch (error) {
       outcome = {
         status: 'UNKNOWN',
-        uncertaintyInfo: 'Delivery boundary failed before returning a normalized provider outcome.',
-        errorClass: error instanceof Error ? error.name : 'UNKNOWN_DELIVERY_ERROR',
+        uncertaintyInfo: 'Delivery boundary failed before returning a trusted normalized provider outcome.',
+        errorClass: 'UNKNOWN',
       };
     }
 
     const completed = await this.transitionAttemptStatus(processingAttempt.id, outcome.status, outcome);
     return {
       notificationId,
-      channel: channel as NotificationChannel,
+      channel: supportedChannel,
       eligible: true,
       attempt: this.projectAttempt(completed),
     };
+  }
+
+  async createSubsequentAttempt(
+    notificationId: string,
+    channel: string,
+    channelEligible: boolean,
+  ): Promise<ReturnType<NotificationDeliveryService['projectAttempt']>> {
+    if (!isSupportedChannel(channel)) {
+      throw new BadRequestException('Unsupported notification delivery channel');
+    }
+    if (!channelEligible) {
+      throw new ConflictException('Notification delivery channel is not eligible');
+    }
+
+    const notification = await this.loadNotification(notificationId);
+    if (notification.status !== 'ACTIVE') {
+      throw new ConflictException('Notification is not active');
+    }
+    if (this.isExpired(notification)) {
+      throw new ConflictException('Notification has expired');
+    }
+
+    const attempts = await this.getAttempts(notificationId, channel as NotificationChannel);
+    const latest = attempts.reduce<DeliveryAttemptRow | null>(
+      (current, candidate) => (!current || candidate.attemptNumber > current.attemptNumber ? candidate : current),
+      null,
+    );
+
+    if (!latest) {
+      throw new ConflictException('An initial delivery attempt must exist before creating a subsequent attempt');
+    }
+    if (latest.status === 'UNKNOWN') {
+      throw new ConflictException('UNKNOWN delivery outcomes require trusted reconciliation before retry');
+    }
+    if (latest.status !== 'FAILED') {
+      throw new ConflictException('Only failed delivery attempts may be retried');
+    }
+    if (latest.attemptNumber >= MAX_DELIVERY_ATTEMPTS) {
+      throw new ConflictException('Maximum notification delivery attempts reached');
+    }
+
+    const nextAttemptNumber = latest.attemptNumber + 1;
+    const candidate = {
+      notificationId: notification.id,
+      recipientUserId: notification.userId,
+      channel: channel as NotificationChannel,
+      attemptNumber: nextAttemptNumber,
+      status: 'PENDING' as const,
+      startedAt: null,
+      completedAt: null,
+      provider: null,
+      providerRef: null,
+      providerOutcome: null,
+      errorClass: null,
+      uncertaintyInfo: null,
+    };
+
+    try {
+      return this.projectAttempt(
+        (await db.orm.public.NotificationDeliveryAttempt.create(candidate)) as DeliveryAttemptRow,
+      );
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+
+      const concurrent = await db.orm.public.NotificationDeliveryAttempt
+        .where({ notificationId: notification.id, channel: channel as NotificationChannel, attemptNumber: nextAttemptNumber })
+        .first();
+      if (!concurrent) throw new ConflictException('Subsequent delivery attempt was created concurrently');
+      return this.projectAttempt(concurrent as DeliveryAttemptRow);
+    }
   }
 
   async transitionAttemptStatus(
@@ -265,22 +434,22 @@ export class NotificationDeliveryService {
     return row as DeliveryAttemptRow;
   }
 
-  private async getOrCreateInitialAttempt(
+  private async getLatestOrCreateInitialAttempt(
     notification: PersistedNotification,
     channel: NotificationChannel,
   ): Promise<DeliveryAttemptRow> {
-    const attemptNumber = 1;
-    const existing = await db.orm.public.NotificationDeliveryAttempt
-      .where({ notificationId: notification.id, channel, attemptNumber })
-      .first();
-
-    if (existing) return existing as DeliveryAttemptRow;
+    const attempts = await this.getAttempts(notification.id, channel);
+    const latest = attempts.reduce<DeliveryAttemptRow | null>(
+      (current, candidate) => (!current || candidate.attemptNumber > current.attemptNumber ? candidate : current),
+      null,
+    );
+    if (latest) return latest;
 
     const candidate = {
       notificationId: notification.id,
       recipientUserId: notification.userId,
       channel,
-      attemptNumber,
+      attemptNumber: 1,
       status: 'PENDING' as const,
       startedAt: null,
       completedAt: null,
@@ -297,12 +466,22 @@ export class NotificationDeliveryService {
       if (!isUniqueViolation(error)) throw error;
 
       const concurrent = await db.orm.public.NotificationDeliveryAttempt
-        .where({ notificationId: notification.id, channel, attemptNumber })
+        .where({ notificationId: notification.id, channel, attemptNumber: 1 })
         .first();
-
       if (!concurrent) throw new ConflictException('Delivery attempt was created concurrently');
       return concurrent as DeliveryAttemptRow;
     }
+  }
+
+  private async getAttempts(notificationId: string, channel: NotificationChannel): Promise<DeliveryAttemptRow[]> {
+    const rows = await db.orm.public.NotificationDeliveryAttempt
+      .where({ notificationId, channel })
+      .all();
+    return rows as DeliveryAttemptRow[];
+  }
+
+  private isExpired(notification: PersistedNotification): boolean {
+    return Boolean(notification.expiresAt && new Date(notification.expiresAt).getTime() <= Date.now());
   }
 
   private async buildInstructions(
