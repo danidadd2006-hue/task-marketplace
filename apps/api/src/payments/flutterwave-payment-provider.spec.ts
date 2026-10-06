@@ -215,4 +215,138 @@ describe('FlutterwavePaymentProvider', () => {
       }),
     );
   });
+
+  it('rejects refund webhook signature failures before refund lookup', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      new FlutterwavePaymentProvider().normalizeRefundWebhook({
+        body: { id: 89074, status: 'completed' },
+        headers: { 'flutterwave-signature': 'wrong' },
+        rawBody: '{"id":89074,"status":"completed"}',
+      }),
+    ).rejects.toThrow('Invalid Flutterwave webhook signature');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('verifies and normalises the documented Flutterwave refund webhook', async () => {
+    const rawBody = JSON.stringify({
+      id: 89074,
+      AmountRefunded: 70,
+      status: 'completed-bank-transfer',
+      FlwRef: 'URF-123',
+      TransactionId: 123456,
+    });
+    const signature = createHmac('sha256', 'test-hash')
+      .update(rawBody)
+      .digest('base64');
+
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'success',
+            data: {
+              id: 89074,
+              AmountRefunded: 70,
+              status: 'completed-bank-transfer',
+              FlwRef: 'URF-123',
+              TransactionId: 123456,
+            },
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'success',
+            data: {
+              id: 123456,
+              tx_ref: 'payment-id',
+              amount: 100,
+              currency: 'KES',
+              status: 'successful',
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await new FlutterwavePaymentProvider().normalizeRefundWebhook({
+      body: JSON.parse(rawBody),
+      headers: { 'flutterwave-signature': signature },
+      rawBody,
+    });
+
+    expect(result).toMatchObject({
+      provider: 'FLUTTERWAVE',
+      providerEventId: 'refund:89074:completed-bank-transfer',
+      type: 'REFUND_SUCCEEDED',
+      providerRefundId: '89074',
+      providerRef: 'URF-123',
+      paymentProviderRef: 'payment-id',
+      amount: '70',
+      currency: 'KES',
+    });
+    expect(String(fetchMock.mock.calls[0][0])).toContain('/refunds/89074');
+    expect(String(fetchMock.mock.calls[1][0])).toContain('/transactions/123456/verify');
+  });
+
+  it('maps Flutterwave completed refund status to PROCESSING rather than success', async () => {
+    const rawBody = JSON.stringify({
+      id: 89074,
+      AmountRefunded: 70,
+      status: 'completed',
+      FlwRef: 'URF-123',
+      TransactionId: 123456,
+    });
+    const signature = createHmac('sha256', 'test-hash')
+      .update(rawBody)
+      .digest('base64');
+
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'success',
+            data: {
+              id: 89074,
+              AmountRefunded: 70,
+              status: 'completed',
+              FlwRef: 'URF-123',
+              TransactionId: 123456,
+            },
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'success',
+            data: {
+              id: 123456,
+              tx_ref: 'payment-id',
+              amount: 100,
+              currency: 'KES',
+              status: 'successful',
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await new FlutterwavePaymentProvider().normalizeRefundWebhook({
+      body: JSON.parse(rawBody),
+      headers: { 'flutterwave-signature': signature },
+      rawBody,
+    });
+
+    expect(result.type).toBe('REFUND_PROCESSING');
+  });
 });

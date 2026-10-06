@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f6b6f7bf7959fa0e34fd49fc319971f62f33dfc021941fbf3c30351720cf7010'>;
+  StorageHashBase<'fb518ed42c4976c70b10320b6b5e4b5680b7eb30feb459a130d6bbf5243250d5'>;
 export type ExecutionHash =
   ExecutionHashBase<'f9ae8f1a9c208286efc773a608fda0dcb9bef955967cdc76b822a79789134275'>;
 export type ProfileHash =
@@ -443,7 +443,6 @@ export type FieldOutputTypes = {
       readonly mimeType: CodecTypes['pg/text@1']['output'];
       readonly size: CodecTypes['pg/int8@1']['output'];
       readonly checksum: CodecTypes['pg/text@1']['output'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly MessageLocation: {
@@ -966,7 +965,6 @@ export type FieldInputTypes = {
       readonly mimeType: CodecTypes['pg/text@1']['input'];
       readonly size: CodecTypes['pg/int8@1']['input'];
       readonly checksum: CodecTypes['pg/text@1']['input'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly MessageLocation: {
@@ -1489,7 +1487,6 @@ export type StorageColumnTypes = {
       readonly mimeType: CodecTypes['pg/text@1']['output'];
       readonly originalFilename: CodecTypes['pg/text@1']['output'] | null;
       readonly size: CodecTypes['pg/int8@1']['output'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
       readonly storageKey: CodecTypes['pg/text@1']['output'];
     };
     readonly messageLocation: {
@@ -2012,7 +2009,6 @@ export type StorageColumnInputTypes = {
       readonly mimeType: CodecTypes['pg/text@1']['input'];
       readonly originalFilename: CodecTypes['pg/text@1']['input'] | null;
       readonly size: CodecTypes['pg/int8@1']['input'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
       readonly storageKey: CodecTypes['pg/text@1']['input'];
     };
     readonly messageLocation: {
@@ -3674,15 +3670,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
-                  };
                 };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
@@ -6094,10 +6081,6 @@ type ContractBase = Omit<
                 'ADJUSTMENT',
               ];
             };
-            readonly MessageAttachmentStatus: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['PENDING', 'READY', 'FAILED'];
-            };
             readonly MessageType: {
               readonly kind: 'valueSet';
               readonly values: readonly ['TEXT', 'IMAGE', 'FILE', 'VOICE', 'LOCATION'];
@@ -7626,10 +7609,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -7662,7 +7641,6 @@ type ContractBase = Omit<
                 readonly mimeType: { readonly column: 'mimeType' };
                 readonly size: { readonly column: 'size' };
                 readonly checksum: { readonly column: 'checksum' };
-                readonly status: { readonly column: 'status' };
                 readonly createdAt: { readonly column: 'createdAt' };
               };
             };
@@ -10152,14 +10130,6 @@ type ContractBase = Omit<
               { readonly name: 'FILE'; readonly value: 'FILE' },
               { readonly name: 'VOICE'; readonly value: 'VOICE' },
               { readonly name: 'LOCATION'; readonly value: 'LOCATION' },
-            ];
-          };
-          readonly MessageAttachmentStatus: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'PENDING'; readonly value: 'PENDING' },
-              { readonly name: 'READY'; readonly value: 'READY' },
-              { readonly name: 'FAILED'; readonly value: 'FAILED' },
             ];
           };
           readonly ReviewType: {

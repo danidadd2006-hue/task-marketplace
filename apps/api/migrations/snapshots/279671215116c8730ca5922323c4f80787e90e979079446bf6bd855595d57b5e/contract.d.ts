@@ -33,9 +33,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f6b6f7bf7959fa0e34fd49fc319971f62f33dfc021941fbf3c30351720cf7010'>;
+  StorageHashBase<'279671215116c8730ca5922323c4f80787e90e979079446bf6bd855595d57b5e'>;
 export type ExecutionHash =
-  ExecutionHashBase<'f9ae8f1a9c208286efc773a608fda0dcb9bef955967cdc76b822a79789134275'>;
+  ExecutionHashBase<'5bb64a2764feed4cfacf5478d5b6f805521f2755c352b83ad524f0896f87911f'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -287,55 +287,6 @@ export type FieldOutputTypes = {
       readonly userAgent: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
-    readonly Cancellation: {
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly taskId: CodecTypes['pg/text@1']['output'];
-      readonly contractId: CodecTypes['pg/text@1']['output'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['output'] | null;
-      readonly actorId: CodecTypes['pg/text@1']['output'];
-      readonly actorType: 'CLIENT' | 'WORKER' | 'ADMIN';
-      readonly stage:
-        | 'DRAFT'
-        | 'PUBLISHED'
-        | 'RECEIVING_APPLICATIONS'
-        | 'WORKER_SELECTED'
-        | 'AWAITING_PAYMENT'
-        | 'FUNDED'
-        | 'IN_PROGRESS'
-        | 'EXPIRED';
-      readonly category:
-        | 'PRE_WORK_FIRST_DAY'
-        | 'SHORT_JOB_SECOND_DAY'
-        | 'LONG_JOB_ELAPSED'
-        | 'EXTENSION'
-        | 'EXPIRY_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly calculationBasis:
-        | 'NO_FINANCIAL_ALLOCATION'
-        | 'FIRST_DAY_FULL_REFUND'
-        | 'SHORT_JOB_FIXED_ALLOCATION'
-        | 'LONG_JOB_ELAPSED_ALLOCATION'
-        | 'EXTENSION_FULL_REFUND'
-        | 'EXPIRY_FULL_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly reason: CodecTypes['pg/text@1']['output'] | null;
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['output'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly firstDayBoundaryAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly cancellationAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly elapsedApplicableSeconds: CodecTypes['pg/int8@1']['output'] | null;
-      readonly applicableDurationSeconds: CodecTypes['pg/int8@1']['output'] | null;
-      readonly fundedAmount: CodecTypes['pg/numeric@1']['output'] | null;
-      readonly currency: CodecTypes['pg/text@1']['output'];
-      readonly workerPercentage: CodecTypes['pg/numeric@1']['output'];
-      readonly workerAmount: CodecTypes['pg/numeric@1']['output'];
-      readonly cancellationFee: CodecTypes['pg/numeric@1']['output'];
-      readonly clientRefund: CodecTypes['pg/numeric@1']['output'];
-      readonly financialClassification: 'NO_FINANCIAL_ACTION' | 'FULL_REFUND' | 'PARTIAL_REFUND';
-      readonly metadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
     readonly Category: {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
@@ -362,16 +313,11 @@ export type FieldOutputTypes = {
       readonly agreedPrice: CodecTypes['pg/numeric@1']['output'];
       readonly startedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['output'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly Conversation: {
       readonly id: CodecTypes['pg/text@1']['output'];
-      readonly taskId: CodecTypes['pg/text@1']['output'] | null;
-      readonly contractId: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -435,23 +381,11 @@ export type FieldOutputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
-    readonly MessageAttachment: {
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly messageId: CodecTypes['pg/text@1']['output'];
-      readonly storageKey: CodecTypes['pg/text@1']['output'];
-      readonly originalFilename: CodecTypes['pg/text@1']['output'] | null;
-      readonly mimeType: CodecTypes['pg/text@1']['output'];
-      readonly size: CodecTypes['pg/int8@1']['output'];
-      readonly checksum: CodecTypes['pg/text@1']['output'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
     readonly MessageLocation: {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly messageId: CodecTypes['pg/text@1']['output'];
       readonly latitude: CodecTypes['pg/numeric@1']['output'];
       readonly longitude: CodecTypes['pg/numeric@1']['output'];
-      readonly accuracy: CodecTypes['pg/numeric@1']['output'] | null;
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
@@ -563,38 +497,6 @@ export type FieldOutputTypes = {
       readonly tokenHash: CodecTypes['pg/text@1']['output'];
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly revokedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
-    readonly Refund: {
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly paymentId: CodecTypes['pg/text@1']['output'];
-      readonly cancellationId: CodecTypes['pg/text@1']['output'];
-      readonly amount: CodecTypes['pg/numeric@1']['output'];
-      readonly currency: CodecTypes['pg/text@1']['output'];
-      readonly type: 'FULL' | 'PARTIAL';
-      readonly status: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
-      readonly provider: CodecTypes['pg/text@1']['output'] | null;
-      readonly providerRef: CodecTypes['pg/text@1']['output'] | null;
-      readonly idempotencyKey: CodecTypes['pg/text@1']['output'];
-      readonly failureCode: CodecTypes['pg/text@1']['output'] | null;
-      readonly failureMessage: CodecTypes['pg/text@1']['output'] | null;
-      readonly uncertaintyReason: CodecTypes['pg/text@1']['output'] | null;
-      readonly reconciliationMetadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly initiatedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly succeededAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly reconciledAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
-    readonly RefundProviderEvent: {
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly provider: CodecTypes['pg/text@1']['output'];
-      readonly providerEventId: CodecTypes['pg/text@1']['output'];
-      readonly refundId: CodecTypes['pg/text@1']['output'];
-      readonly type: CodecTypes['pg/text@1']['output'];
-      readonly providerRef: CodecTypes['pg/text@1']['output'] | null;
-      readonly metadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly processedAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly Region: {
@@ -747,18 +649,6 @@ export type FieldOutputTypes = {
       readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
-    readonly WorkerCancellationPenalty: {
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly workerId: CodecTypes['pg/text@1']['output'];
-      readonly cancellationId: CodecTypes['pg/text@1']['output'];
-      readonly rollingPeriodAnchorAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly sequenceNumber: CodecTypes['pg/int4@1']['output'];
-      readonly banDurationDays: CodecTypes['pg/int4@1']['output'];
-      readonly banStartedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly banEndsAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly warningIssuedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
   };
 };
@@ -810,55 +700,6 @@ export type FieldInputTypes = {
       readonly userAgent: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
-    readonly Cancellation: {
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly taskId: CodecTypes['pg/text@1']['input'];
-      readonly contractId: CodecTypes['pg/text@1']['input'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['input'] | null;
-      readonly actorId: CodecTypes['pg/text@1']['input'];
-      readonly actorType: 'CLIENT' | 'WORKER' | 'ADMIN';
-      readonly stage:
-        | 'DRAFT'
-        | 'PUBLISHED'
-        | 'RECEIVING_APPLICATIONS'
-        | 'WORKER_SELECTED'
-        | 'AWAITING_PAYMENT'
-        | 'FUNDED'
-        | 'IN_PROGRESS'
-        | 'EXPIRED';
-      readonly category:
-        | 'PRE_WORK_FIRST_DAY'
-        | 'SHORT_JOB_SECOND_DAY'
-        | 'LONG_JOB_ELAPSED'
-        | 'EXTENSION'
-        | 'EXPIRY_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly calculationBasis:
-        | 'NO_FINANCIAL_ALLOCATION'
-        | 'FIRST_DAY_FULL_REFUND'
-        | 'SHORT_JOB_FIXED_ALLOCATION'
-        | 'LONG_JOB_ELAPSED_ALLOCATION'
-        | 'EXTENSION_FULL_REFUND'
-        | 'EXPIRY_FULL_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly reason: CodecTypes['pg/text@1']['input'] | null;
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['input'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly firstDayBoundaryAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly cancellationAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly elapsedApplicableSeconds: CodecTypes['pg/int8@1']['input'] | null;
-      readonly applicableDurationSeconds: CodecTypes['pg/int8@1']['input'] | null;
-      readonly fundedAmount: CodecTypes['pg/numeric@1']['input'] | null;
-      readonly currency: CodecTypes['pg/text@1']['input'];
-      readonly workerPercentage: CodecTypes['pg/numeric@1']['input'];
-      readonly workerAmount: CodecTypes['pg/numeric@1']['input'];
-      readonly cancellationFee: CodecTypes['pg/numeric@1']['input'];
-      readonly clientRefund: CodecTypes['pg/numeric@1']['input'];
-      readonly financialClassification: 'NO_FINANCIAL_ACTION' | 'FULL_REFUND' | 'PARTIAL_REFUND';
-      readonly metadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
     readonly Category: {
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
@@ -885,16 +726,11 @@ export type FieldInputTypes = {
       readonly agreedPrice: CodecTypes['pg/numeric@1']['input'];
       readonly startedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['input'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly Conversation: {
       readonly id: CodecTypes['pg/text@1']['input'];
-      readonly taskId: CodecTypes['pg/text@1']['input'] | null;
-      readonly contractId: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -958,23 +794,11 @@ export type FieldInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
-    readonly MessageAttachment: {
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly messageId: CodecTypes['pg/text@1']['input'];
-      readonly storageKey: CodecTypes['pg/text@1']['input'];
-      readonly originalFilename: CodecTypes['pg/text@1']['input'] | null;
-      readonly mimeType: CodecTypes['pg/text@1']['input'];
-      readonly size: CodecTypes['pg/int8@1']['input'];
-      readonly checksum: CodecTypes['pg/text@1']['input'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
     readonly MessageLocation: {
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly messageId: CodecTypes['pg/text@1']['input'];
       readonly latitude: CodecTypes['pg/numeric@1']['input'];
       readonly longitude: CodecTypes['pg/numeric@1']['input'];
-      readonly accuracy: CodecTypes['pg/numeric@1']['input'] | null;
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
@@ -1086,38 +910,6 @@ export type FieldInputTypes = {
       readonly tokenHash: CodecTypes['pg/text@1']['input'];
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly revokedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
-    readonly Refund: {
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly paymentId: CodecTypes['pg/text@1']['input'];
-      readonly cancellationId: CodecTypes['pg/text@1']['input'];
-      readonly amount: CodecTypes['pg/numeric@1']['input'];
-      readonly currency: CodecTypes['pg/text@1']['input'];
-      readonly type: 'FULL' | 'PARTIAL';
-      readonly status: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
-      readonly provider: CodecTypes['pg/text@1']['input'] | null;
-      readonly providerRef: CodecTypes['pg/text@1']['input'] | null;
-      readonly idempotencyKey: CodecTypes['pg/text@1']['input'];
-      readonly failureCode: CodecTypes['pg/text@1']['input'] | null;
-      readonly failureMessage: CodecTypes['pg/text@1']['input'] | null;
-      readonly uncertaintyReason: CodecTypes['pg/text@1']['input'] | null;
-      readonly reconciliationMetadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly initiatedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly succeededAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly reconciledAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
-    readonly RefundProviderEvent: {
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly provider: CodecTypes['pg/text@1']['input'];
-      readonly providerEventId: CodecTypes['pg/text@1']['input'];
-      readonly refundId: CodecTypes['pg/text@1']['input'];
-      readonly type: CodecTypes['pg/text@1']['input'];
-      readonly providerRef: CodecTypes['pg/text@1']['input'] | null;
-      readonly metadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly processedAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly Region: {
@@ -1271,18 +1063,6 @@ export type FieldInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
-    readonly WorkerCancellationPenalty: {
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly workerId: CodecTypes['pg/text@1']['input'];
-      readonly cancellationId: CodecTypes['pg/text@1']['input'];
-      readonly rollingPeriodAnchorAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly sequenceNumber: CodecTypes['pg/int4@1']['input'];
-      readonly banDurationDays: CodecTypes['pg/int4@1']['input'];
-      readonly banStartedAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly banEndsAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly warningIssuedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
   };
 };
 export type StorageColumnTypes = {
@@ -1333,55 +1113,6 @@ export type StorageColumnTypes = {
       readonly userAgent: CodecTypes['pg/text@1']['output'] | null;
       readonly userId: CodecTypes['pg/text@1']['output'] | null;
     };
-    readonly cancellation: {
-      readonly actorId: CodecTypes['pg/text@1']['output'];
-      readonly actorType: 'CLIENT' | 'WORKER' | 'ADMIN';
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['output'] | null;
-      readonly applicableDurationSeconds: CodecTypes['pg/int8@1']['output'] | null;
-      readonly calculationBasis:
-        | 'NO_FINANCIAL_ALLOCATION'
-        | 'FIRST_DAY_FULL_REFUND'
-        | 'SHORT_JOB_FIXED_ALLOCATION'
-        | 'LONG_JOB_ELAPSED_ALLOCATION'
-        | 'EXTENSION_FULL_REFUND'
-        | 'EXPIRY_FULL_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly cancellationAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly cancellationFee: CodecTypes['pg/numeric@1']['output'];
-      readonly category:
-        | 'PRE_WORK_FIRST_DAY'
-        | 'SHORT_JOB_SECOND_DAY'
-        | 'LONG_JOB_ELAPSED'
-        | 'EXTENSION'
-        | 'EXPIRY_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly clientRefund: CodecTypes['pg/numeric@1']['output'];
-      readonly contractId: CodecTypes['pg/text@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly currency: CodecTypes['pg/text@1']['output'];
-      readonly elapsedApplicableSeconds: CodecTypes['pg/int8@1']['output'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly financialClassification: 'NO_FINANCIAL_ACTION' | 'FULL_REFUND' | 'PARTIAL_REFUND';
-      readonly firstDayBoundaryAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly fundedAmount: CodecTypes['pg/numeric@1']['output'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly metadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['output'] | null;
-      readonly reason: CodecTypes['pg/text@1']['output'] | null;
-      readonly stage:
-        | 'DRAFT'
-        | 'PUBLISHED'
-        | 'RECEIVING_APPLICATIONS'
-        | 'WORKER_SELECTED'
-        | 'AWAITING_PAYMENT'
-        | 'FUNDED'
-        | 'IN_PROGRESS'
-        | 'EXPIRED';
-      readonly taskId: CodecTypes['pg/text@1']['output'];
-      readonly workerAmount: CodecTypes['pg/numeric@1']['output'];
-      readonly workerPercentage: CodecTypes['pg/numeric@1']['output'];
-    };
     readonly category: {
       readonly active: CodecTypes['pg/bool@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -1401,12 +1132,9 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly contract: {
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['output'] | null;
       readonly agreedPrice: CodecTypes['pg/numeric@1']['output'];
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly startedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'DISPUTED';
@@ -1415,10 +1143,8 @@ export type StorageColumnTypes = {
       readonly workerId: CodecTypes['pg/text@1']['output'];
     };
     readonly conversation: {
-      readonly contractId: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
-      readonly taskId: CodecTypes['pg/text@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly conversationMember: {
@@ -1481,19 +1207,7 @@ export type StorageColumnTypes = {
       readonly type: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'LOCATION';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
-    readonly messageAttachment: {
-      readonly checksum: CodecTypes['pg/text@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly messageId: CodecTypes['pg/text@1']['output'];
-      readonly mimeType: CodecTypes['pg/text@1']['output'];
-      readonly originalFilename: CodecTypes['pg/text@1']['output'] | null;
-      readonly size: CodecTypes['pg/int8@1']['output'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
-      readonly storageKey: CodecTypes['pg/text@1']['output'];
-    };
     readonly messageLocation: {
-      readonly accuracy: CodecTypes['pg/numeric@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
@@ -1610,38 +1324,6 @@ export type StorageColumnTypes = {
       readonly revokedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly tokenHash: CodecTypes['pg/text@1']['output'];
       readonly userId: CodecTypes['pg/text@1']['output'];
-    };
-    readonly refund: {
-      readonly amount: CodecTypes['pg/numeric@1']['output'];
-      readonly cancellationId: CodecTypes['pg/text@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly currency: CodecTypes['pg/text@1']['output'];
-      readonly failureCode: CodecTypes['pg/text@1']['output'] | null;
-      readonly failureMessage: CodecTypes['pg/text@1']['output'] | null;
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly idempotencyKey: CodecTypes['pg/text@1']['output'];
-      readonly initiatedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['output'];
-      readonly provider: CodecTypes['pg/text@1']['output'] | null;
-      readonly providerRef: CodecTypes['pg/text@1']['output'] | null;
-      readonly reconciledAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly reconciliationMetadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly status: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
-      readonly succeededAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly type: 'FULL' | 'PARTIAL';
-      readonly uncertaintyReason: CodecTypes['pg/text@1']['output'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    };
-    readonly refundProviderEvent: {
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly metadata: CodecTypes['pg/text@1']['output'] | null;
-      readonly processedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly provider: CodecTypes['pg/text@1']['output'];
-      readonly providerEventId: CodecTypes['pg/text@1']['output'];
-      readonly providerRef: CodecTypes['pg/text@1']['output'] | null;
-      readonly refundId: CodecTypes['pg/text@1']['output'];
-      readonly type: CodecTypes['pg/text@1']['output'];
     };
     readonly region: {
       readonly countryId: CodecTypes['pg/text@1']['output'];
@@ -1794,18 +1476,6 @@ export type StorageColumnTypes = {
       readonly userId: CodecTypes['pg/text@1']['output'];
       readonly verifiedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
     };
-    readonly workerCancellationPenalty: {
-      readonly banDurationDays: CodecTypes['pg/int4@1']['output'];
-      readonly banEndsAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly banStartedAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly cancellationId: CodecTypes['pg/text@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly id: CodecTypes['pg/text@1']['output'];
-      readonly rollingPeriodAnchorAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly sequenceNumber: CodecTypes['pg/int4@1']['output'];
-      readonly warningIssuedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly workerId: CodecTypes['pg/text@1']['output'];
-    };
   };
 };
 export type StorageColumnInputTypes = {
@@ -1856,55 +1526,6 @@ export type StorageColumnInputTypes = {
       readonly userAgent: CodecTypes['pg/text@1']['input'] | null;
       readonly userId: CodecTypes['pg/text@1']['input'] | null;
     };
-    readonly cancellation: {
-      readonly actorId: CodecTypes['pg/text@1']['input'];
-      readonly actorType: 'CLIENT' | 'WORKER' | 'ADMIN';
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['input'] | null;
-      readonly applicableDurationSeconds: CodecTypes['pg/int8@1']['input'] | null;
-      readonly calculationBasis:
-        | 'NO_FINANCIAL_ALLOCATION'
-        | 'FIRST_DAY_FULL_REFUND'
-        | 'SHORT_JOB_FIXED_ALLOCATION'
-        | 'LONG_JOB_ELAPSED_ALLOCATION'
-        | 'EXTENSION_FULL_REFUND'
-        | 'EXPIRY_FULL_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly cancellationAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly cancellationFee: CodecTypes['pg/numeric@1']['input'];
-      readonly category:
-        | 'PRE_WORK_FIRST_DAY'
-        | 'SHORT_JOB_SECOND_DAY'
-        | 'LONG_JOB_ELAPSED'
-        | 'EXTENSION'
-        | 'EXPIRY_REFUND'
-        | 'ADMINISTRATIVE';
-      readonly clientRefund: CodecTypes['pg/numeric@1']['input'];
-      readonly contractId: CodecTypes['pg/text@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly currency: CodecTypes['pg/text@1']['input'];
-      readonly elapsedApplicableSeconds: CodecTypes['pg/int8@1']['input'] | null;
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly financialClassification: 'NO_FINANCIAL_ACTION' | 'FULL_REFUND' | 'PARTIAL_REFUND';
-      readonly firstDayBoundaryAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly fundedAmount: CodecTypes['pg/numeric@1']['input'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly metadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['input'] | null;
-      readonly reason: CodecTypes['pg/text@1']['input'] | null;
-      readonly stage:
-        | 'DRAFT'
-        | 'PUBLISHED'
-        | 'RECEIVING_APPLICATIONS'
-        | 'WORKER_SELECTED'
-        | 'AWAITING_PAYMENT'
-        | 'FUNDED'
-        | 'IN_PROGRESS'
-        | 'EXPIRED';
-      readonly taskId: CodecTypes['pg/text@1']['input'];
-      readonly workerAmount: CodecTypes['pg/numeric@1']['input'];
-      readonly workerPercentage: CodecTypes['pg/numeric@1']['input'];
-    };
     readonly category: {
       readonly active: CodecTypes['pg/bool@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -1924,12 +1545,9 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly contract: {
-      readonly agreedDurationDays: CodecTypes['pg/int4@1']['input'] | null;
       readonly agreedPrice: CodecTypes['pg/numeric@1']['input'];
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly extensionStartedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly hiredAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly startedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'DISPUTED';
@@ -1938,10 +1556,8 @@ export type StorageColumnInputTypes = {
       readonly workerId: CodecTypes['pg/text@1']['input'];
     };
     readonly conversation: {
-      readonly contractId: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
-      readonly taskId: CodecTypes['pg/text@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly conversationMember: {
@@ -2004,19 +1620,7 @@ export type StorageColumnInputTypes = {
       readonly type: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'LOCATION';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
-    readonly messageAttachment: {
-      readonly checksum: CodecTypes['pg/text@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly messageId: CodecTypes['pg/text@1']['input'];
-      readonly mimeType: CodecTypes['pg/text@1']['input'];
-      readonly originalFilename: CodecTypes['pg/text@1']['input'] | null;
-      readonly size: CodecTypes['pg/int8@1']['input'];
-      readonly status: 'PENDING' | 'READY' | 'FAILED';
-      readonly storageKey: CodecTypes['pg/text@1']['input'];
-    };
     readonly messageLocation: {
-      readonly accuracy: CodecTypes['pg/numeric@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly expiresAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
@@ -2133,38 +1737,6 @@ export type StorageColumnInputTypes = {
       readonly revokedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly tokenHash: CodecTypes['pg/text@1']['input'];
       readonly userId: CodecTypes['pg/text@1']['input'];
-    };
-    readonly refund: {
-      readonly amount: CodecTypes['pg/numeric@1']['input'];
-      readonly cancellationId: CodecTypes['pg/text@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly currency: CodecTypes['pg/text@1']['input'];
-      readonly failureCode: CodecTypes['pg/text@1']['input'] | null;
-      readonly failureMessage: CodecTypes['pg/text@1']['input'] | null;
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly idempotencyKey: CodecTypes['pg/text@1']['input'];
-      readonly initiatedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly paymentId: CodecTypes['pg/text@1']['input'];
-      readonly provider: CodecTypes['pg/text@1']['input'] | null;
-      readonly providerRef: CodecTypes['pg/text@1']['input'] | null;
-      readonly reconciledAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly reconciliationMetadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly status: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
-      readonly succeededAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly type: 'FULL' | 'PARTIAL';
-      readonly uncertaintyReason: CodecTypes['pg/text@1']['input'] | null;
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
-    };
-    readonly refundProviderEvent: {
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly metadata: CodecTypes['pg/text@1']['input'] | null;
-      readonly processedAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly provider: CodecTypes['pg/text@1']['input'];
-      readonly providerEventId: CodecTypes['pg/text@1']['input'];
-      readonly providerRef: CodecTypes['pg/text@1']['input'] | null;
-      readonly refundId: CodecTypes['pg/text@1']['input'];
-      readonly type: CodecTypes['pg/text@1']['input'];
     };
     readonly region: {
       readonly countryId: CodecTypes['pg/text@1']['input'];
@@ -2316,18 +1888,6 @@ export type StorageColumnInputTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly userId: CodecTypes['pg/text@1']['input'];
       readonly verifiedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-    };
-    readonly workerCancellationPenalty: {
-      readonly banDurationDays: CodecTypes['pg/int4@1']['input'];
-      readonly banEndsAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly banStartedAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly cancellationId: CodecTypes['pg/text@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly id: CodecTypes['pg/text@1']['input'];
-      readonly rollingPeriodAnchorAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly sequenceNumber: CodecTypes['pg/int4@1']['input'];
-      readonly warningIssuedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly workerId: CodecTypes['pg/text@1']['input'];
     };
   };
 };
@@ -2615,243 +2175,6 @@ type ContractBase = Omit<
               ];
               foreignKeys: readonly [];
             };
-            readonly cancellation: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly taskId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly contractId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly paymentId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly actorId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly actorType: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly stage: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly category: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly calculationBasis: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly reason: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly agreedDurationDays: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly hiredAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly firstDayBoundaryAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly extensionStartedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly cancellationAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                };
-                readonly elapsedApplicableSeconds: {
-                  readonly nativeType: 'int8';
-                  readonly codecId: 'pg/int8@1';
-                  readonly nullable: true;
-                };
-                readonly applicableDurationSeconds: {
-                  readonly nativeType: 'int8';
-                  readonly codecId: 'pg/int8@1';
-                  readonly nullable: true;
-                };
-                readonly fundedAmount: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: true;
-                };
-                readonly currency: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly workerPercentage: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: false;
-                };
-                readonly workerAmount: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: false;
-                };
-                readonly cancellationFee: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: false;
-                };
-                readonly clientRefund: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: false;
-                };
-                readonly financialClassification: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly metadata: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
-              indexes: readonly [
-                {
-                  readonly name: 'cancellation_taskId_idx_4965c936';
-                  readonly prefix: 'cancellation_taskId_idx';
-                  readonly columns: readonly ['taskId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_contractId_idx_102708cf';
-                  readonly prefix: 'cancellation_contractId_idx';
-                  readonly columns: readonly ['contractId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_paymentId_idx_b2fe9a10';
-                  readonly prefix: 'cancellation_paymentId_idx';
-                  readonly columns: readonly ['paymentId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_actorId_idx_a58f6b4b';
-                  readonly prefix: 'cancellation_actorId_idx';
-                  readonly columns: readonly ['actorId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_stage_idx_51755035';
-                  readonly prefix: 'cancellation_stage_idx';
-                  readonly columns: readonly ['stage'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_category_idx_f2600f8e';
-                  readonly prefix: 'cancellation_category_idx';
-                  readonly columns: readonly ['category'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_cancellationAt_idx_ae316ae0';
-                  readonly prefix: 'cancellation_cancellationAt_idx';
-                  readonly columns: readonly ['cancellationAt'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'cancellation_financialClassification_idx_ec3bdc4a';
-                  readonly prefix: 'cancellation_financialClassification_idx';
-                  readonly columns: readonly ['financialClassification'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['taskId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'task';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['contractId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'contract';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['paymentId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'payment';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['actorId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'user';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
             readonly category: {
               columns: {
                 readonly id: {
@@ -3053,22 +2376,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                   readonly nullable: true;
                 };
-                readonly hiredAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly agreedDurationDays: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly extensionStartedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -3131,16 +2438,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
-                readonly taskId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly contractId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -3155,46 +2452,8 @@ type ContractBase = Omit<
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [
-                {
-                  readonly name: 'conversation_taskId_idx_4965c936';
-                  readonly prefix: 'conversation_taskId_idx';
-                  readonly columns: readonly ['taskId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'conversation_contractId_idx_102708cf';
-                  readonly prefix: 'conversation_contractId_idx';
-                  readonly columns: readonly ['contractId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'conversation';
-                    readonly columns: readonly ['taskId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'task';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'conversation';
-                    readonly columns: readonly ['contractId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'contract';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
+              indexes: readonly [];
+              foreignKeys: readonly [];
             };
             readonly conversationMember: {
               columns: {
@@ -3638,84 +2897,6 @@ type ContractBase = Omit<
                 },
               ];
             };
-            readonly messageAttachment: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly messageId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly storageKey: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly originalFilename: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly mimeType: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly size: {
-                  readonly nativeType: 'int8';
-                  readonly codecId: 'pg/int8@1';
-                  readonly nullable: false;
-                };
-                readonly checksum: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
-                  };
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
-              indexes: readonly [
-                {
-                  readonly name: 'messageAttachment_messageId_idx_3cdded8d';
-                  readonly prefix: 'messageAttachment_messageId_idx';
-                  readonly columns: readonly ['messageId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'messageAttachment';
-                    readonly columns: readonly ['messageId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'message';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
             readonly messageLocation: {
               columns: {
                 readonly id: {
@@ -3737,11 +2918,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'numeric';
                   readonly codecId: 'pg/numeric@1';
                   readonly nullable: false;
-                };
-                readonly accuracy: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: true;
                 };
                 readonly expiresAt: {
                   readonly nativeType: 'timestamptz';
@@ -4605,255 +3781,6 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'user';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
-            readonly refund: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly paymentId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly cancellationId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly amount: {
-                  readonly nativeType: 'numeric';
-                  readonly codecId: 'pg/numeric@1';
-                  readonly nullable: false;
-                };
-                readonly currency: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly type: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
-                  };
-                };
-                readonly provider: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly providerRef: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly idempotencyKey: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly failureCode: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly failureMessage: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly uncertaintyReason: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly reconciliationMetadata: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly initiatedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly succeededAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly reconciledAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly updatedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [
-                { readonly columns: readonly ['cancellationId'] },
-                { readonly columns: readonly ['idempotencyKey'] },
-                { readonly columns: readonly ['provider', 'providerRef'] },
-              ];
-              indexes: readonly [
-                {
-                  readonly name: 'refund_paymentId_idx_b2fe9a10';
-                  readonly prefix: 'refund_paymentId_idx';
-                  readonly columns: readonly ['paymentId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'refund_status_idx_e98638ab';
-                  readonly prefix: 'refund_status_idx';
-                  readonly columns: readonly ['status'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'refund_provider_idx_faf3af28';
-                  readonly prefix: 'refund_provider_idx';
-                  readonly columns: readonly ['provider'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'refund_createdAt_idx_9575dbd7';
-                  readonly prefix: 'refund_createdAt_idx';
-                  readonly columns: readonly ['createdAt'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'refund';
-                    readonly columns: readonly ['paymentId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'payment';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'refund';
-                    readonly columns: readonly ['cancellationId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
-            readonly refundProviderEvent: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly provider: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly providerEventId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly refundId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly type: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly providerRef: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly metadata: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly processedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['provider', 'providerEventId'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'refundProviderEvent_refundId_idx_903a170a';
-                  readonly prefix: 'refundProviderEvent_refundId_idx';
-                  readonly columns: readonly ['refundId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'refundProviderEvent_type_idx_b6b604ea';
-                  readonly prefix: 'refundProviderEvent_type_idx';
-                  readonly columns: readonly ['type'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'refundProviderEvent_processedAt_idx_e83f4a54';
-                  readonly prefix: 'refundProviderEvent_processedAt_idx';
-                  readonly columns: readonly ['processedAt'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'refundProviderEvent';
-                    readonly columns: readonly ['refundId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'refund';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -5900,107 +4827,6 @@ type ContractBase = Omit<
               ];
               foreignKeys: readonly [];
             };
-            readonly workerCancellationPenalty: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly workerId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly cancellationId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly rollingPeriodAnchorAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                };
-                readonly sequenceNumber: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                };
-                readonly banDurationDays: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                };
-                readonly banStartedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                };
-                readonly banEndsAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                };
-                readonly warningIssuedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['cancellationId'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'wcp_worker_created_idx';
-                  readonly columns: readonly ['workerId', 'createdAt'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'wcp_worker_period_idx';
-                  readonly columns: readonly ['workerId', 'rollingPeriodAnchorAt'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'workerCancellationPenalty_workerId_idx_0b8f3a7c';
-                  readonly prefix: 'workerCancellationPenalty_workerId_idx';
-                  readonly columns: readonly ['workerId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'workerCancellationPenalty';
-                    readonly columns: readonly ['workerId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'user';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'workerCancellationPenalty';
-                    readonly columns: readonly ['cancellationId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'cancellation';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
           };
           readonly valueSet: {
             readonly ApplicationStatus: {
@@ -6031,50 +4857,6 @@ type ContractBase = Omit<
                 'ADMIN_ACTION',
               ];
             };
-            readonly CancellationActorType: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['CLIENT', 'WORKER', 'ADMIN'];
-            };
-            readonly CancellationCalculationBasis: {
-              readonly kind: 'valueSet';
-              readonly values: readonly [
-                'NO_FINANCIAL_ALLOCATION',
-                'FIRST_DAY_FULL_REFUND',
-                'SHORT_JOB_FIXED_ALLOCATION',
-                'LONG_JOB_ELAPSED_ALLOCATION',
-                'EXTENSION_FULL_REFUND',
-                'EXPIRY_FULL_REFUND',
-                'ADMINISTRATIVE',
-              ];
-            };
-            readonly CancellationCategory: {
-              readonly kind: 'valueSet';
-              readonly values: readonly [
-                'PRE_WORK_FIRST_DAY',
-                'SHORT_JOB_SECOND_DAY',
-                'LONG_JOB_ELAPSED',
-                'EXTENSION',
-                'EXPIRY_REFUND',
-                'ADMINISTRATIVE',
-              ];
-            };
-            readonly CancellationFinancialClassification: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['NO_FINANCIAL_ACTION', 'FULL_REFUND', 'PARTIAL_REFUND'];
-            };
-            readonly CancellationStage: {
-              readonly kind: 'valueSet';
-              readonly values: readonly [
-                'DRAFT',
-                'PUBLISHED',
-                'RECEIVING_APPLICATIONS',
-                'WORKER_SELECTED',
-                'AWAITING_PAYMENT',
-                'FUNDED',
-                'IN_PROGRESS',
-                'EXPIRED',
-              ];
-            };
             readonly ContractStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['ACTIVE', 'COMPLETED', 'CANCELLED', 'DISPUTED'];
@@ -6093,10 +4875,6 @@ type ContractBase = Omit<
                 'CANCELLATION_FEE',
                 'ADJUSTMENT',
               ];
-            };
-            readonly MessageAttachmentStatus: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['PENDING', 'READY', 'FAILED'];
             };
             readonly MessageType: {
               readonly kind: 'valueSet';
@@ -6139,14 +4917,6 @@ type ContractBase = Omit<
             readonly ProfileType: {
               readonly kind: 'valueSet';
               readonly values: readonly ['INDIVIDUAL', 'BUSINESS'];
-            };
-            readonly RefundStatus: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'UNKNOWN'];
-            };
-            readonly RefundType: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['FULL', 'PARTIAL'];
             };
             readonly ReportStatus: {
               readonly kind: 'valueSet';
@@ -6263,19 +5033,6 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'PaymentProviderEvent';
     };
-    readonly cancellation: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'Cancellation';
-    };
-    readonly refund: { readonly namespace: 'public' & NamespaceId; readonly model: 'Refund' };
-    readonly refundProviderEvent: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'RefundProviderEvent';
-    };
-    readonly workerCancellationPenalty: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'WorkerCancellationPenalty';
-    };
     readonly payment: { readonly namespace: 'public' & NamespaceId; readonly model: 'Payment' };
     readonly payoutDestination: {
       readonly namespace: 'public' & NamespaceId;
@@ -6308,10 +5065,6 @@ type ContractBase = Omit<
       readonly model: 'ConversationMember';
     };
     readonly message: { readonly namespace: 'public' & NamespaceId; readonly model: 'Message' };
-    readonly messageAttachment: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'MessageAttachment';
-    };
     readonly messageLocation: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'MessageLocation';
@@ -6575,214 +5328,6 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly Cancellation: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly taskId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly contractId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly paymentId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly actorId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly actorType: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly stage: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly category: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly calculationBasis: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly reason: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly agreedDurationDays: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly hiredAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly firstDayBoundaryAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly extensionStartedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly cancellationAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly elapsedApplicableSeconds: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int8@1' };
-              };
-              readonly applicableDurationSeconds: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int8@1' };
-              };
-              readonly fundedAmount: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly currency: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly workerPercentage: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly workerAmount: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly cancellationFee: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly clientRefund: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly financialClassification: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly metadata: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly actor: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['actorId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly contract: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Contract';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['contractId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly payment: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Payment';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['paymentId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly refund: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Refund';
-                };
-                readonly cardinality: '1:1';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['cancellationId'];
-                };
-              };
-              readonly task: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['taskId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'cancellation';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly taskId: { readonly column: 'taskId' };
-                readonly contractId: { readonly column: 'contractId' };
-                readonly paymentId: { readonly column: 'paymentId' };
-                readonly actorId: { readonly column: 'actorId' };
-                readonly actorType: { readonly column: 'actorType' };
-                readonly stage: { readonly column: 'stage' };
-                readonly category: { readonly column: 'category' };
-                readonly calculationBasis: { readonly column: 'calculationBasis' };
-                readonly reason: { readonly column: 'reason' };
-                readonly agreedDurationDays: { readonly column: 'agreedDurationDays' };
-                readonly hiredAt: { readonly column: 'hiredAt' };
-                readonly firstDayBoundaryAt: { readonly column: 'firstDayBoundaryAt' };
-                readonly extensionStartedAt: { readonly column: 'extensionStartedAt' };
-                readonly cancellationAt: { readonly column: 'cancellationAt' };
-                readonly elapsedApplicableSeconds: { readonly column: 'elapsedApplicableSeconds' };
-                readonly applicableDurationSeconds: {
-                  readonly column: 'applicableDurationSeconds';
-                };
-                readonly fundedAmount: { readonly column: 'fundedAmount' };
-                readonly currency: { readonly column: 'currency' };
-                readonly workerPercentage: { readonly column: 'workerPercentage' };
-                readonly workerAmount: { readonly column: 'workerAmount' };
-                readonly cancellationFee: { readonly column: 'cancellationFee' };
-                readonly clientRefund: { readonly column: 'clientRefund' };
-                readonly financialClassification: { readonly column: 'financialClassification' };
-                readonly metadata: { readonly column: 'metadata' };
-                readonly createdAt: { readonly column: 'createdAt' };
-              };
-            };
-          };
           readonly Category: {
             readonly fields: {
               readonly id: {
@@ -6988,24 +5533,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
-              readonly hiredAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly agreedDurationDays: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly extensionStartedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -7022,28 +5549,6 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly cancellations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['contractId'];
-                };
-              };
-              readonly conversations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Conversation';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['contractId'];
-                };
-              };
               readonly payout: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -7083,9 +5588,6 @@ type ContractBase = Omit<
                 readonly agreedPrice: { readonly column: 'agreedPrice' };
                 readonly startedAt: { readonly column: 'startedAt' };
                 readonly completedAt: { readonly column: 'completedAt' };
-                readonly hiredAt: { readonly column: 'hiredAt' };
-                readonly agreedDurationDays: { readonly column: 'agreedDurationDays' };
-                readonly extensionStartedAt: { readonly column: 'extensionStartedAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -7095,14 +5597,6 @@ type ContractBase = Omit<
             readonly fields: {
               readonly id: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly taskId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly contractId: {
-                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly createdAt: {
@@ -7121,17 +5615,6 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly contract: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Contract';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['contractId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
               readonly members: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -7154,22 +5637,12 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['conversationId'];
                 };
               };
-              readonly task: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['taskId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
             };
             readonly storage: {
               readonly table: 'conversation';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly id: { readonly column: 'id' };
-                readonly taskId: { readonly column: 'taskId' };
-                readonly contractId: { readonly column: 'contractId' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -7536,17 +6009,6 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly attachments: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'MessageAttachment';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['messageId'];
-                };
-              };
               readonly conversation: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -7596,77 +6058,6 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly MessageAttachment: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly messageId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly storageKey: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly originalFilename: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly mimeType: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly size: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int8@1' };
-              };
-              readonly checksum: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly message: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Message';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['messageId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'messageAttachment';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly messageId: { readonly column: 'messageId' };
-                readonly storageKey: { readonly column: 'storageKey' };
-                readonly originalFilename: { readonly column: 'originalFilename' };
-                readonly mimeType: { readonly column: 'mimeType' };
-                readonly size: { readonly column: 'size' };
-                readonly checksum: { readonly column: 'checksum' };
-                readonly status: { readonly column: 'status' };
-                readonly createdAt: { readonly column: 'createdAt' };
-              };
-            };
-          };
           readonly MessageLocation: {
             readonly fields: {
               readonly id: {
@@ -7683,10 +6074,6 @@ type ContractBase = Omit<
               };
               readonly longitude: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly accuracy: {
-                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
               };
               readonly expiresAt: {
@@ -7725,7 +6112,6 @@ type ContractBase = Omit<
                 readonly messageId: { readonly column: 'messageId' };
                 readonly latitude: { readonly column: 'latitude' };
                 readonly longitude: { readonly column: 'longitude' };
-                readonly accuracy: { readonly column: 'accuracy' };
                 readonly expiresAt: { readonly column: 'expiresAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
               };
@@ -7862,17 +6248,6 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly cancellations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['paymentId'];
-                };
-              };
               readonly client: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
                 readonly cardinality: 'N:1';
@@ -7907,17 +6282,6 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'PaymentProviderEvent';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['paymentId'];
-                };
-              };
-              readonly refunds: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Refund';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -8505,235 +6869,6 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly Refund: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly paymentId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly cancellationId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly amount: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
-              };
-              readonly currency: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly type: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly provider: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly providerRef: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly idempotencyKey: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly failureCode: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly failureMessage: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly uncertaintyReason: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly reconciliationMetadata: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly initiatedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly succeededAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly reconciledAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly cancellation: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['cancellationId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly payment: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Payment';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['paymentId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly providerEvents: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'RefundProviderEvent';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['refundId'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'refund';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly paymentId: { readonly column: 'paymentId' };
-                readonly cancellationId: { readonly column: 'cancellationId' };
-                readonly amount: { readonly column: 'amount' };
-                readonly currency: { readonly column: 'currency' };
-                readonly type: { readonly column: 'type' };
-                readonly status: { readonly column: 'status' };
-                readonly provider: { readonly column: 'provider' };
-                readonly providerRef: { readonly column: 'providerRef' };
-                readonly idempotencyKey: { readonly column: 'idempotencyKey' };
-                readonly failureCode: { readonly column: 'failureCode' };
-                readonly failureMessage: { readonly column: 'failureMessage' };
-                readonly uncertaintyReason: { readonly column: 'uncertaintyReason' };
-                readonly reconciliationMetadata: { readonly column: 'reconciliationMetadata' };
-                readonly initiatedAt: { readonly column: 'initiatedAt' };
-                readonly succeededAt: { readonly column: 'succeededAt' };
-                readonly reconciledAt: { readonly column: 'reconciledAt' };
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-              };
-            };
-          };
-          readonly RefundProviderEvent: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly provider: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly providerEventId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly refundId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly type: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly providerRef: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly metadata: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly processedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly refund: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Refund';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['refundId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'refundProviderEvent';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly provider: { readonly column: 'provider' };
-                readonly providerEventId: { readonly column: 'providerEventId' };
-                readonly refundId: { readonly column: 'refundId' };
-                readonly type: { readonly column: 'type' };
-                readonly providerRef: { readonly column: 'providerRef' };
-                readonly metadata: { readonly column: 'metadata' };
-                readonly processedAt: { readonly column: 'processedAt' };
-                readonly createdAt: { readonly column: 'createdAt' };
-              };
-            };
-          };
           readonly Region: {
             readonly fields: {
               readonly id: {
@@ -9032,17 +7167,6 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['taskId'];
                 };
               };
-              readonly cancellations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['taskId'];
-                };
-              };
               readonly category: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -9068,17 +7192,6 @@ type ContractBase = Omit<
                   readonly model: 'Contract';
                 };
                 readonly cardinality: '1:1';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['taskId'];
-                };
-              };
-              readonly conversations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Conversation';
-                };
-                readonly cardinality: '1:N';
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['taskId'];
@@ -9484,28 +7597,6 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['workerId'];
                 };
               };
-              readonly cancellationsAsActor: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['actorId'];
-                };
-              };
-              readonly conversations: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'ConversationMember';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['userId'];
-                };
-              };
               readonly location: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -9589,17 +7680,6 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['clientId'];
-                };
-              };
-              readonly workerCancellationPenalties: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'WorkerCancellationPenalty';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['workerId'];
                 };
               };
             };
@@ -9860,102 +7940,6 @@ type ContractBase = Omit<
               };
             };
           };
-          readonly WorkerCancellationPenalty: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly workerId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly cancellationId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly rollingPeriodAnchorAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly sequenceNumber: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly banDurationDays: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly banStartedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly banEndsAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly warningIssuedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly cancellation: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Cancellation';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['cancellationId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly worker: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['workerId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'workerCancellationPenalty';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly workerId: { readonly column: 'workerId' };
-                readonly cancellationId: { readonly column: 'cancellationId' };
-                readonly rollingPeriodAnchorAt: { readonly column: 'rollingPeriodAnchorAt' };
-                readonly sequenceNumber: { readonly column: 'sequenceNumber' };
-                readonly banDurationDays: { readonly column: 'banDurationDays' };
-                readonly banStartedAt: { readonly column: 'banStartedAt' };
-                readonly banEndsAt: { readonly column: 'banEndsAt' };
-                readonly warningIssuedAt: { readonly column: 'warningIssuedAt' };
-                readonly createdAt: { readonly column: 'createdAt' };
-              };
-            };
-          };
         };
         readonly enum: {
           readonly UserStatus: {
@@ -10035,84 +8019,6 @@ type ContractBase = Omit<
               { readonly name: 'DISPUTED'; readonly value: 'DISPUTED' },
             ];
           };
-          readonly CancellationActorType: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'CLIENT'; readonly value: 'CLIENT' },
-              { readonly name: 'WORKER'; readonly value: 'WORKER' },
-              { readonly name: 'ADMIN'; readonly value: 'ADMIN' },
-            ];
-          };
-          readonly CancellationStage: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'DRAFT'; readonly value: 'DRAFT' },
-              { readonly name: 'PUBLISHED'; readonly value: 'PUBLISHED' },
-              { readonly name: 'RECEIVING_APPLICATIONS'; readonly value: 'RECEIVING_APPLICATIONS' },
-              { readonly name: 'WORKER_SELECTED'; readonly value: 'WORKER_SELECTED' },
-              { readonly name: 'AWAITING_PAYMENT'; readonly value: 'AWAITING_PAYMENT' },
-              { readonly name: 'FUNDED'; readonly value: 'FUNDED' },
-              { readonly name: 'IN_PROGRESS'; readonly value: 'IN_PROGRESS' },
-              { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
-            ];
-          };
-          readonly CancellationCategory: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'PRE_WORK_FIRST_DAY'; readonly value: 'PRE_WORK_FIRST_DAY' },
-              { readonly name: 'SHORT_JOB_SECOND_DAY'; readonly value: 'SHORT_JOB_SECOND_DAY' },
-              { readonly name: 'LONG_JOB_ELAPSED'; readonly value: 'LONG_JOB_ELAPSED' },
-              { readonly name: 'EXTENSION'; readonly value: 'EXTENSION' },
-              { readonly name: 'EXPIRY_REFUND'; readonly value: 'EXPIRY_REFUND' },
-              { readonly name: 'ADMINISTRATIVE'; readonly value: 'ADMINISTRATIVE' },
-            ];
-          };
-          readonly CancellationCalculationBasis: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              {
-                readonly name: 'NO_FINANCIAL_ALLOCATION';
-                readonly value: 'NO_FINANCIAL_ALLOCATION';
-              },
-              { readonly name: 'FIRST_DAY_FULL_REFUND'; readonly value: 'FIRST_DAY_FULL_REFUND' },
-              {
-                readonly name: 'SHORT_JOB_FIXED_ALLOCATION';
-                readonly value: 'SHORT_JOB_FIXED_ALLOCATION';
-              },
-              {
-                readonly name: 'LONG_JOB_ELAPSED_ALLOCATION';
-                readonly value: 'LONG_JOB_ELAPSED_ALLOCATION';
-              },
-              { readonly name: 'EXTENSION_FULL_REFUND'; readonly value: 'EXTENSION_FULL_REFUND' },
-              { readonly name: 'EXPIRY_FULL_REFUND'; readonly value: 'EXPIRY_FULL_REFUND' },
-              { readonly name: 'ADMINISTRATIVE'; readonly value: 'ADMINISTRATIVE' },
-            ];
-          };
-          readonly CancellationFinancialClassification: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'NO_FINANCIAL_ACTION'; readonly value: 'NO_FINANCIAL_ACTION' },
-              { readonly name: 'FULL_REFUND'; readonly value: 'FULL_REFUND' },
-              { readonly name: 'PARTIAL_REFUND'; readonly value: 'PARTIAL_REFUND' },
-            ];
-          };
-          readonly RefundType: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'FULL'; readonly value: 'FULL' },
-              { readonly name: 'PARTIAL'; readonly value: 'PARTIAL' },
-            ];
-          };
-          readonly RefundStatus: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'PENDING'; readonly value: 'PENDING' },
-              { readonly name: 'PROCESSING'; readonly value: 'PROCESSING' },
-              { readonly name: 'SUCCEEDED'; readonly value: 'SUCCEEDED' },
-              { readonly name: 'FAILED'; readonly value: 'FAILED' },
-              { readonly name: 'UNKNOWN'; readonly value: 'UNKNOWN' },
-            ];
-          };
           readonly PaymentStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -10152,14 +8058,6 @@ type ContractBase = Omit<
               { readonly name: 'FILE'; readonly value: 'FILE' },
               { readonly name: 'VOICE'; readonly value: 'VOICE' },
               { readonly name: 'LOCATION'; readonly value: 'LOCATION' },
-            ];
-          };
-          readonly MessageAttachmentStatus: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'PENDING'; readonly value: 'PENDING' },
-              { readonly name: 'READY'; readonly value: 'READY' },
-              { readonly name: 'FAILED'; readonly value: 'FAILED' },
             ];
           };
           readonly ReviewType: {
@@ -10320,14 +8218,6 @@ type ContractBase = Omit<
         {
           readonly ref: {
             readonly namespace: 'public';
-            readonly table: 'cancellation';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
             readonly table: 'category';
             readonly column: 'id';
           };
@@ -10471,14 +8361,6 @@ type ContractBase = Omit<
         {
           readonly ref: {
             readonly namespace: 'public';
-            readonly table: 'messageAttachment';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
             readonly table: 'messageLocation';
             readonly column: 'id';
           };
@@ -10580,31 +8462,6 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'refreshToken';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'refund';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'refund';
-            readonly column: 'updatedAt';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
-          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'refundProviderEvent';
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
@@ -10811,14 +8668,6 @@ type ContractBase = Omit<
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
           readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'workerCancellationPenalty';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
         },
       ];
     };

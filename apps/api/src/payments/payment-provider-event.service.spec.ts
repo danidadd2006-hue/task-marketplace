@@ -110,6 +110,12 @@ function makeService() {
     initiateFunding: vi.fn(),
     reconcileFunding: vi.fn(),
     normalizeWebhook: mocks.normalizeWebhook,
+    initiatePayout: vi.fn(),
+    reconcilePayout: vi.fn(),
+    normalizePayoutWebhook: vi.fn(),
+    initiateRefund: vi.fn(),
+    reconcileRefund: vi.fn(),
+    normalizeRefundWebhook: vi.fn(),
   });
 }
 

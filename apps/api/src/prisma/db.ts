@@ -7,3 +7,5 @@ export const db = postgres<Contract>({
   contractJson,
   url: process.env['DATABASE_URL']!,
 });
+
+export type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

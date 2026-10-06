@@ -16,6 +16,10 @@
       "model": "AuditLog",
       "namespace": "public"
     },
+    "cancellation": {
+      "model": "Cancellation",
+      "namespace": "public"
+    },
     "category": {
       "model": "Category",
       "namespace": "public"
@@ -56,6 +60,10 @@
       "model": "Message",
       "namespace": "public"
     },
+    "messageAttachment": {
+      "model": "MessageAttachment",
+      "namespace": "public"
+    },
     "messageLocation": {
       "model": "MessageLocation",
       "namespace": "public"
@@ -72,12 +80,32 @@
       "model": "PaymentProviderEvent",
       "namespace": "public"
     },
+    "payout": {
+      "model": "Payout",
+      "namespace": "public"
+    },
+    "payoutDestination": {
+      "model": "PayoutDestination",
+      "namespace": "public"
+    },
+    "payoutProviderEvent": {
+      "model": "PayoutProviderEvent",
+      "namespace": "public"
+    },
     "profile": {
       "model": "Profile",
       "namespace": "public"
     },
     "refreshToken": {
       "model": "RefreshToken",
+      "namespace": "public"
+    },
+    "refund": {
+      "model": "Refund",
+      "namespace": "public"
+    },
+    "refundProviderEvent": {
+      "model": "RefundProviderEvent",
       "namespace": "public"
     },
     "region": {
@@ -130,6 +158,10 @@
     },
     "verification": {
       "model": "Verification",
+      "namespace": "public"
+    },
+    "workerCancellationPenalty": {
+      "model": "WorkerCancellationPenalty",
       "namespace": "public"
     }
   },
@@ -219,6 +251,139 @@
               }
             ]
           },
+          "CancellationActorType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CLIENT",
+                "value": "CLIENT"
+              },
+              {
+                "name": "WORKER",
+                "value": "WORKER"
+              },
+              {
+                "name": "ADMIN",
+                "value": "ADMIN"
+              }
+            ]
+          },
+          "CancellationCalculationBasis": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "NO_FINANCIAL_ALLOCATION",
+                "value": "NO_FINANCIAL_ALLOCATION"
+              },
+              {
+                "name": "FIRST_DAY_FULL_REFUND",
+                "value": "FIRST_DAY_FULL_REFUND"
+              },
+              {
+                "name": "SHORT_JOB_FIXED_ALLOCATION",
+                "value": "SHORT_JOB_FIXED_ALLOCATION"
+              },
+              {
+                "name": "LONG_JOB_ELAPSED_ALLOCATION",
+                "value": "LONG_JOB_ELAPSED_ALLOCATION"
+              },
+              {
+                "name": "EXTENSION_FULL_REFUND",
+                "value": "EXTENSION_FULL_REFUND"
+              },
+              {
+                "name": "EXPIRY_FULL_REFUND",
+                "value": "EXPIRY_FULL_REFUND"
+              },
+              {
+                "name": "ADMINISTRATIVE",
+                "value": "ADMINISTRATIVE"
+              }
+            ]
+          },
+          "CancellationCategory": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PRE_WORK_FIRST_DAY",
+                "value": "PRE_WORK_FIRST_DAY"
+              },
+              {
+                "name": "SHORT_JOB_SECOND_DAY",
+                "value": "SHORT_JOB_SECOND_DAY"
+              },
+              {
+                "name": "LONG_JOB_ELAPSED",
+                "value": "LONG_JOB_ELAPSED"
+              },
+              {
+                "name": "EXTENSION",
+                "value": "EXTENSION"
+              },
+              {
+                "name": "EXPIRY_REFUND",
+                "value": "EXPIRY_REFUND"
+              },
+              {
+                "name": "ADMINISTRATIVE",
+                "value": "ADMINISTRATIVE"
+              }
+            ]
+          },
+          "CancellationFinancialClassification": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "NO_FINANCIAL_ACTION",
+                "value": "NO_FINANCIAL_ACTION"
+              },
+              {
+                "name": "FULL_REFUND",
+                "value": "FULL_REFUND"
+              },
+              {
+                "name": "PARTIAL_REFUND",
+                "value": "PARTIAL_REFUND"
+              }
+            ]
+          },
+          "CancellationStage": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "DRAFT",
+                "value": "DRAFT"
+              },
+              {
+                "name": "PUBLISHED",
+                "value": "PUBLISHED"
+              },
+              {
+                "name": "RECEIVING_APPLICATIONS",
+                "value": "RECEIVING_APPLICATIONS"
+              },
+              {
+                "name": "WORKER_SELECTED",
+                "value": "WORKER_SELECTED"
+              },
+              {
+                "name": "AWAITING_PAYMENT",
+                "value": "AWAITING_PAYMENT"
+              },
+              {
+                "name": "FUNDED",
+                "value": "FUNDED"
+              },
+              {
+                "name": "IN_PROGRESS",
+                "value": "IN_PROGRESS"
+              },
+              {
+                "name": "EXPIRED",
+                "value": "EXPIRED"
+              }
+            ]
+          },
           "ContractStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -287,6 +452,23 @@
               {
                 "name": "ADJUSTMENT",
                 "value": "ADJUSTMENT"
+              }
+            ]
+          },
+          "MessageAttachmentStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "READY",
+                "value": "READY"
+              },
+              {
+                "name": "FAILED",
+                "value": "FAILED"
               }
             ]
           },
@@ -416,6 +598,44 @@
               {
                 "name": "BUSINESS",
                 "value": "BUSINESS"
+              }
+            ]
+          },
+          "RefundStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "PROCESSING",
+                "value": "PROCESSING"
+              },
+              {
+                "name": "SUCCEEDED",
+                "value": "SUCCEEDED"
+              },
+              {
+                "name": "FAILED",
+                "value": "FAILED"
+              },
+              {
+                "name": "UNKNOWN",
+                "value": "UNKNOWN"
+              }
+            ]
+          },
+          "RefundType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "FULL",
+                "value": "FULL"
+              },
+              {
+                "name": "PARTIAL",
+                "value": "PARTIAL"
               }
             ]
           },
@@ -1042,6 +1262,383 @@
               "table": "auditLog"
             }
           },
+          "Cancellation": {
+            "fields": {
+              "actorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "actorType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CancellationActorType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "agreedDurationDays": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "applicableDurationSeconds": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int8@1",
+                  "kind": "scalar"
+                }
+              },
+              "calculationBasis": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CancellationCalculationBasis",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "cancellationAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "cancellationFee": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "category": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CancellationCategory",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "clientRefund": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "contractId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "elapsedApplicableSeconds": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int8@1",
+                  "kind": "scalar"
+                }
+              },
+              "extensionStartedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "financialClassification": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CancellationFinancialClassification",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "firstDayBoundaryAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fundedAmount": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "hiredAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "paymentId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "stage": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CancellationStage",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "taskId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "workerAmount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "workerPercentage": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "contract": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "contractId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Contract",
+                  "namespace": "public"
+                }
+              },
+              "payment": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "paymentId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Payment",
+                  "namespace": "public"
+                }
+              },
+              "refund": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "cancellationId"
+                  ]
+                },
+                "to": {
+                  "model": "Refund",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actorId": {
+                  "column": "actorId"
+                },
+                "actorType": {
+                  "column": "actorType"
+                },
+                "agreedDurationDays": {
+                  "column": "agreedDurationDays"
+                },
+                "applicableDurationSeconds": {
+                  "column": "applicableDurationSeconds"
+                },
+                "calculationBasis": {
+                  "column": "calculationBasis"
+                },
+                "cancellationAt": {
+                  "column": "cancellationAt"
+                },
+                "cancellationFee": {
+                  "column": "cancellationFee"
+                },
+                "category": {
+                  "column": "category"
+                },
+                "clientRefund": {
+                  "column": "clientRefund"
+                },
+                "contractId": {
+                  "column": "contractId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "currency": {
+                  "column": "currency"
+                },
+                "elapsedApplicableSeconds": {
+                  "column": "elapsedApplicableSeconds"
+                },
+                "extensionStartedAt": {
+                  "column": "extensionStartedAt"
+                },
+                "financialClassification": {
+                  "column": "financialClassification"
+                },
+                "firstDayBoundaryAt": {
+                  "column": "firstDayBoundaryAt"
+                },
+                "fundedAmount": {
+                  "column": "fundedAmount"
+                },
+                "hiredAt": {
+                  "column": "hiredAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadata": {
+                  "column": "metadata"
+                },
+                "paymentId": {
+                  "column": "paymentId"
+                },
+                "reason": {
+                  "column": "reason"
+                },
+                "stage": {
+                  "column": "stage"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "workerAmount": {
+                  "column": "workerAmount"
+                },
+                "workerPercentage": {
+                  "column": "workerPercentage"
+                }
+              },
+              "namespaceId": "public",
+              "table": "cancellation"
+            }
+          },
           "Category": {
             "fields": {
               "active": {
@@ -1298,6 +1895,13 @@
           },
           "Contract": {
             "fields": {
+              "agreedDurationDays": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "agreedPrice": {
                 "nullable": false,
                 "type": {
@@ -1313,6 +1917,20 @@
                 }
               },
               "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "extensionStartedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "hiredAt": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-string@1",
@@ -1369,6 +1987,51 @@
               }
             },
             "relations": {
+              "cancellations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "contractId"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
+              "conversations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "contractId"
+                  ]
+                },
+                "to": {
+                  "model": "Conversation",
+                  "namespace": "public"
+                }
+              },
+              "payout": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "contractId"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
+                  "namespace": "public"
+                }
+              },
               "task": {
                 "cardinality": "N:1",
                 "on": {
@@ -1402,6 +2065,9 @@
             },
             "storage": {
               "fields": {
+                "agreedDurationDays": {
+                  "column": "agreedDurationDays"
+                },
                 "agreedPrice": {
                   "column": "agreedPrice"
                 },
@@ -1410,6 +2076,12 @@
                 },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "extensionStartedAt": {
+                  "column": "extensionStartedAt"
+                },
+                "hiredAt": {
+                  "column": "hiredAt"
                 },
                 "id": {
                   "column": "id"
@@ -1436,6 +2108,13 @@
           },
           "Conversation": {
             "fields": {
+              "contractId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -1450,6 +2129,13 @@
                   "kind": "scalar"
                 }
               },
+              "taskId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -1459,6 +2145,21 @@
               }
             },
             "relations": {
+              "contract": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "contractId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Contract",
+                  "namespace": "public"
+                }
+              },
               "members": {
                 "cardinality": "1:N",
                 "on": {
@@ -1488,15 +2189,36 @@
                   "model": "Message",
                   "namespace": "public"
                 }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
+                "contractId": {
+                  "column": "contractId"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
                 "id": {
                   "column": "id"
+                },
+                "taskId": {
+                  "column": "taskId"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -2097,6 +2819,21 @@
               }
             },
             "relations": {
+              "attachments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "messageId"
+                  ]
+                },
+                "to": {
+                  "model": "MessageAttachment",
+                  "namespace": "public"
+                }
+              },
               "conversation": {
                 "cardinality": "N:1",
                 "on": {
@@ -2183,8 +2920,138 @@
               "table": "message"
             }
           },
+          "MessageAttachment": {
+            "fields": {
+              "checksum": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "messageId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "mimeType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "originalFilename": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "size": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int8@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MessageAttachmentStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "storageKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "message": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "messageId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Message",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "checksum": {
+                  "column": "checksum"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "messageId": {
+                  "column": "messageId"
+                },
+                "mimeType": {
+                  "column": "mimeType"
+                },
+                "originalFilename": {
+                  "column": "originalFilename"
+                },
+                "size": {
+                  "column": "size"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "storageKey": {
+                  "column": "storageKey"
+                }
+              },
+              "namespaceId": "public",
+              "table": "messageAttachment"
+            }
+          },
           "MessageLocation": {
             "fields": {
+              "accuracy": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -2247,6 +3114,9 @@
             },
             "storage": {
               "fields": {
+                "accuracy": {
+                  "column": "accuracy"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -2472,6 +3342,21 @@
               }
             },
             "relations": {
+              "cancellations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "paymentId"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
               "client": {
                 "cardinality": "N:1",
                 "on": {
@@ -2502,6 +3387,21 @@
                   "namespace": "public"
                 }
               },
+              "payout": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "paymentId"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
+                  "namespace": "public"
+                }
+              },
               "providerEvents": {
                 "cardinality": "1:N",
                 "on": {
@@ -2514,6 +3414,21 @@
                 },
                 "to": {
                   "model": "PaymentProviderEvent",
+                  "namespace": "public"
+                }
+              },
+              "refunds": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "paymentId"
+                  ]
+                },
+                "to": {
+                  "model": "Refund",
                   "namespace": "public"
                 }
               },
@@ -2721,6 +3636,533 @@
               },
               "namespaceId": "public",
               "table": "paymentProviderEvent"
+            }
+          },
+          "Payout": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "contractId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "failureCode": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "failureMessage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "paymentId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "payoutDestinationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reconciliationMetadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "taskId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "uncertaintyReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "workerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "contract": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "contractId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Contract",
+                  "namespace": "public"
+                }
+              },
+              "payment": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "paymentId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Payment",
+                  "namespace": "public"
+                }
+              },
+              "payoutDestination": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "payoutDestinationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "PayoutDestination",
+                  "namespace": "public"
+                }
+              },
+              "providerEvents": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "payoutId"
+                  ]
+                },
+                "to": {
+                  "model": "PayoutProviderEvent",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              },
+              "worker": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "workerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "contractId": {
+                  "column": "contractId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "currency": {
+                  "column": "currency"
+                },
+                "failureCode": {
+                  "column": "failureCode"
+                },
+                "failureMessage": {
+                  "column": "failureMessage"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "paymentId": {
+                  "column": "paymentId"
+                },
+                "payoutDestinationId": {
+                  "column": "payoutDestinationId"
+                },
+                "provider": {
+                  "column": "provider"
+                },
+                "providerRef": {
+                  "column": "providerRef"
+                },
+                "reconciliationMetadata": {
+                  "column": "reconciliationMetadata"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "uncertaintyReason": {
+                  "column": "uncertaintyReason"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "workerId": {
+                  "column": "workerId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "payout"
+            }
+          },
+          "PayoutDestination": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "method": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerAccountRef": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "VerificationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "verifiedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "payouts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "payoutDestinationId"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "method": {
+                  "column": "method"
+                },
+                "provider": {
+                  "column": "provider"
+                },
+                "providerAccountRef": {
+                  "column": "providerAccountRef"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
+                },
+                "verifiedAt": {
+                  "column": "verifiedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "payoutDestination"
+            }
+          },
+          "PayoutProviderEvent": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "payoutId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "processedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerEventId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "payout": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "payoutId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadata": {
+                  "column": "metadata"
+                },
+                "payoutId": {
+                  "column": "payoutId"
+                },
+                "processedAt": {
+                  "column": "processedAt"
+                },
+                "provider": {
+                  "column": "provider"
+                },
+                "providerEventId": {
+                  "column": "providerEventId"
+                },
+                "providerRef": {
+                  "column": "providerRef"
+                },
+                "type": {
+                  "column": "type"
+                }
+              },
+              "namespaceId": "public",
+              "table": "payoutProviderEvent"
             }
           },
           "Profile": {
@@ -2961,6 +4403,382 @@
               },
               "namespaceId": "public",
               "table": "refreshToken"
+            }
+          },
+          "Refund": {
+            "fields": {
+              "amount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "cancellationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "failureCode": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "failureMessage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "idempotencyKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "initiatedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "paymentId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reconciledAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "reconciliationMetadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "RefundStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "succeededAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "RefundType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "uncertaintyReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "cancellation": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "cancellationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
+              "payment": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "paymentId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Payment",
+                  "namespace": "public"
+                }
+              },
+              "providerEvents": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "refundId"
+                  ]
+                },
+                "to": {
+                  "model": "RefundProviderEvent",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amount": {
+                  "column": "amount"
+                },
+                "cancellationId": {
+                  "column": "cancellationId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "currency": {
+                  "column": "currency"
+                },
+                "failureCode": {
+                  "column": "failureCode"
+                },
+                "failureMessage": {
+                  "column": "failureMessage"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "idempotencyKey": {
+                  "column": "idempotencyKey"
+                },
+                "initiatedAt": {
+                  "column": "initiatedAt"
+                },
+                "paymentId": {
+                  "column": "paymentId"
+                },
+                "provider": {
+                  "column": "provider"
+                },
+                "providerRef": {
+                  "column": "providerRef"
+                },
+                "reconciledAt": {
+                  "column": "reconciledAt"
+                },
+                "reconciliationMetadata": {
+                  "column": "reconciliationMetadata"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "succeededAt": {
+                  "column": "succeededAt"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "uncertaintyReason": {
+                  "column": "uncertaintyReason"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "refund"
+            }
+          },
+          "RefundProviderEvent": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "processedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "provider": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerEventId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "refundId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "refund": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "refundId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Refund",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadata": {
+                  "column": "metadata"
+                },
+                "processedAt": {
+                  "column": "processedAt"
+                },
+                "provider": {
+                  "column": "provider"
+                },
+                "providerEventId": {
+                  "column": "providerEventId"
+                },
+                "providerRef": {
+                  "column": "providerRef"
+                },
+                "refundId": {
+                  "column": "refundId"
+                },
+                "type": {
+                  "column": "type"
+                }
+              },
+              "namespaceId": "public",
+              "table": "refundProviderEvent"
             }
           },
           "Region": {
@@ -3458,6 +5276,21 @@
                   "namespace": "public"
                 }
               },
+              "cancellations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
               "category": {
                 "cardinality": "N:1",
                 "on": {
@@ -3500,6 +5333,36 @@
                 },
                 "to": {
                   "model": "Contract",
+                  "namespace": "public"
+                }
+              },
+              "conversations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "Conversation",
+                  "namespace": "public"
+                }
+              },
+              "payouts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
                   "namespace": "public"
                 }
               },
@@ -4150,6 +6013,36 @@
                   "namespace": "public"
                 }
               },
+              "cancellationsAsActor": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
+              "conversations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "ConversationMember",
+                  "namespace": "public"
+                }
+              },
               "location": {
                 "cardinality": "1:1",
                 "on": {
@@ -4177,6 +6070,36 @@
                 },
                 "to": {
                   "model": "Message",
+                  "namespace": "public"
+                }
+              },
+              "payoutDestinations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "PayoutDestination",
+                  "namespace": "public"
+                }
+              },
+              "payoutsAsWorker": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "workerId"
+                  ]
+                },
+                "to": {
+                  "model": "Payout",
                   "namespace": "public"
                 }
               },
@@ -4237,6 +6160,21 @@
                 },
                 "to": {
                   "model": "Task",
+                  "namespace": "public"
+                }
+              },
+              "workerCancellationPenalties": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "workerId"
+                  ]
+                },
+                "to": {
+                  "model": "WorkerCancellationPenalty",
                   "namespace": "public"
                 }
               }
@@ -4675,6 +6613,148 @@
               "namespaceId": "public",
               "table": "verification"
             }
+          },
+          "WorkerCancellationPenalty": {
+            "fields": {
+              "banDurationDays": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "banEndsAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "banStartedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "cancellationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "rollingPeriodAnchorAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "sequenceNumber": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "warningIssuedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "workerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "cancellation": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "cancellationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Cancellation",
+                  "namespace": "public"
+                }
+              },
+              "worker": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "workerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "banDurationDays": {
+                  "column": "banDurationDays"
+                },
+                "banEndsAt": {
+                  "column": "banEndsAt"
+                },
+                "banStartedAt": {
+                  "column": "banStartedAt"
+                },
+                "cancellationId": {
+                  "column": "cancellationId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "rollingPeriodAnchorAt": {
+                  "column": "rollingPeriodAnchorAt"
+                },
+                "sequenceNumber": {
+                  "column": "sequenceNumber"
+                },
+                "warningIssuedAt": {
+                  "column": "warningIssuedAt"
+                },
+                "workerId": {
+                  "column": "workerId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "workerCancellationPenalty"
+            }
           }
         }
       }
@@ -5038,6 +7118,343 @@
               },
               "uniques": []
             },
+            "cancellation": {
+              "checks": [
+                {
+                  "expression": "\"actorType\" IN ('CLIENT', 'WORKER', 'ADMIN')",
+                  "name": "cancellation_actorType_check_d96a08cf",
+                  "prefix": "cancellation_actorType_check"
+                },
+                {
+                  "expression": "\"calculationBasis\" IN ('NO_FINANCIAL_ALLOCATION', 'FIRST_DAY_FULL_REFUND', 'SHORT_JOB_FIXED_ALLOCATION', 'LONG_JOB_ELAPSED_ALLOCATION', 'EXTENSION_FULL_REFUND', 'EXPIRY_FULL_REFUND', 'ADMINISTRATIVE')",
+                  "name": "cancellation_calculationBasis_check_7be19a77",
+                  "prefix": "cancellation_calculationBasis_check"
+                },
+                {
+                  "expression": "\"category\" IN ('PRE_WORK_FIRST_DAY', 'SHORT_JOB_SECOND_DAY', 'LONG_JOB_ELAPSED', 'EXTENSION', 'EXPIRY_REFUND', 'ADMINISTRATIVE')",
+                  "name": "cancellation_category_check_ba2a6cb9",
+                  "prefix": "cancellation_category_check"
+                },
+                {
+                  "expression": "\"financialClassification\" IN ('NO_FINANCIAL_ACTION', 'FULL_REFUND', 'PARTIAL_REFUND')",
+                  "name": "cancellation_financialClassification_check_d5724189",
+                  "prefix": "cancellation_financialClassification_check"
+                },
+                {
+                  "expression": "\"stage\" IN ('DRAFT', 'PUBLISHED', 'RECEIVING_APPLICATIONS', 'WORKER_SELECTED', 'AWAITING_PAYMENT', 'FUNDED', 'IN_PROGRESS', 'EXPIRED')",
+                  "name": "cancellation_stage_check_785054c0",
+                  "prefix": "cancellation_stage_check"
+                }
+              ],
+              "columns": {
+                "actorId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "actorType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CancellationActorType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "agreedDurationDays": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "applicableDurationSeconds": {
+                  "codecId": "pg/int8@1",
+                  "nativeType": "int8",
+                  "nullable": true
+                },
+                "calculationBasis": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CancellationCalculationBasis",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "cancellationAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "cancellationFee": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "category": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CancellationCategory",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "clientRefund": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "contractId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "currency": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "elapsedApplicableSeconds": {
+                  "codecId": "pg/int8@1",
+                  "nativeType": "int8",
+                  "nullable": true
+                },
+                "extensionStartedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "financialClassification": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CancellationFinancialClassification",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "firstDayBoundaryAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "fundedAmount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true
+                },
+                "hiredAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadata": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "paymentId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "stage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CancellationStage",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "taskId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "workerAmount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "workerPercentage": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "contractId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "contract"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "paymentId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payment"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "cancellation_actorId_idx_a58f6b4b",
+                  "prefix": "cancellation_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "cancellationAt"
+                  ],
+                  "name": "cancellation_cancellationAt_idx_ae316ae0",
+                  "prefix": "cancellation_cancellationAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "category"
+                  ],
+                  "name": "cancellation_category_idx_f2600f8e",
+                  "prefix": "cancellation_category_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "contractId"
+                  ],
+                  "name": "cancellation_contractId_idx_102708cf",
+                  "prefix": "cancellation_contractId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "financialClassification"
+                  ],
+                  "name": "cancellation_financialClassification_idx_ec3bdc4a",
+                  "prefix": "cancellation_financialClassification_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "paymentId"
+                  ],
+                  "name": "cancellation_paymentId_idx_b2fe9a10",
+                  "prefix": "cancellation_paymentId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "stage"
+                  ],
+                  "name": "cancellation_stage_idx_51755035",
+                  "prefix": "cancellation_stage_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "taskId"
+                  ],
+                  "name": "cancellation_taskId_idx_4965c936",
+                  "prefix": "cancellation_taskId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "category": {
               "columns": {
                 "active": {
@@ -5259,6 +7676,11 @@
                 }
               ],
               "columns": {
+                "agreedDurationDays": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "agreedPrice": {
                   "codecId": "pg/numeric@1",
                   "nativeType": "numeric",
@@ -5270,6 +7692,20 @@
                   "nullable": true
                 },
                 "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "extensionStartedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "hiredAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
                     "expression": "now()",
@@ -5388,6 +7824,11 @@
             },
             "conversation": {
               "columns": {
+                "contractId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -5402,14 +7843,71 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "taskId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "conversation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "contractId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "conversation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "contract"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "contractId"
+                  ],
+                  "name": "conversation_contractId_idx_102708cf",
+                  "prefix": "conversation_contractId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "taskId"
+                  ],
+                  "name": "conversation_taskId_idx_4965c936",
+                  "prefix": "conversation_taskId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -6003,8 +8501,118 @@
               },
               "uniques": []
             },
+            "messageAttachment": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'READY', 'FAILED')",
+                  "name": "messageAttachment_status_check_2b20bc37",
+                  "prefix": "messageAttachment_status_check"
+                }
+              ],
+              "columns": {
+                "checksum": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "messageId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "mimeType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "originalFilename": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "size": {
+                  "codecId": "pg/int8@1",
+                  "nativeType": "int8",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MessageAttachmentStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "storageKey": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "messageId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "messageAttachment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "message"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "messageId"
+                  ],
+                  "name": "messageAttachment_messageId_idx_3cdded8d",
+                  "prefix": "messageAttachment_messageId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "messageLocation": {
               "columns": {
+                "accuracy": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -6516,6 +9124,476 @@
                 }
               ]
             },
+            "payout": {
+              "columns": {
+                "amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "contractId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "currency": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "failureCode": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "failureMessage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "paymentId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "payoutDestinationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "provider": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "providerRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reconciliationMetadata": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "taskId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "uncertaintyReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "workerId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "paymentId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payment"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "contractId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "contract"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "workerId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "payoutDestinationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payoutDestination"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "payoutDestinationId"
+                  ],
+                  "name": "payout_payoutDestinationId_idx_8669d714",
+                  "prefix": "payout_payoutDestinationId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "payout_status_idx_e98638ab",
+                  "prefix": "payout_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "taskId"
+                  ],
+                  "name": "payout_taskId_idx_4965c936",
+                  "prefix": "payout_taskId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "workerId"
+                  ],
+                  "name": "payout_workerId_idx_0b8f3a7c",
+                  "prefix": "payout_workerId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "paymentId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "contractId"
+                  ]
+                }
+              ]
+            },
+            "payoutDestination": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'VERIFIED', 'REJECTED', 'EXPIRED')",
+                  "name": "payoutDestination_status_check_21492f0b",
+                  "prefix": "payoutDestination_status_check"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "method": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "provider": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "providerAccountRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "VerificationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "verifiedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payoutDestination"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "payoutDestination_status_idx_e98638ab",
+                  "prefix": "payoutDestination_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "payoutDestination_userId_idx_a489d58a",
+                  "prefix": "payoutDestination_userId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "provider",
+                    "providerAccountRef"
+                  ]
+                }
+              ]
+            },
+            "payoutProviderEvent": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadata": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "payoutId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "processedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "provider": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "providerEventId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "providerRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "payoutId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payoutProviderEvent"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payout"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "payoutId"
+                  ],
+                  "name": "payoutProviderEvent_payoutId_idx_cce6e609",
+                  "prefix": "payoutProviderEvent_payoutId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "processedAt"
+                  ],
+                  "name": "payoutProviderEvent_processedAt_idx_e83f4a54",
+                  "prefix": "payoutProviderEvent_processedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "type"
+                  ],
+                  "name": "payoutProviderEvent_type_idx_b6b604ea",
+                  "prefix": "payoutProviderEvent_type_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "provider",
+                    "providerEventId"
+                  ]
+                }
+              ]
+            },
             "profile": {
               "checks": [
                 {
@@ -6720,6 +9798,345 @@
                 {
                   "columns": [
                     "tokenHash"
+                  ]
+                }
+              ]
+            },
+            "refund": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'UNKNOWN')",
+                  "name": "refund_status_check_2c7e7c9e",
+                  "prefix": "refund_status_check"
+                },
+                {
+                  "expression": "\"type\" IN ('FULL', 'PARTIAL')",
+                  "name": "refund_type_check_3b9fbc0a",
+                  "prefix": "refund_type_check"
+                }
+              ],
+              "columns": {
+                "amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "cancellationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "currency": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "failureCode": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "failureMessage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "idempotencyKey": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "initiatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "paymentId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "provider": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "providerRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reconciledAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "reconciliationMetadata": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "RefundStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "succeededAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "RefundType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "uncertaintyReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "paymentId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "refund"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "payment"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "cancellationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "refund"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "createdAt"
+                  ],
+                  "name": "refund_createdAt_idx_9575dbd7",
+                  "prefix": "refund_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "paymentId"
+                  ],
+                  "name": "refund_paymentId_idx_b2fe9a10",
+                  "prefix": "refund_paymentId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "provider"
+                  ],
+                  "name": "refund_provider_idx_faf3af28",
+                  "prefix": "refund_provider_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "refund_status_idx_e98638ab",
+                  "prefix": "refund_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "cancellationId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "idempotencyKey"
+                  ]
+                },
+                {
+                  "columns": [
+                    "provider",
+                    "providerRef"
+                  ]
+                }
+              ]
+            },
+            "refundProviderEvent": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadata": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "processedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "provider": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "providerEventId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "providerRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "refundId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "refundId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "refundProviderEvent"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "refund"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "processedAt"
+                  ],
+                  "name": "refundProviderEvent_processedAt_idx_e83f4a54",
+                  "prefix": "refundProviderEvent_processedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "refundId"
+                  ],
+                  "name": "refundProviderEvent_refundId_idx_903a170a",
+                  "prefix": "refundProviderEvent_refundId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "type"
+                  ],
+                  "name": "refundProviderEvent_type_idx_b6b604ea",
+                  "prefix": "refundProviderEvent_type_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "provider",
+                    "providerEventId"
                   ]
                 }
               ]
@@ -8139,6 +11556,145 @@
                 ]
               },
               "uniques": []
+            },
+            "workerCancellationPenalty": {
+              "checks": [
+                {
+                  "expression": "\"sequenceNumber\" >= 1 AND \"sequenceNumber\" <= 3",
+                  "name": "worker_cancellation_penalty_sequence_check_937b68e9",
+                  "prefix": "worker_cancellation_penalty_sequence_check"
+                }
+              ],
+              "columns": {
+                "banDurationDays": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "banEndsAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "banStartedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "cancellationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "rollingPeriodAnchorAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "sequenceNumber": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "warningIssuedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "workerId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "workerId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "workerCancellationPenalty"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "cancellationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "workerCancellationPenalty"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "cancellation"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "workerId",
+                    "createdAt"
+                  ],
+                  "name": "wcp_worker_created_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "workerId",
+                    "rollingPeriodAnchorAt"
+                  ],
+                  "name": "wcp_worker_period_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "workerId"
+                  ],
+                  "name": "workerCancellationPenalty_workerId_idx_0b8f3a7c",
+                  "prefix": "workerCancellationPenalty_workerId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "cancellationId"
+                  ]
+                }
+              ]
             }
           },
           "valueSet": {
@@ -8170,6 +11726,58 @@
                 "ADMIN_ACTION"
               ]
             },
+            "CancellationActorType": {
+              "kind": "valueSet",
+              "values": [
+                "CLIENT",
+                "WORKER",
+                "ADMIN"
+              ]
+            },
+            "CancellationCalculationBasis": {
+              "kind": "valueSet",
+              "values": [
+                "NO_FINANCIAL_ALLOCATION",
+                "FIRST_DAY_FULL_REFUND",
+                "SHORT_JOB_FIXED_ALLOCATION",
+                "LONG_JOB_ELAPSED_ALLOCATION",
+                "EXTENSION_FULL_REFUND",
+                "EXPIRY_FULL_REFUND",
+                "ADMINISTRATIVE"
+              ]
+            },
+            "CancellationCategory": {
+              "kind": "valueSet",
+              "values": [
+                "PRE_WORK_FIRST_DAY",
+                "SHORT_JOB_SECOND_DAY",
+                "LONG_JOB_ELAPSED",
+                "EXTENSION",
+                "EXPIRY_REFUND",
+                "ADMINISTRATIVE"
+              ]
+            },
+            "CancellationFinancialClassification": {
+              "kind": "valueSet",
+              "values": [
+                "NO_FINANCIAL_ACTION",
+                "FULL_REFUND",
+                "PARTIAL_REFUND"
+              ]
+            },
+            "CancellationStage": {
+              "kind": "valueSet",
+              "values": [
+                "DRAFT",
+                "PUBLISHED",
+                "RECEIVING_APPLICATIONS",
+                "WORKER_SELECTED",
+                "AWAITING_PAYMENT",
+                "FUNDED",
+                "IN_PROGRESS",
+                "EXPIRED"
+              ]
+            },
             "ContractStatus": {
               "kind": "valueSet",
               "values": [
@@ -8197,6 +11805,14 @@
                 "REFUND",
                 "CANCELLATION_FEE",
                 "ADJUSTMENT"
+              ]
+            },
+            "MessageAttachmentStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "READY",
+                "FAILED"
               ]
             },
             "MessageType": {
@@ -8248,6 +11864,23 @@
               "values": [
                 "INDIVIDUAL",
                 "BUSINESS"
+              ]
+            },
+            "RefundStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "PROCESSING",
+                "SUCCEEDED",
+                "FAILED",
+                "UNKNOWN"
+              ]
+            },
+            "RefundType": {
+              "kind": "valueSet",
+              "values": [
+                "FULL",
+                "PARTIAL"
               ]
             },
             "ReportStatus": {
@@ -8352,10 +11985,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3b54c924545375b70449b969115952f6dba2287d79bca3709343b2d8a29832b4"
+    "storageHash": "f6b6f7bf7959fa0e34fd49fc319971f62f33dfc021941fbf3c30351720cf7010"
   },
   "execution": {
-    "executionHash": "0bb0cef2db6ce7969b3e53db718f1de5d597b2d6cc22ef4a08866a2f15e44768",
+    "executionHash": "f9ae8f1a9c208286efc773a608fda0dcb9bef955967cdc76b822a79789134275",
     "mutations": {
       "defaults": [
         {
@@ -8419,6 +12052,17 @@
             "column": "id",
             "namespace": "public",
             "table": "auditLog"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "cancellation"
           }
         },
         {
@@ -8644,6 +12288,17 @@
           "ref": {
             "column": "id",
             "namespace": "public",
+            "table": "messageAttachment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
             "table": "messageLocation"
           }
         },
@@ -8703,6 +12358,69 @@
           "ref": {
             "column": "id",
             "namespace": "public",
+            "table": "payout"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "payout"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "payoutDestination"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "payoutDestination"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "payoutProviderEvent"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
             "table": "profile"
           }
         },
@@ -8730,6 +12448,43 @@
             "column": "id",
             "namespace": "public",
             "table": "refreshToken"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "refund"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "refund"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "refundProviderEvent"
           }
         },
         {
@@ -9038,6 +12793,17 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "verification"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "workerCancellationPenalty"
           }
         }
       ]

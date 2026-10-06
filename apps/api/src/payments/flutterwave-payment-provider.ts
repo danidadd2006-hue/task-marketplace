@@ -2,6 +2,9 @@ import { BadRequestException, ServiceUnavailableException } from '@nestjs/common
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type {
   NormalizedPaymentProviderEvent,
+  NormalizedPayoutProviderEvent,
+  NormalizedRefundProviderEvent,
+  NormalizedRefundProviderResult,
   PaymentProvider,
 } from './payment-provider.js';
 
@@ -30,6 +33,10 @@ type FlutterwaveTransactionsResponse = {
 };
 
 export class FlutterwavePaymentProvider implements PaymentProvider {
+  payoutProviderName(): string {
+    return PROVIDER;
+  }
+
   async initiateFunding(input: {
     paymentId: string;
     amount: string;
@@ -262,6 +269,294 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
     };
   }
 
+  async initiateRefund(input: {
+    refundId: string;
+    paymentProviderRef: string;
+    amount: string;
+    currency: string;
+    idempotencyKey: string;
+    metadata?: Record<string, string>;
+  }) {
+    if (!/^\d+$/.test(input.amount.trim())) {
+      throw new BadRequestException('Flutterwave refunds cannot represent this amount without loss of precision');
+    }
+    const secretKey = process.env['FLUTTERWAVE_SECRET_KEY'];
+    if (!secretKey) throw new ServiceUnavailableException('Flutterwave payment configuration is not available');
+
+    const verification = await this.verifyByReference(input.paymentProviderRef);
+    const verified = this.object(verification['data']);
+    const transactionId = this.stringValue(verified['id']);
+    const verifiedAmount = this.stringValue(verified['amount']);
+    const verifiedCurrency = this.stringValue(verified['currency']);
+    const verifiedStatus = this.stringValue(verified['status'])?.toLowerCase();
+    if (!transactionId || !verifiedAmount || !verifiedCurrency) {
+      throw new ServiceUnavailableException('Flutterwave transaction verification is missing refund prerequisites');
+    }
+    if (verifiedCurrency.toUpperCase() !== input.currency.trim().toUpperCase()) {
+      throw new BadRequestException('Flutterwave transaction currency does not match the authoritative refund');
+    }
+    if (BigInt(input.amount.trim()) > BigInt(verifiedAmount)) {
+      throw new BadRequestException('Flutterwave refund exceeds the funded transaction amount');
+    }
+    if (verifiedStatus !== 'successful') {
+      throw new BadRequestException('Only a successfully funded Flutterwave transaction can be refunded');
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(API_BASE_URL + '/transactions/' + transactionId + '/refund', {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + secretKey,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          amount: Number(input.amount),
+          comments: 'Marketplace refund ' + input.refundId,
+          ...(process.env['FLUTTERWAVE_REFUND_CALLBACK_URL'] ? { callbackurl: process.env['FLUTTERWAVE_REFUND_CALLBACK_URL'] } : {}),
+        }),
+      });
+    } catch {
+      throw new ServiceUnavailableException('Flutterwave refund initiation outcome is uncertain');
+    }
+
+    const payload = await this.parseResponse<Record<string, unknown>>(response);
+    const data = this.object(payload['data']);
+    const status = this.stringValue(data['status'])?.toLowerCase();
+    const providerRef = this.stringValue(data['flw_ref']) || this.stringValue(data['id']) || null;
+    const providerRefundId = this.stringValue(data['id']);
+    const originalTransactionId = this.stringValue(data['tx_id']);
+
+    if (!response.ok || payload['status'] !== 'success') {
+      return {
+        provider: PROVIDER,
+        status: 'FAILED' as const,
+        providerRef,
+        failureCode: String(response.status),
+        failureMessage: this.stringValue(payload['message']) || 'Flutterwave refund initiation failed',
+        metadata: JSON.stringify({
+          refundId: input.refundId,
+          providerRefundId,
+          transactionId: originalTransactionId,
+          providerStatus: status ?? null,
+        }),
+      };
+    }
+    if (status === 'completed-bank-transfer' || status === 'completed-momo' || status === 'completed-mpgs' || status === 'completed-offline' || status === 'completed-preauth') {
+      return {
+        provider: PROVIDER,
+        status: 'SUCCEEDED' as const,
+        providerRef,
+        metadata: JSON.stringify({
+          refundId: input.refundId,
+          providerRefundId,
+          transactionId,
+          providerStatus: status,
+        }),
+      };
+    }
+    if (status === 'completed' || status === 'processing' || status === 'pending-momo') {
+      return {
+        provider: PROVIDER,
+        status: 'PROCESSING' as const,
+        providerRef,
+        metadata: JSON.stringify({
+          refundId: input.refundId,
+          providerRefundId,
+          transactionId,
+          providerStatus: status,
+        }),
+      };
+    }
+    return {
+      provider: PROVIDER,
+      status: 'UNKNOWN' as const,
+      providerRef,
+      uncertaintyReason: 'Flutterwave returned an unrecognized refund status',
+      metadata: JSON.stringify({
+        refundId: input.refundId,
+        providerRefundId,
+        transactionId,
+        providerStatus: status ?? null,
+      }),
+    };
+  }
+
+  async reconcileRefund(input: {
+    refundId: string;
+    providerRef: string;
+    amount: string;
+    currency: string;
+    metadata?: string | null;
+  }): Promise<NormalizedRefundProviderResult> {
+    const metadata = this.parseRefundMetadata(input.metadata);
+    const providerRefundId = metadata.providerRefundId ?? input.providerRef;
+    const refund = await this.fetchRefund(providerRefundId);
+    const data = this.object(refund['data']);
+    const status = this.stringValue(data['status'])?.toLowerCase();
+    const amount = this.stringValue(data['AmountRefunded'] ?? data['amount_refunded']);
+    const providerRef = this.stringValue(data['FlwRef'] ?? data['flw_ref']) ?? input.providerRef;
+    const transactionId = this.stringValue(data['TransactionId'] ?? data['tx_id'] ?? metadata.transactionId);
+
+    if (!amount || amount !== input.amount) {
+      throw new BadRequestException('Flutterwave refund amount does not match the authoritative refund');
+    }
+    if (providerRef !== input.providerRef) {
+      throw new BadRequestException('Flutterwave refund reference does not match the authoritative refund');
+    }
+
+    let currency = input.currency;
+    if (transactionId) {
+      const transaction = await this.verifyTransactionById(transactionId);
+      const transactionData = this.object(transaction['data']);
+      const verifiedCurrency = this.stringValue(transactionData['currency']);
+      if (verifiedCurrency) currency = verifiedCurrency;
+    }
+    if (currency.toUpperCase() !== input.currency.trim().toUpperCase()) {
+      throw new BadRequestException('Flutterwave refund transaction currency does not match the authoritative refund');
+    }
+
+    const normalized = this.mapRefundStatus(status);
+    return {
+      provider: PROVIDER,
+      status: normalized,
+      providerRef,
+      ...(normalized === 'FAILED'
+        ? { failureMessage: 'Flutterwave reported refund failure' }
+        : {}),
+      ...(normalized === 'UNKNOWN'
+        ? { uncertaintyReason: 'Flutterwave returned an unrecognized refund status' }
+        : {}),
+      metadata: JSON.stringify({
+        ...metadata,
+        providerRefundId,
+        transactionId,
+        providerStatus: status ?? null,
+      }),
+    };
+  }
+
+  async normalizeRefundWebhook(input: {
+    body: unknown;
+    headers: Record<string, string | string[] | undefined>;
+    rawBody?: string;
+  }): Promise<NormalizedRefundProviderEvent> {
+    const secretHash = process.env['FLUTTERWAVE_WEBHOOK_SECRET_HASH'];
+    if (!secretHash || !input.rawBody) {
+      throw new ServiceUnavailableException(
+        'Flutterwave webhook verification is not configured',
+      );
+    }
+
+    const signature = this.headerValue(input.headers['flutterwave-signature']);
+    if (signature) {
+      if (!this.isValidSignature(input.rawBody, signature, secretHash)) {
+        throw new BadRequestException('Invalid Flutterwave webhook signature');
+      }
+    } else {
+      const legacyHash = this.headerValue(input.headers['verif-hash']);
+      if (!legacyHash || !this.isValidLegacyHash(legacyHash, secretHash)) {
+        throw new BadRequestException('Invalid Flutterwave webhook signature');
+      }
+    }
+
+    const body = this.object(input.body);
+    const data = this.object(body['data']);
+    const refundId = this.stringValue(
+      data['id'] ?? body['refund_id'] ?? body['id'],
+    );
+    if (!refundId) {
+      throw new BadRequestException('Flutterwave refund webhook has no refund reference');
+    }
+
+    const verifiedRefund = await this.fetchRefund(refundId);
+    const verified = this.object(verifiedRefund['data']);
+    const verifiedRefundId = this.stringValue(verified['id']);
+    const providerRef = this.stringValue(verified['FlwRef'] ?? verified['flw_ref']);
+    const amount = this.stringValue(
+      verified['AmountRefunded'] ?? verified['amount_refunded'],
+    );
+    const transactionId = this.stringValue(
+      verified['TransactionId'] ?? verified['tx_id'],
+    );
+
+    if (!verifiedRefundId || verifiedRefundId !== refundId || !providerRef || !amount) {
+      throw new BadRequestException('Flutterwave refund verification is incomplete');
+    }
+
+    const transaction = transactionId
+      ? await this.verifyTransactionById(transactionId)
+      : null;
+    const transactionData = this.object(transaction?.['data']);
+    const paymentProviderRef = this.stringValue(transactionData['tx_ref']);
+    const currency = this.stringValue(transactionData['currency']);
+
+    if (!currency) {
+      throw new BadRequestException(
+        'Flutterwave refund verification is missing transaction currency',
+      );
+    }
+
+    const status = this.mapRefundStatus(
+      this.stringValue(verified['status'])?.toLowerCase(),
+    );
+    const explicitEventId =
+      this.stringValue(body['webhook_id']) ||
+      (body['type'] ? this.stringValue(body['id']) : undefined);
+    const providerEventId =
+      explicitEventId ||
+      `refund:${verifiedRefundId}:${this.stringValue(verified['status'])?.toLowerCase() ?? 'unknown'}`;
+
+    return {
+      provider: PROVIDER,
+      providerEventId,
+      type:
+        status === 'SUCCEEDED'
+          ? 'REFUND_SUCCEEDED'
+          : status === 'FAILED'
+            ? 'REFUND_FAILED'
+            : status === 'PROCESSING'
+              ? 'REFUND_PROCESSING'
+              : 'REFUND_UNKNOWN',
+      providerRefundId: verifiedRefundId,
+      providerRef,
+      paymentProviderRef: paymentProviderRef ?? null,
+      amount,
+      currency,
+      metadata: JSON.stringify({
+        providerRefundId: verifiedRefundId,
+        transactionId,
+        providerStatus: this.stringValue(verified['status'])?.toLowerCase() ?? null,
+      }),
+    };
+  }
+
+  async initiatePayout(_input: { payoutId: string; destination: { provider: string; method: string; providerAccountRef: string }; amount: string; currency: string }): Promise<{
+    status: 'PENDING' | 'PROCESSING';
+    provider: string;
+    providerRef: string;
+  }> {
+    throw new ServiceUnavailableException(
+      'Flutterwave payout initiation is not configured for Step 4.3 foundation',
+    );
+  }
+
+  async reconcilePayout(_input: { payoutId: string; providerRef: string; amount: string; currency: string }): Promise<
+    | { status: 'FOUND'; provider: string; providerRef: string }
+    | { status: 'NOT_FOUND' }
+  > {
+    throw new ServiceUnavailableException(
+      'Flutterwave payout reconciliation is not configured for Step 4.3 foundation',
+    );
+  }
+
+  async normalizePayoutWebhook(_input: { body: unknown; headers: Record<string, string | string[] | undefined>; rawBody?: string }): Promise<NormalizedPayoutProviderEvent> {
+    throw new ServiceUnavailableException(
+      'Flutterwave payout webhook verification is not configured for Step 4.3 foundation',
+    );
+  }
+
   private async listTransactionsByReference(
     txRef: string,
   ): Promise<Array<Record<string, unknown>>> {
@@ -330,6 +625,96 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
     }
 
     return payload as Record<string, unknown>;
+  }
+
+  private async fetchRefund(refundId: string): Promise<Record<string, unknown>> {
+    const secretKey = process.env['FLUTTERWAVE_SECRET_KEY'];
+    if (!secretKey) {
+      throw new ServiceUnavailableException(
+        'Flutterwave payment configuration is not available',
+      );
+    }
+
+    const response = await fetch(`${API_BASE_URL}/refunds/${encodeURIComponent(refundId)}`, {
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        Accept: 'application/json',
+      },
+    });
+    const payload = await this.parseResponse(response);
+    if (!response.ok || payload.status !== 'success' || !payload.data) {
+      throw new ServiceUnavailableException(
+        payload.message || 'Flutterwave refund lookup failed',
+      );
+    }
+    return payload as Record<string, unknown>;
+  }
+
+  private async verifyTransactionById(transactionId: string): Promise<Record<string, unknown>> {
+    const secretKey = process.env['FLUTTERWAVE_SECRET_KEY'];
+    if (!secretKey) {
+      throw new ServiceUnavailableException(
+        'Flutterwave payment configuration is not available',
+      );
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/transactions/${encodeURIComponent(transactionId)}/verify`,
+      {
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          Accept: 'application/json',
+        },
+      },
+    );
+    const payload = await this.parseResponse(response);
+    if (!response.ok || payload.status !== 'success' || !payload.data) {
+      throw new ServiceUnavailableException(
+        payload.message || 'Flutterwave transaction verification failed',
+      );
+    }
+    return payload as Record<string, unknown>;
+  }
+
+  private mapRefundStatus(status: string | undefined): NormalizedRefundProviderResult['status'] {
+    switch (status) {
+      case 'completed-bank-transfer':
+      case 'completed-momo':
+      case 'completed-mpgs':
+      case 'completed-offline':
+      case 'completed-preauth':
+      case 'succeeded':
+        return 'SUCCEEDED';
+      case 'completed':
+      case 'processing':
+      case 'pending-momo':
+      case 'pending':
+      case 'new':
+      case 'requires_action':
+        return 'PROCESSING';
+      case 'failed':
+      case 'cancelled':
+      case 'canceled':
+        return 'FAILED';
+      default:
+        return 'UNKNOWN';
+    }
+  }
+
+  private parseRefundMetadata(metadata: string | null | undefined): Record<string, string> {
+    if (!metadata) return {};
+    try {
+      const value = JSON.parse(metadata) as Record<string, unknown>;
+      return Object.fromEntries(
+        Object.entries(value).flatMap(([key, raw]) =>
+          typeof raw === 'string' || typeof raw === 'number'
+            ? [[key, String(raw)]]
+            : [],
+        ),
+      );
+    } catch {
+      return {};
+    }
   }
 
   private async parseResponse<T = FlutterwaveResponse>(

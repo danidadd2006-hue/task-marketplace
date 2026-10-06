@@ -35,8 +35,13 @@ model User {
   tasks             Task[]
   applications      Application[]
   messages          Message[]
+  conversations     ConversationMember[]
   refreshTokens     RefreshToken[]
   roleAssignments   UserRoleAssignment[]
+  payoutDestinations PayoutDestination[]
+  payoutsAsWorker   Payout[] @relation("WorkerPayouts")
+  cancellationsAsActor Cancellation[] @relation("CancellationActors")
+  workerCancellationPenalties WorkerCancellationPenalty[] @relation("WorkerCancellationPenalties")
 }
 
 model UserRoleAssignment {
@@ -210,7 +215,10 @@ model Task {
   requirementsList      TaskRequirement[]
   attachments           TaskAttachment[]
   contract              Contract?
+  payouts               Payout[]
   applications          Application[]
+  cancellations         Cancellation[]
+  conversations         Conversation[]
 
   @@index([clientId])
   @@index([categoryId])
@@ -290,6 +298,61 @@ enum ContractStatus {
   DISPUTED
 }
 
+enum CancellationActorType {
+  CLIENT
+  WORKER
+  ADMIN
+}
+
+enum CancellationStage {
+  DRAFT
+  PUBLISHED
+  RECEIVING_APPLICATIONS
+  WORKER_SELECTED
+  AWAITING_PAYMENT
+  FUNDED
+  IN_PROGRESS
+  EXPIRED
+}
+
+enum CancellationCategory {
+  PRE_WORK_FIRST_DAY
+  SHORT_JOB_SECOND_DAY
+  LONG_JOB_ELAPSED
+  EXTENSION
+  EXPIRY_REFUND
+  ADMINISTRATIVE
+}
+
+enum CancellationCalculationBasis {
+  NO_FINANCIAL_ALLOCATION
+  FIRST_DAY_FULL_REFUND
+  SHORT_JOB_FIXED_ALLOCATION
+  LONG_JOB_ELAPSED_ALLOCATION
+  EXTENSION_FULL_REFUND
+  EXPIRY_FULL_REFUND
+  ADMINISTRATIVE
+}
+
+enum CancellationFinancialClassification {
+  NO_FINANCIAL_ACTION
+  FULL_REFUND
+  PARTIAL_REFUND
+}
+
+enum RefundType {
+  FULL
+  PARTIAL
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  UNKNOWN
+}
+
 model Contract {
   id          String         @id @default(uuid())
   taskId      String         @unique
@@ -298,11 +361,17 @@ model Contract {
   agreedPrice Decimal
   startedAt   TimestamptzString?
   completedAt TimestamptzString?
+  hiredAt TimestamptzString @default(now())
+  agreedDurationDays Int?
+  extensionStartedAt TimestamptzString?
   createdAt   TimestamptzString @default(now())
   updatedAt   temporal.updatedAtString()
 
   task        Task           @relation(fields: [taskId], references: [id], onDelete: Restrict)
   worker      User           @relation(fields: [workerId], references: [id], onDelete: Restrict)
+  payout      Payout?
+  cancellations Cancellation[]
+  conversations Conversation[]
 
   @@index([workerId])
   @@index([status])
@@ -341,6 +410,121 @@ model PaymentProviderEvent {
   @@index([type])
   @@index([processedAt])
 }
+model Cancellation {
+  id                         String                           @id @default(uuid())
+  taskId                     String
+  contractId                 String?
+  paymentId                  String?
+  actorId                    String
+  actorType                  CancellationActorType
+  stage                      CancellationStage
+  category                   CancellationCategory
+  calculationBasis           CancellationCalculationBasis
+  reason                     String?
+  agreedDurationDays         Int?
+  hiredAt                    TimestamptzString?
+  firstDayBoundaryAt         TimestamptzString?
+  extensionStartedAt         TimestamptzString?
+  cancellationAt             TimestamptzString
+  elapsedApplicableSeconds   BigInt?
+  applicableDurationSeconds  BigInt?
+  fundedAmount               Decimal?
+  currency                   String
+  workerPercentage           Decimal
+  workerAmount               Decimal
+  cancellationFee            Decimal
+  clientRefund               Decimal
+  financialClassification    CancellationFinancialClassification
+  metadata                   String?
+  createdAt                  TimestamptzString @default(now())
+
+  task                       Task             @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  contract                   Contract?        @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  payment                    Payment?         @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  actor                      User             @relation("CancellationActors", fields: [actorId], references: [id], onDelete: Restrict)
+  refund                     Refund?
+
+  @@index([taskId])
+  @@index([contractId])
+  @@index([paymentId])
+  @@index([actorId])
+  @@index([stage])
+  @@index([category])
+  @@index([cancellationAt])
+  @@index([financialClassification])
+}
+
+model Refund {
+  id                       String        @id @default(uuid())
+  paymentId                String
+  cancellationId           String        @unique
+  amount                   Decimal
+  currency                 String
+  type                     RefundType
+  status                   RefundStatus  @default(PENDING)
+  provider                 String?
+  providerRef              String?
+  idempotencyKey           String        @unique
+  failureCode              String?
+  failureMessage           String?
+  uncertaintyReason        String?
+  reconciliationMetadata  String?
+  initiatedAt              TimestamptzString?
+  succeededAt              TimestamptzString?
+  reconciledAt             TimestamptzString?
+  createdAt                TimestamptzString @default(now())
+  updatedAt                temporal.updatedAtString()
+
+  payment                  Payment        @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  cancellation             Cancellation   @relation(fields: [cancellationId], references: [id], onDelete: Restrict)
+  providerEvents           RefundProviderEvent[]
+
+  @@unique([provider, providerRef])
+  @@index([paymentId])
+  @@index([status])
+  @@index([provider])
+  @@index([createdAt])
+}
+
+model RefundProviderEvent {
+  id              String        @id @default(uuid())
+  provider        String
+  providerEventId String
+  refundId        String
+  type            String
+  providerRef     String?
+  metadata        String?
+  processedAt     TimestamptzString @default(now())
+  createdAt       TimestamptzString @default(now())
+
+  refund          Refund        @relation(fields: [refundId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([refundId])
+  @@index([type])
+  @@index([processedAt])
+}
+
+model WorkerCancellationPenalty {
+  id                    String   @id @default(uuid())
+  workerId              String
+  cancellationId        String   @unique
+  rollingPeriodAnchorAt TimestamptzString
+  sequenceNumber        Int
+  banDurationDays       Int
+  banStartedAt          TimestamptzString
+  banEndsAt             TimestamptzString
+  warningIssuedAt       TimestamptzString?
+  createdAt             TimestamptzString @default(now())
+
+  worker                User         @relation("WorkerCancellationPenalties", fields: [workerId], references: [id], onDelete: Restrict)
+  cancellation          Cancellation @relation(fields: [cancellationId], references: [id], onDelete: Restrict)
+
+  @@index([workerId, createdAt], map: "wcp_worker_created_idx")
+  @@index([workerId, rollingPeriodAnchorAt], map: "wcp_worker_period_idx")
+  @@check(expression: "\"sequenceNumber\" >= 1 AND \"sequenceNumber\" <= 3", name: "worker_cancellation_penalty_sequence_check")
+}
+
 model Payment {
   id          String        @id @default(uuid())
   taskId      String
@@ -363,6 +547,9 @@ model Payment {
   worker      User?         @relation("WorkerPayments", fields: [workerId], references: [id], onDelete: Restrict)
   contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
   providerEvents PaymentProviderEvent[]
+  payout      Payout?
+  cancellations Cancellation[]
+  refunds      Refund[]
 
   @@index([taskId])
   @@index([contractId])
@@ -370,6 +557,76 @@ model Payment {
   @@index([workerId])
   @@index([status])
 }
+model PayoutDestination {
+  id                 String             @id @default(uuid())
+  userId             String
+  provider           String
+  method             String
+  providerAccountRef String
+  status             VerificationStatus @default(PENDING)
+  verifiedAt         TimestamptzString?
+  createdAt          TimestamptzString  @default(now())
+  updatedAt         temporal.updatedAtString()
+
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payouts            Payout[]
+
+  @@unique([provider, providerAccountRef])
+  @@index([userId])
+  @@index([status])
+}
+
+model Payout {
+  id                     String        @id @default(uuid())
+  paymentId              String        @unique
+  contractId             String        @unique
+  taskId                 String
+  workerId               String
+  payoutDestinationId    String
+  amount                 Decimal
+  currency               String
+  provider               String?
+  providerRef            String?
+  status                 String        @default("PENDING")
+  failureCode            String?
+  failureMessage         String?
+  uncertaintyReason      String?
+  reconciliationMetadata String?
+  createdAt              TimestamptzString @default(now())
+  updatedAt              temporal.updatedAtString()
+
+  payment                Payment       @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  contract               Contract      @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  task                   Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  worker                 User          @relation("WorkerPayouts", fields: [workerId], references: [id], onDelete: Restrict)
+  payoutDestination      PayoutDestination @relation(fields: [payoutDestinationId], references: [id], onDelete: Restrict)
+  providerEvents         PayoutProviderEvent[]
+
+  @@index([taskId])
+  @@index([workerId])
+  @@index([payoutDestinationId])
+  @@index([status])
+}
+
+model PayoutProviderEvent {
+  id              String                  @id @default(uuid())
+  provider        String
+  providerEventId String
+  type            String
+  payoutId        String
+  providerRef     String?
+  metadata        String?
+  processedAt     TimestamptzString       @default(now())
+  createdAt       TimestamptzString       @default(now())
+
+  payout          Payout                  @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([payoutId])
+  @@index([type])
+  @@index([processedAt])
+}
+
 model TokenWallet {
   id        String   @id @default(uuid())
   userId    String   @unique
@@ -434,11 +691,19 @@ model Review {
   @@index([revieweeId])
 }
 model Conversation {
-  id        String   @id @default(uuid())
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
-  members   ConversationMember[]
-  messages  Message[]
+  id         String   @id @default(uuid())
+  taskId     String?
+  contractId String?
+  createdAt  TimestamptzString @default(now())
+  updatedAt  temporal.updatedAtString()
+
+  task       Task?     @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  contract   Contract? @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  members    ConversationMember[]
+  messages   Message[]
+
+  @@index([taskId])
+  @@index([contractId])
 }
 model ConversationMember {
   id             String       @id @default(uuid())
@@ -460,6 +725,11 @@ enum MessageType {
   VOICE
   LOCATION
 }
+enum MessageAttachmentStatus {
+  PENDING
+  READY
+  FAILED
+}
 enum ReviewType {
   CLIENT_TO_WORKER
   WORKER_TO_CLIENT
@@ -472,11 +742,13 @@ model Message {
   location       MessageLocation?
   type           MessageType   @default(TEXT)
   content        String?
+  // Legacy attachment fields retained temporarily for compatibility; new messaging architecture must use MessageAttachment.
   fileUrl        String?
   fileName       String?
   latitude       Decimal?
   longitude      Decimal?
 
+  attachments    MessageAttachment[]
   conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User          @relation(fields: [senderId], references: [id], onDelete: Restrict)
 
@@ -488,11 +760,27 @@ model Message {
   @@index([createdAt])
 
 }
+model MessageAttachment {
+  id               String                 @id @default(uuid())
+  messageId        String
+  storageKey       String
+  originalFilename String?
+  mimeType         String
+  size             BigInt
+  checksum         String
+  status           MessageAttachmentStatus @default(PENDING)
+  createdAt        TimestamptzString      @default(now())
+
+  message          Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
 model MessageLocation {
   id          String   @id @default(uuid())
   messageId   String   @unique
   latitude    Decimal
   longitude   Decimal
+  accuracy    Decimal?
   expiresAt   TimestamptzString?
 
   message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
