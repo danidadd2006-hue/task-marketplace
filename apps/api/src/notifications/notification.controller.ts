@@ -1,7 +1,7 @@
 import { BadRequestException, Controller, Get, Param, Patch, Query, Req, UseGuards } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { NotificationService } from './notification.service.js';
+import { NotificationService, type NotificationType } from './notification.service.js';
 
 @Controller('api/v1/notifications')
 @UseGuards(JwtAuthGuard)
@@ -21,7 +21,11 @@ export class NotificationController {
   @Get('preferences/eligibility')
   preferenceEligibility(@Req() request: { user: AuthenticatedUser }, @Query('type') type?: string) {
     if (!type) throw new BadRequestException('type is required');
-    return this.notificationService.getPreferenceEligibility(request.user.userId, type);
+    const supportedTypes = new Set<NotificationType>([
+      'MESSAGE', 'APPLICATION', 'CONTRACT', 'PAYMENT', 'REVIEW', 'DISPUTE', 'REPORT', 'VERIFICATION', 'SYSTEM',
+    ]);
+    if (!supportedTypes.has(type as NotificationType)) throw new BadRequestException('Unsupported notification type');
+    return this.notificationService.getPreferenceEligibility(request.user.userId, type as NotificationType);
   }
 
   @Get(':notificationId')

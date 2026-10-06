@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db, type Tx } from '../prisma/db.js';
+import { NotificationDeliveryService } from './notification-delivery.service.js';
 
 type NotificationType =
   | 'MESSAGE'
@@ -98,6 +99,8 @@ const CRITICAL_TYPES = new Set<NotificationType>(['PAYMENT', 'DISPUTE', 'CONTRAC
 
 @Injectable()
 export class NotificationService {
+  constructor(private readonly notificationDeliveryService: NotificationDeliveryService) {}
+
   async createFromDomainEvent(input: TrustedNotificationEvent): Promise<NotificationProjection> {
     this.validateTrustedInput(input);
 
@@ -136,6 +139,14 @@ export class NotificationService {
 
       return this.projectNotification(created);
     });
+  }
+
+  async deliverNotification(notificationId: string, channel: NotificationChannel) {
+    const notification = await db.orm.public.Notification.where({ id: notificationId }).first();
+    if (!notification) throw new NotFoundException('Notification not found');
+
+    const eligibility = await this.getPreferenceEligibility(notification.userId, notification.type as NotificationType);
+    return this.notificationDeliveryService.deliverPersistedNotification(notificationId, channel, eligibility[channel]);
   }
 
   async getPreferenceEligibility(

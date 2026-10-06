@@ -87,7 +87,9 @@ function makeTx() {
 }
 
 describe('NotificationService', () => {
-  const service = new NotificationService();
+  const service = new NotificationService({
+    deliverPersistedNotification: vi.fn(),
+  } as never);
 
   beforeEach(() => {
     vi.resetAllMocks();
