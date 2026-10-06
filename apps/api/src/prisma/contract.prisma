@@ -42,6 +42,10 @@ model User {
   payoutsAsWorker   Payout[] @relation("WorkerPayouts")
   cancellationsAsActor Cancellation[] @relation("CancellationActors")
   workerCancellationPenalties WorkerCancellationPenalty[] @relation("WorkerCancellationPenalties")
+  notifications Notification[]
+  notificationPreferences NotificationPreference[]
+  pushDevices PushDevice[]
+  notificationDeliveryAttempts NotificationDeliveryAttempt[] @relation("NotificationAttemptRecipients")
 }
 
 model UserRoleAssignment {
@@ -219,6 +223,7 @@ model Task {
   applications          Application[]
   cancellations         Cancellation[]
   conversations         Conversation[]
+  notifications         Notification[]
 
   @@index([clientId])
   @@index([categoryId])
@@ -270,6 +275,7 @@ model Application {
   task                  Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
   worker                User              @relation(fields: [workerId], references: [id], onDelete: Restrict)
   attachments           ApplicationAttachment[]
+  notifications         Notification[]
 
   @@unique([taskId, workerId])
   @@index([taskId])
@@ -372,6 +378,7 @@ model Contract {
   payout      Payout?
   cancellations Cancellation[]
   conversations Conversation[]
+  notifications Notification[]
 
   @@index([workerId])
   @@index([status])
@@ -550,6 +557,7 @@ model Payment {
   payout      Payout?
   cancellations Cancellation[]
   refunds      Refund[]
+  notifications Notification[]
 
   @@index([taskId])
   @@index([contractId])
@@ -751,6 +759,7 @@ model Message {
   attachments    MessageAttachment[]
   conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User          @relation(fields: [senderId], references: [id], onDelete: Restrict)
+  notifications  Notification[]
 
   createdAt      TimestamptzString @default(now())
   updatedAt      temporal.updatedAtString()
@@ -950,21 +959,137 @@ enum NotificationType {
   SYSTEM
 }
 
-model Notification {
-  id        String           @id @default(uuid())
-  userId    String
-  type      NotificationType
-  title     String
-  message   String
-  readAt    TimestamptzString?
-  createdAt TimestamptzString @default(now())
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+}
 
+enum NotificationStatus {
+  ACTIVE
+  EXPIRED
+  SUPPRESSED
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  UNKNOWN
+}
+
+enum PushDeviceStatus {
+  ACTIVE
+  REVOKED
+  INVALID
+}
+
+model Notification {
+  id                String             @id @default(uuid())
+  userId            String
+  type              NotificationType
+  title             String
+  message           String
+  eventId           String
+  eventType         String
+  aggregateType     String
+  aggregateId       String
+  taskId            String?
+  contractId        String?
+  applicationId     String?
+  paymentId         String?
+  messageId         String?
+  referenceMetadata String?
+  deepLink          String?
+  status            NotificationStatus @default(ACTIVE)
+  readAt            TimestamptzString?
+  expiresAt         TimestamptzString?
+  createdAt         TimestamptzString @default(now())
+
+  recipient         User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  task              Task?              @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  contract          Contract?          @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  application       Application?       @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  payment           Payment?            @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  messageRecord     Message?           @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  deliveryAttempts  NotificationDeliveryAttempt[]
+
+  @@unique([eventId, userId, type], map: "notification_event_recipient_type_key")
   @@index([userId])
   @@index([type])
   @@index([readAt])
   @@index([createdAt])
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([eventType, aggregateType, aggregateId])
+  @@index([taskId])
+  @@index([contractId])
+  @@index([applicationId])
+  @@index([paymentId])
+  @@index([messageId])
+  @@index([status, expiresAt])
 }
 
+model NotificationPreference {
+  id          String             @id @default(uuid())
+  userId      String
+  type        NotificationType
+  channel     NotificationChannel
+  enabled     Boolean            @default(true)
+  createdAt   TimestamptzString  @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, type, channel], map: "notification_preference_user_type_channel_key")
+  @@index([userId])
+  @@index([type, channel])
+}
+
+model NotificationDeliveryAttempt {
+  id              String                     @id @default(uuid())
+  notificationId  String
+  recipientUserId String
+  channel         NotificationChannel
+  attemptNumber   Int
+  status          NotificationDeliveryStatus @default(PENDING)
+  startedAt       TimestamptzString?
+  completedAt     TimestamptzString?
+  provider        String?
+  providerRef     String?
+  providerOutcome String?
+  errorClass      String?
+  uncertaintyInfo String?
+  createdAt       TimestamptzString         @default(now())
+
+  notification    Notification @relation(fields: [notificationId], references: [id], onDelete: Restrict)
+  recipient       User         @relation("NotificationAttemptRecipients", fields: [recipientUserId], references: [id], onDelete: Restrict)
+
+  @@unique([notificationId, channel, attemptNumber], map: "notification_delivery_attempt_key")
+  @@index([notificationId])
+  @@index([recipientUserId, channel, status], map: "nda_recipient_channel_status_idx")
+  @@index([channel, status, createdAt], map: "nda_channel_status_created_idx")
+}
+
+model PushDevice {
+  id           String           @id @default(uuid())
+  userId       String
+  provider     String
+  platform     String
+  token        String
+  status       PushDeviceStatus @default(ACTIVE)
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+  revokedAt    TimestamptzString?
+
+  user         User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, token], map: "push_device_provider_token_key")
+  @@index([userId, status])
+  @@index([provider, platform, status])
+}
 model RefreshToken {
   id          String   @id @default(uuid())
   userId      String

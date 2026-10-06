@@ -6,9 +6,10 @@ import { TasksModule } from './tasks/tasks.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { AccountModule } from './accounts/account.module.js';
 import { MessagingModule } from './messaging/messaging.module.js';
+import { NotificationModule } from './notifications/notification.module.js';
 
 @Module({
-  imports: [AuditModule, AuthModule, AccountModule, TasksModule, MessagingModule],
+  imports: [AuditModule, AuthModule, AccountModule, TasksModule, MessagingModule, NotificationModule],
   controllers: [ProfileController],
   providers: [ProfileService],
   exports: [ProfileService],
