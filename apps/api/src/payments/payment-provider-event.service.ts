@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   BadRequestException,
   ConflictException,
@@ -143,8 +144,30 @@ export class PaymentProviderEventService {
         );
       }
 
+      const recordedEvent = await this.recordEventIfAbsent(tx, event);
+      if (!recordedEvent) {
+        const duplicateEvent = await tx.orm.public.PaymentProviderEvent
+          .where({
+            provider: event.provider,
+            providerEventId: event.providerEventId,
+          })
+          .first();
+
+        if (!duplicateEvent) {
+          throw new ConflictException(
+            'Provider event conflict could not be resolved safely',
+          );
+        }
+
+        return {
+          status: 'DUPLICATE' as const,
+          eventId: duplicateEvent.id,
+          paymentId: duplicateEvent.paymentId,
+          paymentStatus: 'UNCHANGED' as const,
+        };
+      }
+
       if (event.type === 'FUNDING_SUCCEEDED' && payment.status === 'FUNDED') {
-        await this.recordEvent(tx, event);
         return {
           status: 'ALREADY_APPLIED' as const,
           eventId: event.providerEventId,
@@ -157,7 +180,6 @@ export class PaymentProviderEventService {
         (event.type === 'FUNDING_FAILED' && payment.status === 'FAILED') ||
         (event.type === 'FUNDING_CANCELLED' && payment.status === 'CANCELLED')
       ) {
-        await this.recordEvent(tx, event);
         return {
           status: 'ALREADY_APPLIED' as const,
           eventId: event.providerEventId,
@@ -266,8 +288,6 @@ export class PaymentProviderEventService {
           details: `Payment funded from verified provider event ${event.providerEventId}`,
         });
 
-        await this.recordEvent(tx, event);
-
         return {
           status: 'PROCESSED' as const,
           eventId: event.providerEventId,
@@ -302,8 +322,6 @@ export class PaymentProviderEventService {
         details: `Payment marked ${nextStatus} from verified provider event ${event.providerEventId}`,
       });
 
-      await this.recordEvent(tx, event);
-
       return {
         status: 'PROCESSED' as const,
         eventId: event.providerEventId,
@@ -313,17 +331,26 @@ export class PaymentProviderEventService {
     });
   }
 
-  private async recordEvent(
+  private async recordEventIfAbsent(
     tx: any,
     event: NormalizedPaymentProviderEvent,
-  ) {
-    return tx.orm.public.PaymentProviderEvent.create({
-      provider: event.provider,
-      providerEventId: event.providerEventId,
-      type: event.type,
-      paymentId: event.paymentId,
-      providerRef: event.providerRef,
-      metadata: event.metadata,
-    });
+  ): Promise<Record<string, unknown> | null> {
+    const eventTable = tx.sql.public.paymentProviderEvent;
+    const eventId = randomUUID();
+    const plan = tx.raw.sql`
+      INSERT INTO "PaymentProviderEvent"
+        ("id", "provider", "providerEventId", "type", "paymentId", "providerRef", "metadata")
+      VALUES
+        (${eventId}, ${event.provider}, ${event.providerEventId}, ${event.type},
+         ${event.paymentId}, ${event.providerRef}, ${event.metadata})
+      ON CONFLICT ("provider", "providerEventId") DO NOTHING
+      RETURNING "id", "paymentId"
+    `.returnsRow({
+      id: eventTable.columns.id,
+      paymentId: eventTable.columns.paymentId,
+    }).build();
+
+    const inserted = await tx.query(plan);
+    return inserted[0] ?? null;
   }
 }

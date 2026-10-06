@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   categoryFirst: vi.fn(),
+  locationFirst: vi.fn(),
+  countryFirst: vi.fn(),
   taskCreate: vi.fn(),
   requirementCreate: vi.fn(),
   attachmentCreate: vi.fn(),
@@ -15,6 +17,8 @@ vi.mock('../prisma/db.js', () => ({
     orm: {
       public: {
         Category: { where: vi.fn(() => ({ first: mocks.categoryFirst })) },
+        UserLocation: { where: vi.fn(() => ({ first: mocks.locationFirst })) },
+        Country: { where: vi.fn(() => ({ first: mocks.countryFirst })) },
         Task: { create: mocks.taskCreate },
         TaskRequirement: { create: mocks.requirementCreate },
         TaskAttachment: { create: mocks.attachmentCreate },
@@ -43,6 +47,8 @@ describe('TasksService.createTask', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mocks.categoryFirst.mockResolvedValue({ id: dto.categoryId, active: true });
+    mocks.locationFirst.mockResolvedValue({ countryId: 'country-id' });
+    mocks.countryFirst.mockResolvedValue({ id: 'country-id', currency: 'KES' });
     mocks.taskCreate.mockResolvedValue({ id: 'task-id', ...dto });
     mocks.requirementCreate.mockResolvedValue({ id: 'requirement-id' });
     mocks.attachmentCreate.mockResolvedValue({ id: 'attachment-id' });

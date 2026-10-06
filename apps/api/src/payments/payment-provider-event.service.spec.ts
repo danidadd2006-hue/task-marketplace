@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaymentProviderEventService } from './payment-provider-event.service.js';
 
 const mocks = vi.hoisted(() => ({
@@ -25,6 +25,10 @@ const mocks = vi.hoisted(() => ({
     id: 'task-id-column',
     status: 'task-status-column',
     currency: 'task-currency-column',
+  },
+  eventColumns: {
+    id: 'event-id-column',
+    paymentId: 'event-payment-id-column',
   },
   contractFirst: vi.fn(),
 }));
@@ -64,6 +68,7 @@ function setupTransaction() {
         public: {
           payment: { columns: mocks.paymentColumns },
           task: { columns: mocks.taskColumns },
+          paymentProviderEvent: { columns: mocks.eventColumns },
         },
       },
       raw: {
@@ -103,6 +108,7 @@ function setupTransaction() {
 function makeService() {
   return new PaymentProviderEventService({
     initiateFunding: vi.fn(),
+    reconcileFunding: vi.fn(),
     normalizeWebhook: mocks.normalizeWebhook,
   });
 }
@@ -114,6 +120,7 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
     mocks.eventFirst.mockResolvedValue(undefined);
     mocks.query
       .mockResolvedValueOnce([payment])
+      .mockResolvedValueOnce([{ id: 'event-id', paymentId: 'payment-id' }])
       .mockResolvedValueOnce([
         { id: 'task-id', status: 'AWAITING_PAYMENT', currency: 'USD' },
       ]);
@@ -169,16 +176,35 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
   it('serializes concurrent deliveries by locking the payment and task rows', async () => {
     await makeService().processNormalizedEvent(event);
 
-    expect(mocks.query).toHaveBeenCalledTimes(2);
+    expect(mocks.query).toHaveBeenCalledTimes(3);
     expect(mocks.query.mock.calls[0][0]).toBe('lock-plan');
-    expect(mocks.query.mock.calls[1][0]).toBe('lock-plan');
+    expect(mocks.query.mock.calls[2][0]).toBe('lock-plan');
+  });
+
+  it('returns a clean duplicate when concurrent conflict-safe insertion loses the race', async () => {
+    mocks.query.mockReset();
+    mocks.query.mockResolvedValueOnce([payment]).mockResolvedValueOnce([]);
+    mocks.eventFirst
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ id: 'event-id', paymentId: 'payment-id' });
+
+    const result = await makeService().processNormalizedEvent(event);
+
+    expect(result).toEqual({
+      status: 'DUPLICATE',
+      eventId: 'event-id',
+      paymentId: 'payment-id',
+      paymentStatus: 'UNCHANGED',
+    });
+    expect(mocks.paymentUpdate).not.toHaveBeenCalled();
+    expect(mocks.ledgerCreate).not.toHaveBeenCalled();
   });
 
   it('rejects a second event that targets a terminal payment', async () => {
     mocks.query.mockReset();
-    mocks.query.mockResolvedValueOnce([
-      { ...payment, status: 'FAILED' },
-    ]);
+    mocks.query
+      .mockResolvedValueOnce([{ ...payment, status: 'FAILED' }])
+      .mockResolvedValueOnce([{ id: 'event-id', paymentId: 'payment-id' }]);
 
     await expect(
       makeService().processNormalizedEvent(event),
@@ -207,43 +233,39 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
   });
 
   it('rejects provider/reference, amount, and currency mismatches', async () => {
-    await expect(
-      makeService().processNormalizedEvent({
-        ...event,
-        provider: 'different-provider',
-      }),
-    ).rejects.toThrow('Payment provider does not match the event');
+    const mismatchCases = [
+      {
+        event: { ...event, provider: 'different-provider' },
+        message: 'Payment provider does not match the event',
+      },
+      {
+        event: { ...event, providerRef: 'different-reference' },
+        message: 'Payment provider reference does not match the event',
+      },
+      {
+        event: { ...event, amount: '99.00' },
+        message: 'Provider transaction amount or currency does not match the payment',
+      },
+      {
+        event: { ...event, currency: 'KES' },
+        message: 'Provider transaction amount or currency does not match the payment',
+      },
+    ];
 
-    await expect(
-      makeService().processNormalizedEvent({
-        ...event,
-        providerRef: 'different-reference',
-      }),
-    ).rejects.toThrow('Payment provider reference does not match the event');
-
-    await expect(
-      makeService().processNormalizedEvent({
-        ...event,
-        amount: '99.00',
-      }),
-    ).rejects.toThrow(
-      'Provider transaction amount or currency does not match the payment',
-    );
-
-    await expect(
-      makeService().processNormalizedEvent({
-        ...event,
-        currency: 'KES',
-      }),
-    ).rejects.toThrow(
-      'Provider transaction amount or currency does not match the payment',
-    );
+    for (const mismatch of mismatchCases) {
+      mocks.query.mockReset();
+      mocks.query.mockResolvedValueOnce([payment]);
+      await expect(
+        makeService().processNormalizedEvent(mismatch.event),
+      ).rejects.toThrow(mismatch.message);
+    }
   });
 
   it('does not fund when the task currency differs from the payment', async () => {
     mocks.query.mockReset();
     mocks.query
       .mockResolvedValueOnce([payment])
+      .mockResolvedValueOnce([{ id: 'event-id', paymentId: 'payment-id' }])
       .mockResolvedValueOnce([
         { id: 'task-id', status: 'AWAITING_PAYMENT', currency: 'KES' },
       ]);

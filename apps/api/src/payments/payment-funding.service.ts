@@ -15,9 +15,6 @@ import {
   type PaymentProvider,
 } from './payment-provider.js';
 
-const COMMISSION_RATE_NUMERATOR = 10n;
-const COMMISSION_RATE_DENOMINATOR = 100n;
-
 function decimalTenPercent(value: string): string {
   const normalized = value.trim();
   if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
@@ -27,10 +24,8 @@ function decimalTenPercent(value: string): string {
   const [whole, fraction = ''] = normalized.split('.');
   const scale = fraction.length;
   const digits = BigInt(whole + fraction);
-  const result =
-    (digits * COMMISSION_RATE_NUMERATOR) / COMMISSION_RATE_DENOMINATOR;
   const commissionScale = scale + 1;
-  const raw = result.toString().padStart(commissionScale + 1, '0');
+  const raw = digits.toString().padStart(commissionScale + 1, '0');
   const wholePart = raw.slice(0, -commissionScale);
   const fractionPart = raw.slice(-commissionScale).replace(/0+$/, '');
 
@@ -111,6 +106,17 @@ export class PaymentFundingService {
         throw new ConflictException('Payment has already been funded');
       }
 
+      if (
+        existingPayment &&
+        existingPayment.status !== 'PENDING' &&
+        existingPayment.status !== 'FAILED' &&
+        existingPayment.status !== 'CANCELLED'
+      ) {
+        throw new ConflictException(
+          `Payment cannot be retried from ${existingPayment.status}`,
+        );
+      }
+
       const amount = contract.agreedPrice;
       const currency = task.currency;
       if (!currency) {
@@ -179,8 +185,10 @@ export class PaymentFundingService {
           contractId: contract.id,
           amount,
           currency,
+          providerRef: payment.providerRef,
           taskStatus: 'AWAITING_PAYMENT' as const,
           isRetry: shouldReopen,
+          isExistingPayment: true,
         };
       }
 
@@ -246,18 +254,49 @@ export class PaymentFundingService {
         contractId: contract.id,
         amount,
         currency,
+        providerRef: null,
         taskStatus: 'AWAITING_PAYMENT' as const,
         isRetry: false,
+        isExistingPayment: false,
       };
     });
 
     try {
-      const providerResult = await this.paymentProvider.initiateFunding({
-        paymentId: intent.paymentId,
-        amount: intent.amount,
-        currency: intent.currency,
-        customerEmail: client.email,
-      });
+      let providerResult: Awaited<
+        ReturnType<PaymentProvider['initiateFunding']>
+      >;
+
+      if (intent.isExistingPayment) {
+        const reconciliation = await this.paymentProvider.reconcileFunding({
+          paymentId: intent.paymentId,
+          providerRef: intent.providerRef,
+          amount: intent.amount,
+          currency: intent.currency,
+        });
+
+        if (reconciliation.status === 'FOUND') {
+          providerResult = {
+            status: 'PENDING',
+            provider: reconciliation.provider,
+            providerRef: reconciliation.providerRef,
+            checkoutUrl: reconciliation.checkoutUrl,
+          };
+        } else {
+          providerResult = await this.paymentProvider.initiateFunding({
+            paymentId: intent.paymentId,
+            amount: intent.amount,
+            currency: intent.currency,
+            customerEmail: client.email,
+          });
+        }
+      } else {
+        providerResult = await this.paymentProvider.initiateFunding({
+          paymentId: intent.paymentId,
+          amount: intent.amount,
+          currency: intent.currency,
+          customerEmail: client.email,
+        });
+      }
 
       const updated = await db.transaction(async (tx) => {
         const payment = await tx.orm.public.Payment

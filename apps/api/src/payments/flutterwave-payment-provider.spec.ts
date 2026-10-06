@@ -73,6 +73,79 @@ describe('FlutterwavePaymentProvider', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
+  it('reconciles an existing pending transaction by the stable tx_ref without creating another transaction', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          status: 'success',
+          data: [
+            {
+              tx_ref: 'payment-id',
+              status: 'pending',
+              amount: 100,
+              currency: 'KES',
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await new FlutterwavePaymentProvider().reconcileFunding({
+      paymentId: 'payment-id',
+      amount: '100',
+      currency: 'KES',
+    });
+
+    expect(result).toEqual({
+      status: 'FOUND',
+      provider: 'FLUTTERWAVE',
+      providerRef: 'payment-id',
+      checkoutUrl: null,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toContain(
+      '/transactions?tx_ref=payment-id',
+    );
+  });
+
+  it('allows a new initiation when provider lookup confirms no transaction exists', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ status: 'success', data: [] }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      new FlutterwavePaymentProvider().reconcileFunding({
+        paymentId: 'payment-id',
+        amount: '100',
+        currency: 'KES',
+      }),
+    ).resolves.toEqual({ status: 'NOT_FOUND' });
+  });
+
+  it('treats provider lookup failures as uncertain and never assumes no transaction exists', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ status: 'failed', message: 'temporary error' }),
+        { status: 500 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      new FlutterwavePaymentProvider().reconcileFunding({
+        paymentId: 'payment-id',
+        amount: '100',
+        currency: 'KES',
+      }),
+    ).rejects.toThrow('temporary error');
+  });
+
   it('rejects webhook signature failures before provider verification', async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
@@ -130,10 +203,10 @@ describe('FlutterwavePaymentProvider', () => {
       amount: '100',
       currency: 'KES',
     });
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining(
-        '/transactions/verify_by_reference?tx_ref=payment-id',
-      ),
+    expect(String(fetchMock.mock.calls[0][0])).toContain(
+      '/transactions/verify_by_reference?tx_ref=payment-id',
+    );
+    expect(fetchMock.mock.calls[0][1]).toEqual(
       expect.objectContaining({
         headers: {
           Authorization: 'Bearer test-secret',

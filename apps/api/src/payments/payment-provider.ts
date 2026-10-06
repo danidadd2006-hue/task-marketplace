@@ -26,6 +26,23 @@ export interface PaymentProvider {
     checkoutUrl: string | null;
   }>;
 
+  reconcileFunding(input: {
+    paymentId: string;
+    providerRef?: string | null;
+    amount: string;
+    currency: string;
+  }): Promise<
+    | {
+        status: 'FOUND';
+        provider: string;
+        providerRef: string;
+        checkoutUrl: string | null;
+      }
+    | {
+        status: 'NOT_FOUND';
+      }
+  >;
+
   normalizeWebhook(input: {
     body: unknown;
     headers: Record<string, string | string[] | undefined>;
@@ -46,6 +63,20 @@ export class PendingPaymentProvider implements PaymentProvider {
       providerRef: null,
       checkoutUrl: null,
     };
+  }
+
+  async reconcileFunding(): Promise<
+    | {
+        status: 'FOUND';
+        provider: string;
+        providerRef: string;
+        checkoutUrl: string | null;
+      }
+    | {
+        status: 'NOT_FOUND';
+      }
+  > {
+    return { status: 'NOT_FOUND' };
   }
 
   async normalizeWebhook(): Promise<NormalizedPaymentProviderEvent> {

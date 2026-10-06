@@ -6,6 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PaymentFundingService } from './payment-funding.service.js';
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -18,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   taskUpdate: vi.fn(),
   transaction: vi.fn(),
   provider: vi.fn(),
+  reconcileFunding: vi.fn(),
   committedPaymentFirst: vi.fn(),
   taskColumns: {
     id: 'task-id-column',
@@ -125,6 +127,7 @@ function setupTransaction() {
 function makeService() {
   return new PaymentFundingService({
     initiateFunding: mocks.provider,
+    reconcileFunding: mocks.reconcileFunding,
     normalizeWebhook: vi.fn(),
   });
 }
@@ -136,6 +139,7 @@ describe('PaymentFundingService.initiateFunding', () => {
     mocks.query.mockResolvedValueOnce([task]);
     mocks.contractFirst.mockResolvedValue(contract);
     mocks.paymentFirst.mockResolvedValue(undefined);
+    mocks.reconcileFunding.mockResolvedValue({ status: 'NOT_FOUND' });
     mocks.provider.mockResolvedValue({
       status: 'PENDING',
       provider: 'TEST_PROVIDER',
@@ -237,6 +241,7 @@ describe('PaymentFundingService.initiateFunding', () => {
   });
 
   it('rejects an unrelated client before creating a payment', async () => {
+    mocks.query.mockReset();
     mocks.query.mockResolvedValueOnce([
       { ...task, clientId: 'different-client-id' },
     ]);
@@ -279,6 +284,98 @@ describe('PaymentFundingService.initiateFunding', () => {
     }
   });
 
+  it('reconciles an uncertain prior initiation before retrying', async () => {
+    mocks.paymentFirst
+      .mockResolvedValueOnce({
+        ...payment,
+        provider: null,
+        providerRef: null,
+      })
+      .mockResolvedValueOnce(payment);
+    mocks.query.mockResolvedValueOnce([
+      { ...task, status: 'AWAITING_PAYMENT' },
+    ]);
+    mocks.paymentUpdate.mockRejectedValueOnce(
+      new Error('provider reference persistence timeout'),
+    );
+
+    await expect(
+      makeService().initiateFunding(client, 'task-id'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+
+    expect(mocks.provider).toHaveBeenCalledTimes(1);
+
+    mocks.paymentFirst
+      .mockResolvedValueOnce({
+        ...payment,
+        provider: null,
+        providerRef: null,
+      })
+      .mockResolvedValueOnce(payment);
+    mocks.query.mockResolvedValueOnce([
+      { ...task, status: 'AWAITING_PAYMENT' },
+    ]);
+    mocks.reconcileFunding.mockResolvedValueOnce({
+      status: 'FOUND',
+      provider: 'TEST_PROVIDER',
+      providerRef: 'provider-ref',
+      checkoutUrl: null,
+    });
+    mocks.paymentUpdate.mockResolvedValueOnce({
+      ...payment,
+      provider: 'TEST_PROVIDER',
+      providerRef: 'provider-ref',
+    });
+
+    const result = await makeService().initiateFunding(client, 'task-id');
+
+    expect(mocks.reconcileFunding).toHaveBeenCalledWith({
+      paymentId: 'payment-id',
+      providerRef: null,
+      amount: '100',
+      currency: 'KES',
+    });
+    expect(mocks.provider).toHaveBeenCalledTimes(1);
+    expect(result.payment.providerRef).toBe('provider-ref');
+  });
+
+  it('allows a new provider initiation only after reconciliation confirms no usable prior transaction', async () => {
+    mocks.paymentFirst.mockResolvedValueOnce({
+      ...payment,
+      provider: null,
+      providerRef: null,
+    });
+    mocks.query.mockResolvedValueOnce([
+      { ...task, status: 'AWAITING_PAYMENT' },
+    ]);
+    mocks.reconcileFunding.mockResolvedValueOnce({ status: 'NOT_FOUND' });
+
+    await makeService().initiateFunding(client, 'task-id');
+
+    expect(mocks.reconcileFunding).toHaveBeenCalled();
+    expect(mocks.provider).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not initiate a second provider transaction when reconciliation is uncertain', async () => {
+    mocks.paymentFirst.mockResolvedValueOnce({
+      ...payment,
+      provider: null,
+      providerRef: null,
+    });
+    mocks.query.mockResolvedValueOnce([
+      { ...task, status: 'AWAITING_PAYMENT' },
+    ]);
+    mocks.reconcileFunding.mockRejectedValueOnce(
+      new ServiceUnavailableException('provider lookup uncertain'),
+    );
+
+    await expect(
+      makeService().initiateFunding(client, 'task-id'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+
+    expect(mocks.provider).not.toHaveBeenCalled();
+  });
+
   it('retries an existing PENDING payment using the same local Payment identity', async () => {
     mocks.paymentFirst.mockResolvedValueOnce(payment);
     mocks.query.mockResolvedValueOnce([{ ...task, status: 'AWAITING_PAYMENT' }]);
@@ -294,6 +391,23 @@ describe('PaymentFundingService.initiateFunding', () => {
       }),
     );
     expect(result.payment.id).toBe('payment-id');
+  });
+
+  it('does not retry released, refunded, disputed, or funded payments', async () => {
+    for (const status of ['FUNDED', 'RELEASED', 'REFUNDED', 'DISPUTED']) {
+      mocks.paymentFirst.mockResolvedValueOnce({
+        ...payment,
+        status,
+      });
+      mocks.query.mockResolvedValueOnce([
+        { ...task, status: 'AWAITING_PAYMENT' },
+      ]);
+
+      await expect(
+        makeService().initiateFunding(client, 'task-id'),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(mocks.provider).not.toHaveBeenCalled();
+    }
   });
 
   it('reopens FAILED/CANCELLED payments for a safe retry instead of permanently blocking /fund', async () => {
