@@ -4,9 +4,11 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db } from '../prisma/db.js';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 
 type SqlError = {
   sqlState?: string;
@@ -28,6 +30,8 @@ function isUniqueViolation(error: unknown): boolean {
 
 @Injectable()
 export class TaskWorkerSelectionService {
+  constructor(@Optional() private readonly notificationDomainEventService?: NotificationDomainEventService) {}
+
   async selectWorker(
     client: AuthenticatedUser,
     taskId: string,
@@ -37,7 +41,7 @@ export class TaskWorkerSelectionService {
       throw new ForbiddenException('CLIENT role required');
     }
 
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
       const applicationTable = tx.sql.public.application;
 
@@ -190,5 +194,9 @@ export class TaskWorkerSelectionService {
         },
       };
     });
+
+    await this.notificationDomainEventService?.applicationAccepted(result.application.id);
+    await this.notificationDomainEventService?.contractCreated(result.contract.id);
+    return result;
   }
 }

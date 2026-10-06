@@ -4,10 +4,12 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db } from '../prisma/db.js';
 import { CreateTaskApplicationDto } from './dto/create-task-application.dto.js';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 
 const ELIGIBLE_TASK_STATUSES = ['PUBLISHED', 'RECEIVING_APPLICATIONS'] as const;
 
@@ -31,6 +33,8 @@ function isUniqueViolation(error: unknown): boolean {
 
 @Injectable()
 export class TaskApplicationService {
+  constructor(@Optional() private readonly notificationDomainEventService?: NotificationDomainEventService) {}
+
   async submitApplication(
     worker: AuthenticatedUser,
     taskId: string,
@@ -47,7 +51,7 @@ export class TaskApplicationService {
       throw new BadRequestException('estimatedCompletionAt must be in the future');
     }
 
-    return db.transaction(async (tx) => {
+    const created = await db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
       const lockPlan = tx.raw.sql`
         SELECT "id", "clientId", "status"
@@ -152,5 +156,8 @@ export class TaskApplicationService {
 
       return created;
     });
+
+    await this.notificationDomainEventService?.applicationCreated(created.id);
+    return created;
   }
 }

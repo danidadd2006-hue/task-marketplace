@@ -6,6 +6,7 @@ import { NotificationDeliveryService } from './notification-delivery.service.js'
 import { InAppNotificationDeliveryProvider } from './in-app-notification-delivery.provider.js';
 import { EmailNotificationDeliveryProvider } from './email-notification-delivery.provider.js';
 import { PushNotificationDeliveryProvider } from './push-notification-delivery.provider.js';
+import { NotificationDomainEventService } from './notification-domain-event.service.js';
 
 @Module({
   imports: [AuthModule],
@@ -16,7 +17,8 @@ import { PushNotificationDeliveryProvider } from './push-notification-delivery.p
     InAppNotificationDeliveryProvider,
     EmailNotificationDeliveryProvider,
     PushNotificationDeliveryProvider,
+    NotificationDomainEventService,
   ],
-  exports: [NotificationService, NotificationDeliveryService],
+  exports: [NotificationService, NotificationDeliveryService, NotificationDomainEventService],
 })
 export class NotificationModule {}

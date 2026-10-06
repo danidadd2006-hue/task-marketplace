@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => ({
   ledgerWhere: vi.fn(),
   ledgerCreate: vi.fn(),
   auditCreate: vi.fn(),
+  notificationPaymentReleased: vi.fn(),
 }));
 
 vi.mock('../prisma/db.js', () => ({
@@ -87,11 +88,15 @@ function setup() {
   }));
   mocks.ledgerCreate.mockResolvedValue({ id: 'release-1' });
   mocks.auditCreate.mockResolvedValue({ id: 'audit-1' });
+  mocks.notificationPaymentReleased.mockResolvedValue(undefined);
 }
 
 function service() {
   if (!currentService) {
-    currentService = new PaymentReleaseService(mocks.provider as any);
+    currentService = new PaymentReleaseService(
+      mocks.provider as any,
+      { paymentReleased: mocks.notificationPaymentReleased } as any,
+    );
     (currentService as any).lockPayment = vi.fn().mockResolvedValue(payment);
   }
   return currentService;
@@ -159,6 +164,23 @@ describe('PaymentReleaseService — Step 4.3C', () => {
   it('does not duplicate commission', async () => {
     await service().releasePayment(client, 'payment-1', 'dest-1');
     expect(mocks.ledgerCreate).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'COMMISSION' }));
+  });
+
+  it('emits a notification only after verified payout success releases the payment', async () => {
+    mocks.payoutWhere.mockReturnValue({
+      first: vi.fn().mockResolvedValue({ ...payout, status: 'SUCCEEDED', providerRef: 'payout-ref' }),
+      update: vi.fn().mockResolvedValue(1),
+    });
+
+    const result = await service().releasePayment(client, 'payment-1', 'dest-1');
+    expect((result as any).status).toBe('RELEASED');
+    expect(mocks.notificationPaymentReleased).toHaveBeenCalledWith('payment-1');
+  });
+
+  it('does not emit a release notification when payout initiation does not establish success', async () => {
+    mocks.provider.initiatePayout.mockResolvedValueOnce({ status: 'PROCESSING', provider: 'TEST', providerRef: 'payout-ref' });
+    await service().releasePayment(client, 'payment-1', 'dest-1');
+    expect(mocks.notificationPaymentReleased).not.toHaveBeenCalled();
   });
 
   it('reuses the stable payout identity', async () => {

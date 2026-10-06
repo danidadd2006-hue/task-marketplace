@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException, Optional } from '@nestjs/common';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 import { db, type Tx } from '../prisma/db.js';
 import { CancellationRefundAccountingService } from './cancellation-refund-accounting.service.js';
 
@@ -46,6 +47,8 @@ export class RefundStateService {
   constructor(
     @Optional()
     private readonly accountingService?: CancellationRefundAccountingService,
+    @Optional()
+    private readonly notificationDomainEventService?: NotificationDomainEventService,
   ) {}
 
   async transition(
@@ -61,9 +64,15 @@ export class RefundStateService {
       actorUserId?: string | null;
     } = {},
   ): Promise<RefundTransitionResult> {
-    return db.transaction(async (tx) =>
+    const result = await db.transaction(async (tx) =>
       this.transitionInTransaction(refundId, nextStatus, tx, outcome),
     );
+
+    if (result.status === 'SUCCEEDED') {
+      await this.notificationDomainEventService?.refundSucceeded(result.refundId);
+    }
+
+    return result;
   }
 
   async transitionInTransaction(

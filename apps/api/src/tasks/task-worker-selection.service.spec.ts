@@ -62,6 +62,8 @@ const application = {
   proposedPrice: '75',
 };
 
+const notificationEvents = { applicationAccepted: vi.fn(), contractCreated: vi.fn() };
+
 const contract = {
   id: 'contract-id',
   taskId: 'task-id',
@@ -115,7 +117,7 @@ function setupTransaction() {
 }
 
 describe('TaskWorkerSelectionService.selectWorker', () => {
-  const service = new TaskWorkerSelectionService();
+  const service = new TaskWorkerSelectionService(notificationEvents as never);
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -129,6 +131,8 @@ describe('TaskWorkerSelectionService.selectWorker', () => {
     mocks.contractCreate.mockResolvedValue(contract);
     mocks.applicationUpdate.mockResolvedValue({ ...application, status: 'ACCEPTED' });
     mocks.taskUpdate.mockResolvedValue({ ...task, status: 'WORKER_SELECTED' });
+    notificationEvents.applicationAccepted.mockResolvedValue(undefined);
+    notificationEvents.contractCreated.mockResolvedValue(undefined);
   });
 
   it('allows the task owner to select a valid submitted application', async () => {
@@ -137,6 +141,8 @@ describe('TaskWorkerSelectionService.selectWorker', () => {
     expect(result.task.status).toBe('WORKER_SELECTED');
     expect(result.application.status).toBe('ACCEPTED');
     expect(result.contract.status).toBe('ACTIVE');
+    expect(notificationEvents.applicationAccepted).toHaveBeenCalledWith('application-id');
+    expect(notificationEvents.contractCreated).toHaveBeenCalledWith('contract-id');
   });
 
   it('enforces CLIENT role at the service boundary', async () => {
@@ -292,6 +298,14 @@ describe('TaskWorkerSelectionService.selectWorker', () => {
       .rejects.toBeInstanceOf(ConflictException);
     expect(mocks.applicationUpdate).not.toHaveBeenCalled();
     expect(mocks.taskUpdate).not.toHaveBeenCalled();
+  });
+
+  it('does not emit notifications when selection transaction fails', async () => {
+    mocks.taskUpdate.mockRejectedValueOnce(new Error('selection transaction failed'));
+
+    await expect(service.selectWorker(client, 'task-id', 'application-id')).rejects.toThrow('selection transaction failed');
+    expect(notificationEvents.applicationAccepted).not.toHaveBeenCalled();
+    expect(notificationEvents.contractCreated).not.toHaveBeenCalled();
   });
 
   it('does not accept client-supplied worker/status/contract fields because the endpoint has no request body', async () => {

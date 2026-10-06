@@ -12,7 +12,10 @@ vi.mock('../prisma/db.js', () => ({
   },
 }));
 
+const notificationEvents = { refundSucceeded: vi.fn() };
+
 function setup(status: string, paymentStatus = 'FUNDED') {
+  notificationEvents.refundSucceeded.mockClear();
   const refund = {
     id: 'refund-id', paymentId: 'payment-id', cancellationId: 'cancellation-id',
     amount: '70', currency: 'KES', type: 'PARTIAL', status,
@@ -47,7 +50,7 @@ function setup(status: string, paymentStatus = 'FUNDED') {
     query: vi.fn(),
   } as any;
   mocks.transaction.mockImplementation(async (callback) => callback(tx));
-  const service = new RefundStateService();
+  const service = new RefundStateService(undefined, notificationEvents as never);
   (service as any).lockRefund = vi.fn(async () => refund);
   (service as any).lockPayment = vi.fn(async () => payment);
   return { service, refund, payment, audit, refundWhere, paymentWhere };
@@ -79,6 +82,7 @@ describe('RefundStateService — Phase 4 Step 4.4G', () => {
     expect(payment.status).toBe('REFUNDED');
     expect(payment.refundedAt).toBeTruthy();
     expect(audit).toHaveBeenCalledTimes(2);
+    expect(notificationEvents.refundSucceeded).toHaveBeenCalledWith('refund-id');
   });
 
   it('accounts a confirmed refund in the same transaction as refund finalisation', async () => {
@@ -113,6 +117,14 @@ describe('RefundStateService — Phase 4 Step 4.4G', () => {
       expect(payment.status).toBe('FUNDED');
     }
     expect(payment.status).toBe('FUNDED');
+  });
+
+  it('does not emit a refund notification when refund finalisation fails', async () => {
+    const { service } = setup('PROCESSING');
+    (service as any).lockPayment = vi.fn(async () => ({ id: 'payment-id', amount: '100', currency: 'KES', status: 'RELEASED', refundedAt: null }));
+
+    await expect(service.transition('refund-id', 'SUCCEEDED')).rejects.toThrow('Released payments');
+    expect(notificationEvents.refundSucceeded).not.toHaveBeenCalled();
   });
 
   it('rejects SUCCEEDED finalisation for RELEASED payment', async () => {

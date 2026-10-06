@@ -18,6 +18,7 @@ import type { MessageHistoryQueryDto } from './dto/message-history-query.dto.js'
 import { AttachmentService } from './attachment.service.js';
 import { MessageDeliveryService } from './message-delivery.service.js';
 import { MESSAGE_CREATED_EVENT } from './message-realtime.event.js';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 
 const MESSAGE_TYPES = ['TEXT', 'IMAGE', 'FILE', 'VOICE', 'LOCATION'] as const;
 
@@ -85,6 +86,7 @@ export class MessagingService {
   constructor(
     private readonly messageDeliveryService: MessageDeliveryService,
     @Optional() private readonly attachmentService?: AttachmentService,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
   ) {}
 
   async createConversation(user: AuthenticatedUser, dto: CreateConversationDto) {
@@ -270,6 +272,8 @@ export class MessagingService {
         attachmentId,
       );
     }
+
+    await this.notificationDomainEventService?.messageCreated(message.id);
 
     await this.messageDeliveryService.publishMessageCreated({
       eventType: MESSAGE_CREATED_EVENT,

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RefundProviderEventService } from './refund-provider-event.service.js';
 
 const mocks = vi.hoisted(() => ({
+  notificationRefundSucceeded: vi.fn(),
   transaction: vi.fn(),
   eventFirst: vi.fn(),
   eventQuery: vi.fn(),
@@ -132,9 +133,12 @@ function setupTransaction() {
 }
 
 function makeService() {
-  return new RefundProviderEventService({
-    transitionInTransaction: mocks.stateTransition,
-  } as any);
+  return new RefundProviderEventService(
+    {
+      transitionInTransaction: mocks.stateTransition,
+    } as any,
+    { refundSucceeded: mocks.notificationRefundSucceeded } as any,
+  );
 }
 
 beforeEach(() => {
@@ -153,7 +157,9 @@ beforeEach(() => {
     idempotent: false,
     status,
     paymentStatus: status === 'SUCCEEDED' ? 'REFUNDED' : 'FUNDED',
+    refundId: 'refund-id',
   }));
+  mocks.notificationRefundSucceeded.mockResolvedValue(undefined);
 });
 
 describe('RefundProviderEventService.processNormalizedEvent — Step 4.4H', () => {
@@ -179,6 +185,7 @@ describe('RefundProviderEventService.processNormalizedEvent — Step 4.4H', () =
     expect(mocks.refundUpdate).toHaveBeenCalledWith({
       reconciledAt: expect.any(String),
     });
+    expect(mocks.notificationRefundSucceeded).toHaveBeenCalledWith('refund-id');
   });
 
   it('resolves PROCESSING to FAILED without refunding the Payment', async () => {

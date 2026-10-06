@@ -56,6 +56,8 @@ const dto = {
   ],
 };
 
+const notificationEvents = { applicationCreated: vi.fn() };
+
 const submittedApplication = {
   id: 'application-id',
   taskId: 'task-id',
@@ -111,7 +113,7 @@ function setupTransaction() {
 }
 
 describe('TaskApplicationService.submitApplication', () => {
-  const service = new TaskApplicationService();
+  const service = new TaskApplicationService(notificationEvents as never);
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -126,10 +128,13 @@ describe('TaskApplicationService.submitApplication', () => {
       ...submittedApplication,
       attachments: [{ id: 'application-attachment-id' }],
     });
+    notificationEvents.applicationCreated.mockResolvedValue(undefined);
   });
 
   it('allows an authenticated WORKER to apply to a PUBLISHED task', async () => {
     const result = await service.submitApplication(worker, 'task-id', dto);
+
+    expect(notificationEvents.applicationCreated).toHaveBeenCalledWith('application-id');
 
     expect(result.status).toBe('SUBMITTED');
     expect(mocks.applicationCreate).toHaveBeenCalledWith(expect.objectContaining({
@@ -240,6 +245,13 @@ describe('TaskApplicationService.submitApplication', () => {
     await service.submitApplication(worker, 'task-id', dto);
 
     expect(mocks.query).toHaveBeenCalledWith('task-lock-plan');
+  });
+
+  it('does not emit a notification when the authoritative application transaction fails', async () => {
+    mocks.applicationCreate.mockRejectedValue(new Error('transaction failed'));
+
+    await expect(service.submitApplication(worker, 'task-id', dto)).rejects.toThrow('transaction failed');
+    expect(notificationEvents.applicationCreated).not.toHaveBeenCalled();
   });
 
   it('rejects a missing task', async () => {

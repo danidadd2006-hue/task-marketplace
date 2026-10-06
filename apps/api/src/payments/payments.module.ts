@@ -19,9 +19,10 @@ import { RefundProviderEventService } from './refund-provider-event.service.js';
 import { RefundProviderEventController } from './refund-provider-event.controller.js';
 import { RefundStateService } from './refund-state.service.js';
 import { CancellationRefundAccountingService } from './cancellation-refund-accounting.service.js';
+import { NotificationModule } from '../notifications/notification.module.js';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, NotificationModule],
   controllers: [
     PaymentFundingController,
     PaymentProviderEventController,

@@ -7,11 +7,12 @@ const mocks = vi.hoisted(() => ({
   eventFirst: vi.fn(),
   eventCreate: vi.fn(),
   applyProviderEvent: vi.fn(),
+  notificationPaymentReleased: vi.fn(),
 }));
 
 vi.mock('../prisma/db.js', () => ({ db: { transaction: mocks.transaction } }));
 
-const payout = { id: 'payout-id', amount: '90.00', currency: 'KES', status: 'PENDING', provider: 'TEST', providerRef: null };
+const payout = { id: 'payout-id', paymentId: 'payment-id', amount: '90.00', currency: 'KES', status: 'PENDING', provider: 'TEST', providerRef: null };
 const event = { provider: 'TEST', providerEventId: 'payout-event-1', type: 'PAYOUT_SUCCEEDED' as const, payoutId: 'payout-id', providerRef: 'payout-ref', amount: '90.00', currency: 'KES', metadata: '{"status":"successful"}' };
 
 function setup() {
@@ -30,17 +31,22 @@ describe('PayoutProviderEventService — Step 4.3C', () => {
     mocks.eventFirst.mockResolvedValue(undefined);
     mocks.payoutFirst.mockResolvedValue(payout);
     mocks.eventCreate.mockResolvedValue({ id: 'event-id', payoutId: 'payout-id' });
-    mocks.applyProviderEvent.mockResolvedValue({ status: 'RELEASED' });
+    mocks.applyProviderEvent.mockResolvedValue({ status: 'SUCCEEDED' });
+    mocks.notificationPaymentReleased.mockResolvedValue(undefined);
   });
 
   function service() {
-    return new PayoutProviderEventService({ applyProviderEvent: mocks.applyProviderEvent } as any);
+    return new PayoutProviderEventService(
+      { applyProviderEvent: mocks.applyProviderEvent } as any,
+      { paymentReleased: mocks.notificationPaymentReleased } as any,
+    );
   }
 
   it('processes a verified payout success and delegates atomic release completion', async () => {
     const result = await service().processNormalizedEvent(event);
     expect(result).toMatchObject({ status: 'PROCESSED', payoutId: 'payout-id' });
     expect(mocks.applyProviderEvent).toHaveBeenCalledWith(event, expect.anything());
+    expect(mocks.notificationPaymentReleased).toHaveBeenCalledWith('payment-id');
   });
 
   it('returns duplicate for an already recorded provider event', async () => {

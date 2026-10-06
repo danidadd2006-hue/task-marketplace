@@ -1,14 +1,18 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, Optional } from '@nestjs/common';
 import { db, type Tx } from '../prisma/db.js';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 import { PaymentReleaseService } from './payment-release.service.js';
 import type { NormalizedPayoutProviderEvent } from './payment-provider.js';
 
 @Injectable()
 export class PayoutProviderEventService {
-  constructor(private readonly paymentReleaseService: PaymentReleaseService) {}
+  constructor(
+    private readonly paymentReleaseService: PaymentReleaseService,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
+  ) {}
 
   async processNormalizedEvent(event: NormalizedPayoutProviderEvent) {
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const existing = await tx.orm.public.PayoutProviderEvent.where({
         provider: event.provider,
         providerEventId: event.providerEventId,
@@ -57,9 +61,16 @@ export class PayoutProviderEventService {
         status: 'PROCESSED' as const,
         eventId: recorded.id,
         payoutId: payout.id,
+        paymentId: payout.paymentId,
         payoutStatus: result?.status ?? null,
       };
     });
+
+    if (result.payoutStatus === 'SUCCEEDED' && result.paymentId) {
+      await this.notificationDomainEventService?.paymentReleased(result.paymentId);
+    }
+
+    return result;
   }
 
   async processWebhook(input: {

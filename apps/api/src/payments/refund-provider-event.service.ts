@@ -1,5 +1,6 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 import { db, type Tx } from '../prisma/db.js';
 import { RefundStateService } from './refund-state.service.js';
 import type { NormalizedRefundProviderEvent, NormalizedRefundProviderResult } from './payment-provider.js';
@@ -8,7 +9,10 @@ type RefundOutcome = 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'UNKNOWN';
 
 @Injectable()
 export class RefundProviderEventService {
-  constructor(private readonly refundStateService: RefundStateService) {}
+  constructor(
+    private readonly refundStateService: RefundStateService,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
+  ) {}
 
   async processWebhook(input: {
     body: unknown;
@@ -29,7 +33,7 @@ export class RefundProviderEventService {
   }
 
   async processNormalizedEvent(event: NormalizedRefundProviderEvent) {
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const duplicate = await tx.orm.public.RefundProviderEvent.where({
         provider: event.provider,
         providerEventId: event.providerEventId,
@@ -183,6 +187,12 @@ export class RefundProviderEventService {
         paymentStatus: transition.paymentStatus,
       };
     });
+
+    if (result.refundStatus === 'SUCCEEDED' && result.refundId) {
+      await this.notificationDomainEventService?.refundSucceeded(result.refundId);
+    }
+
+    return result;
   }
 
   async reconcileRefund(
@@ -222,7 +232,7 @@ export class RefundProviderEventService {
       metadata: refund.reconciliationMetadata,
     });
 
-    return db.transaction(async (tx) => {
+    const reconciled = await db.transaction(async (tx) => {
       const current = (await this.lockRefund(tx, refund.id)) as any;
       if (!current) throw new NotFoundException('Refund not found');
 
@@ -259,6 +269,12 @@ export class RefundProviderEventService {
         paymentStatus: transition.paymentStatus,
       };
     });
+
+    if (reconciled.refundStatus === 'SUCCEEDED' && reconciled.refundId) {
+      await this.notificationDomainEventService?.refundSucceeded(reconciled.refundId);
+    }
+
+    return reconciled;
   }
 
   private outcomeFor(type: NormalizedRefundProviderEvent['type']): RefundOutcome {

@@ -39,6 +39,8 @@ vi.mock('./payment-provider.js', () => ({
   PAYMENT_PROVIDER: Symbol.for('PAYMENT_PROVIDER'),
 }));
 
+const notificationEvents = { paymentFunded: vi.fn(), refundSucceeded: vi.fn() };
+
 const event = {
   provider: 'test-provider',
   providerEventId: 'evt-1',
@@ -116,7 +118,7 @@ function makeService() {
     initiateRefund: vi.fn(),
     reconcileRefund: vi.fn(),
     normalizeRefundWebhook: vi.fn(),
-  });
+  }, notificationEvents as any);
 }
 
 describe('PaymentProviderEventService.processNormalizedEvent', () => {
@@ -163,6 +165,7 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
         paymentId: 'payment-id',
       }),
     );
+    expect(notificationEvents.paymentFunded).toHaveBeenCalledWith('payment-id');
   });
 
   it('returns a duplicate without financial writes for an already recorded event', async () => {
@@ -215,6 +218,13 @@ describe('PaymentProviderEventService.processNormalizedEvent', () => {
     await expect(
       makeService().processNormalizedEvent(event),
     ).rejects.toThrow('Payment cannot transition from FAILED');
+  });
+
+  it('does not emit a funding notification when the authoritative payment transition fails', async () => {
+    mocks.paymentUpdate.mockRejectedValueOnce(new Error('payment update failed'));
+
+    await expect(makeService().processNormalizedEvent(event)).rejects.toThrow('payment update failed');
+    expect(notificationEvents.paymentFunded).not.toHaveBeenCalled();
   });
 
   it('records failed provider events without funding the task', async () => {

@@ -14,9 +14,10 @@ import { TaskCancellationService } from './task-cancellation.service.js';
 import { TaskCancellationController } from './task-cancellation.controller.js';
 import { TasksController } from './tasks.controller.js';
 import { TasksService } from './tasks.service.js';
+import { NotificationModule } from '../notifications/notification.module.js';
 
 @Module({
-  imports: [AuthModule, PaymentsModule],
+  imports: [AuthModule, PaymentsModule, NotificationModule],
   controllers: [
     TasksController,
     PublicTasksController,

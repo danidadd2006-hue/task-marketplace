@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { db } from '../prisma/db.js';
+import { Optional } from '@nestjs/common';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 import {
   PAYMENT_PROVIDER,
   type NormalizedPaymentProviderEvent,
@@ -38,6 +40,7 @@ export class PaymentProviderEventService {
   constructor(
     @Inject(PAYMENT_PROVIDER)
     private readonly paymentProvider: PaymentProvider,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
   ) {}
 
   async processWebhook(input: {
@@ -52,7 +55,7 @@ export class PaymentProviderEventService {
   }
 
   async processNormalizedEvent(event: NormalizedPaymentProviderEvent) {
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const existingEvent = await tx.orm.public.PaymentProviderEvent
         .where({
           provider: event.provider,
@@ -329,6 +332,11 @@ export class PaymentProviderEventService {
         paymentStatus: nextStatus,
       };
     });
+
+    if (result.paymentStatus === 'FUNDED') {
+      await this.notificationDomainEventService?.paymentFunded(result.paymentId);
+    }
+    return result;
   }
 
   private async recordEventIfAbsent(

@@ -6,10 +6,12 @@ import {
   Injectable,
   Inject,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db, type Tx } from '../prisma/db.js';
+import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
 import {
   PAYMENT_PROVIDER,
   type PaymentProvider,
@@ -91,6 +93,7 @@ export class PaymentReleaseService {
   constructor(
     @Inject(PAYMENT_PROVIDER)
     private readonly paymentProvider: PaymentProvider,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
   ) {}
 
   async releasePayment(
@@ -238,6 +241,8 @@ export class PaymentReleaseService {
     });
 
     if (intent.kind === 'COMPLETE') {
+      if (!intent.payout) throw new ConflictException('Payout intent is missing');
+      await this.notificationDomainEventService?.paymentReleased(intent.payout.paymentId);
       return { status: 'RELEASED', payout: intent.payout };
     }
 
@@ -246,11 +251,15 @@ export class PaymentReleaseService {
     }
 
     if (intent.payout.status === 'SUCCEEDED') {
-      return this.completeVerifiedSuccess(intent.payout.id, 'IDEMPOTENT_RELEASE');
+      const result = await this.completeVerifiedSuccess(intent.payout.id, 'IDEMPOTENT_RELEASE');
+      if (result.status === 'RELEASED') await this.notificationDomainEventService?.paymentReleased(result.paymentId);
+      return result;
     }
 
     if (intent.payout.status === 'UNKNOWN' || intent.payout.status === 'PROCESSING') {
-      return this.reconcileExistingPayout(intent.payout);
+      const result = await this.reconcileExistingPayout(intent.payout);
+      if (result.status === 'RELEASED') await this.notificationDomainEventService?.paymentReleased(result.paymentId);
+      return result;
     }
 
     if (intent.payout.status !== 'PENDING') {
@@ -313,7 +322,9 @@ export class PaymentReleaseService {
     const payout = (await db.orm.public.Payout.where({ id: payoutId }).first()) as PayoutRecord | null;
     if (!payout) throw new NotFoundException('Payout not found');
     if (payout.status === 'SUCCEEDED') {
-      return this.completeVerifiedSuccess(payout.id, 'IDEMPOTENT_RECONCILIATION');
+      const result = await this.completeVerifiedSuccess(payout.id, 'IDEMPOTENT_RECONCILIATION');
+      if (result.status === 'RELEASED') await this.notificationDomainEventService?.paymentReleased(result.paymentId);
+      return result;
     }
     if (!payout.providerRef) {
       throw new ConflictException('Payout has no provider reference to reconcile');
