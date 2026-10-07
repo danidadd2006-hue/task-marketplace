@@ -1,0 +1,29 @@
+export type VerificationType =
+  | 'IDENTITY'
+  | 'PHONE'
+  | 'EMAIL'
+  | 'PAYMENT'
+  | 'ADDRESS'
+  | 'BUSINESS'
+  | 'QUALIFICATION';
+
+export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'EXPIRED';
+
+export type VerificationCapability =
+  | 'EMAIL_VERIFIED'
+  | 'PHONE_VERIFIED'
+  | 'IDENTITY_VERIFIED'
+  | 'QUALIFICATION_VERIFIED'
+  | 'BUSINESS_VERIFIED'
+  | 'PAYMENT_VERIFIED'
+  | 'ADDRESS_VERIFIED';
+
+export const CAPABILITY_TO_TYPE: Record<VerificationCapability, VerificationType> = {
+  EMAIL_VERIFIED: 'EMAIL',
+  PHONE_VERIFIED: 'PHONE',
+  IDENTITY_VERIFIED: 'IDENTITY',
+  QUALIFICATION_VERIFIED: 'QUALIFICATION',
+  BUSINESS_VERIFIED: 'BUSINESS',
+  PAYMENT_VERIFIED: 'PAYMENT',
+  ADDRESS_VERIFIED: 'ADDRESS',
+};

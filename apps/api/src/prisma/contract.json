@@ -172,6 +172,18 @@
       "model": "Verification",
       "namespace": "public"
     },
+    "verificationChallenge": {
+      "model": "VerificationChallenge",
+      "namespace": "public"
+    },
+    "verificationEvidence": {
+      "model": "VerificationEvidence",
+      "namespace": "public"
+    },
+    "verificationHistory": {
+      "model": "VerificationHistory",
+      "namespace": "public"
+    },
     "workerCancellationPenalty": {
       "model": "WorkerCancellationPenalty",
       "namespace": "public"
@@ -911,6 +923,19 @@
               }
             ]
           },
+          "VerificationChallengeType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "EMAIL",
+                "value": "EMAIL"
+              },
+              {
+                "name": "PHONE",
+                "value": "PHONE"
+              }
+            ]
+          },
           "VerificationStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -958,6 +983,10 @@
               {
                 "name": "BUSINESS",
                 "value": "BUSINESS"
+              },
+              {
+                "name": "QUALIFICATION",
+                "value": "QUALIFICATION"
               }
             ]
           }
@@ -2147,6 +2176,21 @@
                 },
                 "to": {
                   "model": "Payout",
+                  "namespace": "public"
+                }
+              },
+              "reviews": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "contractId"
+                  ]
+                },
+                "to": {
+                  "model": "Review",
                   "namespace": "public"
                 }
               },
@@ -5840,6 +5884,13 @@
                   "kind": "scalar"
                 }
               },
+              "communicationRating": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "contractId": {
                 "nullable": false,
                 "type": {
@@ -5861,7 +5912,28 @@
                   "kind": "scalar"
                 }
               },
+              "professionalismRating": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "qualityRating": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "rating": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "reliabilityRating": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -5896,11 +5968,60 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "contract": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "contractId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Contract",
+                  "namespace": "public"
+                }
+              },
+              "reviewee": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "revieweeId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "reviewer": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "reviewerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "comment": {
                   "column": "comment"
+                },
+                "communicationRating": {
+                  "column": "communicationRating"
                 },
                 "contractId": {
                   "column": "contractId"
@@ -5911,8 +6032,17 @@
                 "id": {
                   "column": "id"
                 },
+                "professionalismRating": {
+                  "column": "professionalismRating"
+                },
+                "qualityRating": {
+                  "column": "qualityRating"
+                },
                 "rating": {
                   "column": "rating"
+                },
+                "reliabilityRating": {
+                  "column": "reliabilityRating"
                 },
                 "revieweeId": {
                   "column": "revieweeId"
@@ -7024,6 +7154,36 @@
                   "namespace": "public"
                 }
               },
+              "reviewsGiven": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "reviewerId"
+                  ]
+                },
+                "to": {
+                  "model": "Review",
+                  "namespace": "public"
+                }
+              },
+              "reviewsReceived": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "revieweeId"
+                  ]
+                },
+                "to": {
+                  "model": "Review",
+                  "namespace": "public"
+                }
+              },
               "roleAssignments": {
                 "cardinality": "1:N",
                 "on": {
@@ -7051,6 +7211,66 @@
                 },
                 "to": {
                   "model": "Task",
+                  "namespace": "public"
+                }
+              },
+              "verificationHistoryActors": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
+                },
+                "to": {
+                  "model": "VerificationHistory",
+                  "namespace": "public"
+                }
+              },
+              "verificationReviews": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "reviewedById"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
+                  "namespace": "public"
+                }
+              },
+              "verifications": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
+                  "namespace": "public"
+                }
+              },
+              "verificationsRevoked": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "revokedById"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
                   "namespace": "public"
                 }
               },
@@ -7374,10 +7594,24 @@
           },
           "Verification": {
             "fields": {
+              "activeKey": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "decisionReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -7410,6 +7644,41 @@
                 }
               },
               "providerRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "revocationReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "revokedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "revokedById": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -7464,11 +7733,108 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "challenges": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "verificationId"
+                  ]
+                },
+                "to": {
+                  "model": "VerificationChallenge",
+                  "namespace": "public"
+                }
+              },
+              "evidence": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "verificationId"
+                  ]
+                },
+                "to": {
+                  "model": "VerificationEvidence",
+                  "namespace": "public"
+                }
+              },
+              "history": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "verificationId"
+                  ]
+                },
+                "to": {
+                  "model": "VerificationHistory",
+                  "namespace": "public"
+                }
+              },
+              "reviewer": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "reviewedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "revoker": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "revokedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
+                "activeKey": {
+                  "column": "activeKey"
+                },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "decisionReason": {
+                  "column": "decisionReason"
                 },
                 "expiresAt": {
                   "column": "expiresAt"
@@ -7484,6 +7850,21 @@
                 },
                 "providerRef": {
                   "column": "providerRef"
+                },
+                "reviewedAt": {
+                  "column": "reviewedAt"
+                },
+                "reviewedById": {
+                  "column": "reviewedById"
+                },
+                "revocationReason": {
+                  "column": "revocationReason"
+                },
+                "revokedAt": {
+                  "column": "revokedAt"
+                },
+                "revokedById": {
+                  "column": "revokedById"
                 },
                 "status": {
                   "column": "status"
@@ -7503,6 +7884,340 @@
               },
               "namespaceId": "public",
               "table": "verification"
+            }
+          },
+          "VerificationChallenge": {
+            "fields": {
+              "challengeHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "expiresAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "VerificationChallengeType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "usedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "verificationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "verification": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "verificationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "challengeHash": {
+                  "column": "challengeHash"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "expiresAt": {
+                  "column": "expiresAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "usedAt": {
+                  "column": "usedAt"
+                },
+                "verificationId": {
+                  "column": "verificationId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "verificationChallenge"
+            }
+          },
+          "VerificationEvidence": {
+            "fields": {
+              "checksum": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "mimeType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "originalName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "sizeBytes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int8@1",
+                  "kind": "scalar"
+                }
+              },
+              "storageRef": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "verificationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "verification": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "verificationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "checksum": {
+                  "column": "checksum"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "mimeType": {
+                  "column": "mimeType"
+                },
+                "originalName": {
+                  "column": "originalName"
+                },
+                "sizeBytes": {
+                  "column": "sizeBytes"
+                },
+                "storageRef": {
+                  "column": "storageRef"
+                },
+                "verificationId": {
+                  "column": "verificationId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "verificationEvidence"
+            }
+          },
+          "VerificationHistory": {
+            "fields": {
+              "actorId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fromStatus": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "VerificationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "toStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "VerificationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "verificationId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "verification": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "verificationId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Verification",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actorId": {
+                  "column": "actorId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "fromStatus": {
+                  "column": "fromStatus"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "reason": {
+                  "column": "reason"
+                },
+                "toStatus": {
+                  "column": "toStatus"
+                },
+                "verificationId": {
+                  "column": "verificationId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "verificationHistory"
             }
           },
           "WorkerCancellationPenalty": {
@@ -11966,6 +12681,31 @@
             "review": {
               "checks": [
                 {
+                  "expression": "\"communicationRating\" >= 1 AND \"communicationRating\" <= 5",
+                  "name": "review_communication_rating_bounds_cb2dfc21",
+                  "prefix": "review_communication_rating_bounds"
+                },
+                {
+                  "expression": "\"professionalismRating\" >= 1 AND \"professionalismRating\" <= 5",
+                  "name": "review_professionalism_rating_bounds_cb3155a0",
+                  "prefix": "review_professionalism_rating_bounds"
+                },
+                {
+                  "expression": "\"qualityRating\" >= 1 AND \"qualityRating\" <= 5",
+                  "name": "review_quality_rating_bounds_0a5bd729",
+                  "prefix": "review_quality_rating_bounds"
+                },
+                {
+                  "expression": "\"rating\" >= 1 AND \"rating\" <= 5",
+                  "name": "review_rating_bounds_aa71e2ac",
+                  "prefix": "review_rating_bounds"
+                },
+                {
+                  "expression": "\"reliabilityRating\" >= 1 AND \"reliabilityRating\" <= 5",
+                  "name": "review_reliability_rating_bounds_75b13ec9",
+                  "prefix": "review_reliability_rating_bounds"
+                },
+                {
                   "expression": "\"type\" IN ('CLIENT_TO_WORKER', 'WORKER_TO_CLIENT')",
                   "name": "review_type_check_53a69253",
                   "prefix": "review_type_check"
@@ -11976,6 +12716,11 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
+                },
+                "communicationRating": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
                 },
                 "contractId": {
                   "codecId": "pg/text@1",
@@ -11996,7 +12741,22 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "professionalismRating": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "qualityRating": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "rating": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "reliabilityRating": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": false
@@ -12023,7 +12783,59 @@
                   }
                 }
               },
-              "foreignKeys": [],
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "contractId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "review"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "contract"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "reviewerId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "review"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "revieweeId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "review"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
               "indexes": [
                 {
                   "columns": [
@@ -12055,7 +12867,14 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "contractId",
+                    "type"
+                  ]
+                }
+              ]
             },
             "task": {
               "checks": [
@@ -13059,12 +13878,17 @@
                   "prefix": "verification_status_check"
                 },
                 {
-                  "expression": "\"type\" IN ('IDENTITY', 'PHONE', 'EMAIL', 'PAYMENT', 'ADDRESS', 'BUSINESS')",
-                  "name": "verification_type_check_886734c1",
+                  "expression": "\"type\" IN ('IDENTITY', 'PHONE', 'EMAIL', 'PAYMENT', 'ADDRESS', 'BUSINESS', 'QUALIFICATION')",
+                  "name": "verification_type_check_4b9703a1",
                   "prefix": "verification_type_check"
                 }
               ],
               "columns": {
+                "activeKey": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -13073,6 +13897,11 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "decisionReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "expiresAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -13095,6 +13924,31 @@
                   "nullable": true
                 },
                 "providerRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reviewedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "reviewedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "revocationReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "revokedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "revokedById": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -13141,8 +13995,76 @@
                   "nullable": true
                 }
               },
-              "foreignKeys": [],
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "reviewedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "revokedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
               "indexes": [
+                {
+                  "columns": [
+                    "reviewedById"
+                  ],
+                  "name": "verification_reviewedById_idx_e2835478",
+                  "prefix": "verification_reviewedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "revokedById"
+                  ],
+                  "name": "verification_revokedById_idx_ab374353",
+                  "prefix": "verification_revokedById_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "status"
@@ -13165,6 +14087,357 @@
                   ],
                   "name": "verification_userId_idx_a489d58a",
                   "prefix": "verification_userId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId",
+                    "type",
+                    "status"
+                  ],
+                  "name": "verification_userId_type_status_idx_50a52fdf",
+                  "prefix": "verification_userId_type_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "activeKey"
+                  ]
+                }
+              ]
+            },
+            "verificationChallenge": {
+              "checks": [
+                {
+                  "expression": "\"type\" IN ('EMAIL', 'PHONE')",
+                  "name": "verificationChallenge_type_check_b177d871",
+                  "prefix": "verificationChallenge_type_check"
+                }
+              ],
+              "columns": {
+                "challengeHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "expiresAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "VerificationChallengeType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "usedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "verificationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "verificationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verificationChallenge"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "type",
+                    "expiresAt"
+                  ],
+                  "name": "verificationChallenge_type_expiresAt_idx_0db59516",
+                  "prefix": "verificationChallenge_type_expiresAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verificationId"
+                  ],
+                  "name": "verificationChallenge_verificationId_idx_6306b1d9",
+                  "prefix": "verificationChallenge_verificationId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "verificationId",
+                    "type",
+                    "usedAt"
+                  ]
+                }
+              ]
+            },
+            "verificationEvidence": {
+              "columns": {
+                "checksum": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "mimeType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "originalName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "sizeBytes": {
+                  "codecId": "pg/int8@1",
+                  "nativeType": "int8",
+                  "nullable": true
+                },
+                "storageRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "verificationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "verificationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verificationEvidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "checksum"
+                  ],
+                  "name": "verificationEvidence_checksum_idx_bad26039",
+                  "prefix": "verificationEvidence_checksum_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verificationId"
+                  ],
+                  "name": "verificationEvidence_verificationId_idx_6306b1d9",
+                  "prefix": "verificationEvidence_verificationId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "verificationHistory": {
+              "checks": [
+                {
+                  "expression": "\"fromStatus\" IN ('PENDING', 'VERIFIED', 'REJECTED', 'EXPIRED')",
+                  "name": "verificationHistory_fromStatus_check_5e9dadf2",
+                  "prefix": "verificationHistory_fromStatus_check"
+                },
+                {
+                  "expression": "\"toStatus\" IN ('PENDING', 'VERIFIED', 'REJECTED', 'EXPIRED')",
+                  "name": "verificationHistory_toStatus_check_7c35de9f",
+                  "prefix": "verificationHistory_toStatus_check"
+                }
+              ],
+              "columns": {
+                "actorId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "fromStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "VerificationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "toStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "VerificationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "verificationId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "verificationId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verificationHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verification"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "verificationHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "verificationHistory_actorId_idx_a58f6b4b",
+                  "prefix": "verificationHistory_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verificationId",
+                    "createdAt"
+                  ],
+                  "name": "verificationHistory_verificationId_createdAt_idx_cbb011dd",
+                  "prefix": "verificationHistory_verificationId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "verificationId"
+                  ],
+                  "name": "verificationHistory_verificationId_idx_6306b1d9",
+                  "prefix": "verificationHistory_verificationId_idx",
                   "unique": false
                 }
               ],
@@ -13611,6 +14884,13 @@
                 "DELETED"
               ]
             },
+            "VerificationChallengeType": {
+              "kind": "valueSet",
+              "values": [
+                "EMAIL",
+                "PHONE"
+              ]
+            },
             "VerificationStatus": {
               "kind": "valueSet",
               "values": [
@@ -13628,7 +14908,8 @@
                 "EMAIL",
                 "PAYMENT",
                 "ADDRESS",
-                "BUSINESS"
+                "BUSINESS",
+                "QUALIFICATION"
               ]
             }
           }
@@ -13637,10 +14918,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b53edb4b6254297b8c207563e430d40dea053b2c6582860ec34cd1c3ab7563bb"
+    "storageHash": "3b4be8d8955f3a678df8f6e3a8b9bf0a8134b8266d3fb687d9d12819c5d76879"
   },
   "execution": {
-    "executionHash": "616b5451a993dcb8e8a64f7e0ce31bf2a7242bdae4c2098f19ebd3de47878f43",
+    "executionHash": "59603f5dbb5d506a671b910ab089e11814cd0f8fcaf68a53e5844d0d25887f7f",
     "mutations": {
       "defaults": [
         {
@@ -14508,6 +15789,39 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "verification"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "verificationChallenge"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "verificationEvidence"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "verificationHistory"
           }
         },
         {

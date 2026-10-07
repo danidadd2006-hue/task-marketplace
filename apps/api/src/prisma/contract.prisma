@@ -46,6 +46,12 @@ model User {
   notificationPreferences NotificationPreference[]
   pushDevices PushDevice[]
   notificationDeliveryAttempts NotificationDeliveryAttempt[] @relation("NotificationAttemptRecipients")
+  reviewsGiven      Review[] @relation("ReviewReviewer")
+  reviewsReceived   Review[] @relation("ReviewReviewee")
+  verifications     Verification[] @relation("VerificationSubject")
+  verificationsRevoked Verification[] @relation("VerificationRevokers")
+  verificationReviews Verification[] @relation("VerificationReviewers")
+  verificationHistoryActors VerificationHistory[] @relation("VerificationHistoryActors")
 }
 
 model UserRoleAssignment {
@@ -379,6 +385,7 @@ model Contract {
   cancellations Cancellation[]
   conversations Conversation[]
   notifications Notification[]
+  reviews      Review[]
 
   @@index([workerId])
   @@index([status])
@@ -685,18 +692,32 @@ model TokenPackage {
   @@index([active])
 }
 model Review {
-  id         String     @id @default(uuid())
-  contractId String
-  reviewerId String
-  revieweeId String
-  type       ReviewType
-  rating     Int
-  comment    String?
-  createdAt  TimestamptzString @default(now())
+  id                   String     @id @default(uuid())
+  contractId           String
+  reviewerId           String
+  revieweeId           String
+  type                 ReviewType
+  rating               Int
+  communicationRating  Int
+  reliabilityRating    Int
+  qualityRating        Int
+  professionalismRating Int
+  comment              String?
+  createdAt            TimestamptzString @default(now())
 
+  contract             Contract   @relation(fields: [contractId], references: [id], onDelete: Restrict)
+  reviewer             User       @relation("ReviewReviewer", fields: [reviewerId], references: [id], onDelete: Restrict)
+  reviewee             User       @relation("ReviewReviewee", fields: [revieweeId], references: [id], onDelete: Restrict)
+
+  @@unique([contractId, type])
   @@index([contractId])
   @@index([reviewerId])
   @@index([revieweeId])
+  @@check(expression: "\"rating\" >= 1 AND \"rating\" <= 5", name: "review_rating_bounds")
+  @@check(expression: "\"communicationRating\" >= 1 AND \"communicationRating\" <= 5", name: "review_communication_rating_bounds")
+  @@check(expression: "\"reliabilityRating\" >= 1 AND \"reliabilityRating\" <= 5", name: "review_reliability_rating_bounds")
+  @@check(expression: "\"qualityRating\" >= 1 AND \"qualityRating\" <= 5", name: "review_quality_rating_bounds")
+  @@check(expression: "\"professionalismRating\" >= 1 AND \"professionalismRating\" <= 5", name: "review_professionalism_rating_bounds")
 }
 model Conversation {
   id         String   @id @default(uuid())
@@ -897,24 +918,93 @@ enum VerificationType {
   PAYMENT
   ADDRESS
   BUSINESS
+  QUALIFICATION
+}
+
+enum VerificationChallengeType {
+  EMAIL
+  PHONE
 }
 
 model Verification {
-  id          String             @id @default(uuid())
-  userId      String
-  type        VerificationType
-  status      VerificationStatus @default(PENDING)
-  provider    String?
-  providerRef String?
-  verifiedAt  TimestamptzString?
-  expiresAt   TimestamptzString?
-  notes       String?
-  createdAt   TimestamptzString @default(now())
-  updatedAt   temporal.updatedAtString()
+  id             String             @id @default(uuid())
+  userId         String
+  type           VerificationType
+  status         VerificationStatus @default(PENDING)
+  provider       String?
+  providerRef    String?
+  verifiedAt     TimestamptzString?
+  expiresAt      TimestamptzString?
+  reviewedAt     TimestamptzString?
+  reviewedById   String?
+  decisionReason String?
+  revokedAt      TimestamptzString?
+  revokedById    String?
+  revocationReason String?
+  activeKey      String?            @unique
+  notes          String?
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  user           User               @relation("VerificationSubject", fields: [userId], references: [id], onDelete: Restrict)
+  reviewer       User?              @relation("VerificationReviewers", fields: [reviewedById], references: [id], onDelete: Restrict)
+  revoker        User?              @relation("VerificationRevokers", fields: [revokedById], references: [id], onDelete: Restrict)
+  challenges     VerificationChallenge[]
+  evidence       VerificationEvidence[]
+  history        VerificationHistory[]
 
   @@index([userId])
   @@index([type])
   @@index([status])
+  @@index([userId, type, status])
+}
+
+model VerificationChallenge {
+  id             String                   @id @default(uuid())
+  verificationId String
+  type           VerificationChallengeType
+  challengeHash  String
+  expiresAt      TimestamptzString
+  usedAt         TimestamptzString?
+  createdAt      TimestamptzString        @default(now())
+
+  verification   Verification             @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+
+  @@index([verificationId])
+  @@index([type, expiresAt])
+  @@unique([verificationId, type, usedAt])
+}
+
+model VerificationEvidence {
+  id             String             @id @default(uuid())
+  verificationId String
+  storageRef     String
+  checksum      String?
+  mimeType      String?
+  sizeBytes     BigInt?
+  originalName  String?
+  createdAt     TimestamptzString @default(now())
+
+  verification  Verification      @relation(fields: [verificationId], references: [id], onDelete: Restrict)
+
+  @@index([verificationId])
+  @@index([checksum])
+}
+
+model VerificationHistory {
+  id             String             @id @default(uuid())
+  verificationId String
+  fromStatus     VerificationStatus?
+  toStatus       VerificationStatus
+  actorId        String?
+  reason         String?
+  createdAt      TimestamptzString @default(now())
+
+  verification   Verification      @relation(fields: [verificationId], references: [id], onDelete: Restrict)
+  actor          User?              @relation("VerificationHistoryActors", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([verificationId, createdAt])
+  @@index([actorId])
 }
 enum AuditAction {
   CREATE
