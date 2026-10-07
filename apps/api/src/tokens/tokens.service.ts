@@ -5,6 +5,15 @@ import {
 } from '@nestjs/common';
 import { db } from '../prisma/db.js';
 
+const DEFAULT_TOKEN_PACKAGE = {
+  id: 'starter-50',
+  name: '50 Tokens',
+  tokenAmount: 50,
+  price: '5.00',
+  currency: 'USD',
+  active: true,
+} as const;
+
 @Injectable()
 export class TokensService {
   async getWallet(userId: string) {
@@ -25,9 +34,11 @@ export class TokensService {
   }
 
   async getPackages() {
-    return db.orm.public.TokenPackage
+    const packages = await db.orm.public.TokenPackage
       .where({ active: true })
       .all();
+
+    return packages.length > 0 ? packages : [DEFAULT_TOKEN_PACKAGE];
   }
 
   async spend(
