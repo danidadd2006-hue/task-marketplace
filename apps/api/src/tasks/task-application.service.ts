@@ -10,6 +10,8 @@ import { db } from '../prisma/db.js';
 import { CreateTaskApplicationDto } from './dto/create-task-application.dto.js';
 
 const ELIGIBLE_TASK_STATUSES = ['PUBLISHED', 'RECEIVING_APPLICATIONS'] as const;
+const APPLICATION_TOKEN_COST = 5;
+const STARTING_WORKER_TOKENS = 100;
 
 type SqlError = {
   sqlState?: string;
@@ -48,6 +50,23 @@ export class TaskApplicationService {
     }
 
     return db.transaction(async (tx) => {
+      const userTable = tx.sql.public.user;
+      const userLockPlan = tx.raw.sql`
+        SELECT "id"
+        FROM "User"
+        WHERE "id" = ${worker.userId}
+        FOR UPDATE
+      `
+        .returnsRow({
+          id: userTable.columns.id,
+        })
+        .build();
+
+      const lockedUsers = await tx.query(userLockPlan);
+      if (!lockedUsers[0]) {
+        throw new NotFoundException('Worker account not found');
+      }
+
       const taskTable = tx.sql.public.task;
       const lockPlan = tx.raw.sql`
         SELECT "id", "clientId", "status"
@@ -88,6 +107,30 @@ export class TaskApplicationService {
         throw new ConflictException('You have already applied to this task');
       }
 
+      let wallet = await tx.orm.public.TokenWallet
+        .where({ userId: worker.userId })
+        .first();
+
+      if (!wallet) {
+        wallet = await tx.orm.public.TokenWallet.create({
+          userId: worker.userId,
+          balance: STARTING_WORKER_TOKENS,
+        });
+
+        await tx.orm.public.TokenTransaction.create({
+          userId: worker.userId,
+          type: 'GRANT',
+          amount: STARTING_WORKER_TOKENS,
+          balanceAfter: STARTING_WORKER_TOKENS,
+          reference: `worker-starting-grant:${worker.userId}`,
+          note: 'Initial token grant for WORKER account',
+        });
+      }
+
+      if (wallet.balance < APPLICATION_TOKEN_COST) {
+        throw new BadRequestException('Insufficient tokens to apply for this task');
+      }
+
       let application;
       try {
         application = await tx.orm.public.Application.create({
@@ -106,6 +149,29 @@ export class TaskApplicationService {
         }
         throw error;
       }
+
+      const nextBalance = wallet.balance - APPLICATION_TOKEN_COST;
+      const tokenBalanceUpdated = await tx.orm.public.TokenWallet
+        .where({
+          userId: worker.userId,
+          balance: wallet.balance,
+        })
+        .update({
+          balance: nextBalance,
+        });
+
+      if (!tokenBalanceUpdated) {
+        throw new BadRequestException('Token balance changed; retry the application');
+      }
+
+      await tx.orm.public.TokenTransaction.create({
+        userId: worker.userId,
+        type: 'SPEND',
+        amount: -APPLICATION_TOKEN_COST,
+        balanceAfter: nextBalance,
+        reference: `application:${application.id}`,
+        note: 'Token cost for job application',
+      });
 
       for (const attachment of dto.attachments ?? []) {
         await tx.orm.public.ApplicationAttachment.create({
