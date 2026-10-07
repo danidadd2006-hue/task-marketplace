@@ -52,6 +52,12 @@ model User {
   verificationsRevoked Verification[] @relation("VerificationRevokers")
   verificationReviews Verification[] @relation("VerificationReviewers")
   verificationHistoryActors VerificationHistory[] @relation("VerificationHistoryActors")
+  trustCasesCreated TrustCase[] @relation("TrustCaseCreators")
+  trustCasesAssigned TrustCase[] @relation("TrustCaseAssignees")
+  trustCasesClosed TrustCase[] @relation("TrustCaseClosers")
+  trustCaseEvidenceAttached TrustCaseEvidence[] @relation("TrustCaseEvidenceActors")
+  trustCaseHistoryActors TrustCaseHistory[] @relation("TrustCaseHistoryActors")
+  trustCaseDecisionActors TrustCaseDecision[] @relation("TrustCaseDecisionActors")
 }
 
 model UserRoleAssignment {
@@ -1005,6 +1011,130 @@ model VerificationHistory {
 
   @@index([verificationId, createdAt])
   @@index([actorId])
+}
+
+enum TrustCaseType {
+  REPORT
+  DISPUTE
+  MODERATION
+  RISK
+}
+
+enum TrustCaseStatus {
+  OPEN
+  ASSIGNED
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum TrustCaseEvidenceType {
+  ATTACHMENT
+  MESSAGE
+  TASK
+  CONTRACT
+  PAYMENT
+  REVIEW
+  VERIFICATION
+  MEDIA
+  OTHER
+}
+
+enum TrustCaseAction {
+  CREATE
+  ASSIGN
+  REASSIGN
+  EVIDENCE_ADDED
+  DECISION
+  ACTION_APPLIED
+  RESOLVED
+  CLOSED
+}
+
+model TrustCase {
+  id               String          @id @default(uuid())
+  type             TrustCaseType
+  category         String?
+  status           TrustCaseStatus @default(OPEN)
+  subjectType      String
+  subjectId        String
+  createdById      String
+  assignedToId     String?
+  assignedAt       TimestamptzString?
+  resolvedAt       TimestamptzString?
+  closedAt         TimestamptzString?
+  closedById       String?
+  resolutionCode   String?
+  resolutionReason String?
+  revision         Int              @default(0)
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+
+  creator          User              @relation("TrustCaseCreators", fields: [createdById], references: [id], onDelete: Restrict)
+  assignee         User?             @relation("TrustCaseAssignees", fields: [assignedToId], references: [id], onDelete: Restrict)
+  closer           User?             @relation("TrustCaseClosers", fields: [closedById], references: [id], onDelete: Restrict)
+  evidence         TrustCaseEvidence[]
+  history          TrustCaseHistory[]
+  decisions        TrustCaseDecision[]
+
+  @@index([type, status])
+  @@index([subjectType, subjectId])
+  @@index([createdById, createdAt])
+  @@index([assignedToId, status])
+}
+
+model TrustCaseEvidence {
+  id             String                  @id @default(uuid())
+  caseId         String
+  evidenceType   TrustCaseEvidenceType
+  referenceType  String
+  referenceId    String
+  storageRef     String?
+  attachedById   String
+  description    String?
+  metadataJson   String?
+  createdAt      TimestamptzString       @default(now())
+
+  case           TrustCase               @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  attachedBy     User                    @relation("TrustCaseEvidenceActors", fields: [attachedById], references: [id], onDelete: Restrict)
+
+  @@index([caseId, createdAt])
+  @@index([referenceType, referenceId])
+  @@index([attachedById])
+}
+
+model TrustCaseHistory {
+  id          String          @id @default(uuid())
+  caseId      String
+  actorId     String
+  action      TrustCaseAction
+  fromStatus  TrustCaseStatus?
+  toStatus    TrustCaseStatus?
+  reason      String?
+  metadataJson String?
+  createdAt   TimestamptzString @default(now())
+
+  case        TrustCase       @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  actor       User            @relation("TrustCaseHistoryActors", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([caseId, createdAt])
+  @@index([actorId, createdAt])
+}
+
+model TrustCaseDecision {
+  id           String          @id @default(uuid())
+  caseId       String
+  actorId      String
+  outcome      String
+  reason       String?
+  metadataJson String?
+  createdAt    TimestamptzString @default(now())
+
+  case         TrustCase       @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  actor        User            @relation("TrustCaseDecisionActors", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([caseId, createdAt])
+  @@index([actorId, createdAt])
 }
 enum AuditAction {
   CREATE

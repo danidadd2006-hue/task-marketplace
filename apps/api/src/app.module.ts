@@ -9,9 +9,10 @@ import { MessagingModule } from './messaging/messaging.module.js';
 import { NotificationModule } from './notifications/notification.module.js';
 import { ReviewModule } from './reviews/review.module.js';
 import { VerificationModule } from './verification/verification.module.js';
+import { TrustSafetyModule } from './trust-safety/trust-safety.module.js';
 
 @Module({
-  imports: [AuditModule, AuthModule, AccountModule, TasksModule, MessagingModule, NotificationModule, ReviewModule, VerificationModule],
+  imports: [AuditModule, AuthModule, AccountModule, TasksModule, MessagingModule, NotificationModule, ReviewModule, VerificationModule, TrustSafetyModule],
   controllers: [ProfileController],
   providers: [ProfileService],
   exports: [ProfileService],

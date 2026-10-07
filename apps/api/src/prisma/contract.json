@@ -156,6 +156,22 @@
       "model": "TokenWallet",
       "namespace": "public"
     },
+    "trustCase": {
+      "model": "TrustCase",
+      "namespace": "public"
+    },
+    "trustCaseDecision": {
+      "model": "TrustCaseDecision",
+      "namespace": "public"
+    },
+    "trustCaseEvidence": {
+      "model": "TrustCaseEvidence",
+      "namespace": "public"
+    },
+    "trustCaseHistory": {
+      "model": "TrustCaseHistory",
+      "namespace": "public"
+    },
     "user": {
       "model": "User",
       "namespace": "public"
@@ -882,6 +898,130 @@
               {
                 "name": "EXPIRY",
                 "value": "EXPIRY"
+              }
+            ]
+          },
+          "TrustCaseAction": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "CREATE",
+                "value": "CREATE"
+              },
+              {
+                "name": "ASSIGN",
+                "value": "ASSIGN"
+              },
+              {
+                "name": "REASSIGN",
+                "value": "REASSIGN"
+              },
+              {
+                "name": "EVIDENCE_ADDED",
+                "value": "EVIDENCE_ADDED"
+              },
+              {
+                "name": "DECISION",
+                "value": "DECISION"
+              },
+              {
+                "name": "ACTION_APPLIED",
+                "value": "ACTION_APPLIED"
+              },
+              {
+                "name": "RESOLVED",
+                "value": "RESOLVED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
+              }
+            ]
+          },
+          "TrustCaseEvidenceType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "ATTACHMENT",
+                "value": "ATTACHMENT"
+              },
+              {
+                "name": "MESSAGE",
+                "value": "MESSAGE"
+              },
+              {
+                "name": "TASK",
+                "value": "TASK"
+              },
+              {
+                "name": "CONTRACT",
+                "value": "CONTRACT"
+              },
+              {
+                "name": "PAYMENT",
+                "value": "PAYMENT"
+              },
+              {
+                "name": "REVIEW",
+                "value": "REVIEW"
+              },
+              {
+                "name": "VERIFICATION",
+                "value": "VERIFICATION"
+              },
+              {
+                "name": "MEDIA",
+                "value": "MEDIA"
+              },
+              {
+                "name": "OTHER",
+                "value": "OTHER"
+              }
+            ]
+          },
+          "TrustCaseStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "OPEN",
+                "value": "OPEN"
+              },
+              {
+                "name": "ASSIGNED",
+                "value": "ASSIGNED"
+              },
+              {
+                "name": "IN_REVIEW",
+                "value": "IN_REVIEW"
+              },
+              {
+                "name": "RESOLVED",
+                "value": "RESOLVED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
+              }
+            ]
+          },
+          "TrustCaseType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "REPORT",
+                "value": "REPORT"
+              },
+              {
+                "name": "DISPUTE",
+                "value": "DISPUTE"
+              },
+              {
+                "name": "MODERATION",
+                "value": "MODERATION"
+              },
+              {
+                "name": "RISK",
+                "value": "RISK"
               }
             ]
           },
@@ -6873,6 +7013,700 @@
               "table": "tokenWallet"
             }
           },
+          "TrustCase": {
+            "fields": {
+              "assignedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "assignedToId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "category": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "closedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "closedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolutionCode": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolutionReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolvedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "revision": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "subjectId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "subjectType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "assignee": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "assignedToId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "closer": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "closedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "creator": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "decisions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "caseId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseDecision",
+                  "namespace": "public"
+                }
+              },
+              "evidence": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "caseId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseEvidence",
+                  "namespace": "public"
+                }
+              },
+              "history": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "caseId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseHistory",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "assignedAt": {
+                  "column": "assignedAt"
+                },
+                "assignedToId": {
+                  "column": "assignedToId"
+                },
+                "category": {
+                  "column": "category"
+                },
+                "closedAt": {
+                  "column": "closedAt"
+                },
+                "closedById": {
+                  "column": "closedById"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "createdById": {
+                  "column": "createdById"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "resolutionCode": {
+                  "column": "resolutionCode"
+                },
+                "resolutionReason": {
+                  "column": "resolutionReason"
+                },
+                "resolvedAt": {
+                  "column": "resolvedAt"
+                },
+                "revision": {
+                  "column": "revision"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "subjectId": {
+                  "column": "subjectId"
+                },
+                "subjectType": {
+                  "column": "subjectType"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "trustCase"
+            }
+          },
+          "TrustCaseDecision": {
+            "fields": {
+              "actorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "caseId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadataJson": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "outcome": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "case": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "caseId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actorId": {
+                  "column": "actorId"
+                },
+                "caseId": {
+                  "column": "caseId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadataJson": {
+                  "column": "metadataJson"
+                },
+                "outcome": {
+                  "column": "outcome"
+                },
+                "reason": {
+                  "column": "reason"
+                }
+              },
+              "namespaceId": "public",
+              "table": "trustCaseDecision"
+            }
+          },
+          "TrustCaseEvidence": {
+            "fields": {
+              "attachedById": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "caseId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "evidenceType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseEvidenceType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadataJson": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "referenceId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "referenceType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "storageRef": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "attachedBy": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "attachedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "case": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "caseId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "attachedById": {
+                  "column": "attachedById"
+                },
+                "caseId": {
+                  "column": "caseId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "evidenceType": {
+                  "column": "evidenceType"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadataJson": {
+                  "column": "metadataJson"
+                },
+                "referenceId": {
+                  "column": "referenceId"
+                },
+                "referenceType": {
+                  "column": "referenceType"
+                },
+                "storageRef": {
+                  "column": "storageRef"
+                }
+              },
+              "namespaceId": "public",
+              "table": "trustCaseEvidence"
+            }
+          },
+          "TrustCaseHistory": {
+            "fields": {
+              "action": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseAction",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "actorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "caseId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fromStatus": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadataJson": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "toStatus": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "TrustCaseStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "case": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "caseId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "action": {
+                  "column": "action"
+                },
+                "actorId": {
+                  "column": "actorId"
+                },
+                "caseId": {
+                  "column": "caseId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "fromStatus": {
+                  "column": "fromStatus"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadataJson": {
+                  "column": "metadataJson"
+                },
+                "reason": {
+                  "column": "reason"
+                },
+                "toStatus": {
+                  "column": "toStatus"
+                }
+              },
+              "namespaceId": "public",
+              "table": "trustCaseHistory"
+            }
+          },
           "User": {
             "fields": {
               "createdAt": {
@@ -7211,6 +8045,96 @@
                 },
                 "to": {
                   "model": "Task",
+                  "namespace": "public"
+                }
+              },
+              "trustCaseDecisionActors": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseDecision",
+                  "namespace": "public"
+                }
+              },
+              "trustCaseEvidenceAttached": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "attachedById"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseEvidence",
+                  "namespace": "public"
+                }
+              },
+              "trustCaseHistoryActors": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "actorId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCaseHistory",
+                  "namespace": "public"
+                }
+              },
+              "trustCasesAssigned": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "assignedToId"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
+                  "namespace": "public"
+                }
+              },
+              "trustCasesClosed": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "closedById"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
+                  "namespace": "public"
+                }
+              },
+              "trustCasesCreated": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "TrustCase",
                   "namespace": "public"
                 }
               },
@@ -13486,6 +14410,688 @@
                 }
               ]
             },
+            "trustCase": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('OPEN', 'ASSIGNED', 'IN_REVIEW', 'RESOLVED', 'CLOSED')",
+                  "name": "trustCase_status_check_efd71095",
+                  "prefix": "trustCase_status_check"
+                },
+                {
+                  "expression": "\"type\" IN ('REPORT', 'DISPUTE', 'MODERATION', 'RISK')",
+                  "name": "trustCase_type_check_4c745738",
+                  "prefix": "trustCase_type_check"
+                }
+              ],
+              "columns": {
+                "assignedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "assignedToId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "category": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "closedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "closedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "createdById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "resolutionCode": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "resolutionReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "resolvedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "revision": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "OPEN"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "subjectId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "subjectType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "createdById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "assignedToId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "closedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "assignedToId"
+                  ],
+                  "name": "trustCase_assignedToId_idx_45a131c2",
+                  "prefix": "trustCase_assignedToId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "assignedToId",
+                    "status"
+                  ],
+                  "name": "trustCase_assignedToId_status_idx_06a25d86",
+                  "prefix": "trustCase_assignedToId_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "closedById"
+                  ],
+                  "name": "trustCase_closedById_idx_3fbe6e44",
+                  "prefix": "trustCase_closedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "createdById",
+                    "createdAt"
+                  ],
+                  "name": "trustCase_createdById_createdAt_idx_bbcfd794",
+                  "prefix": "trustCase_createdById_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "createdById"
+                  ],
+                  "name": "trustCase_createdById_idx_8bf640ed",
+                  "prefix": "trustCase_createdById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "subjectType",
+                    "subjectId"
+                  ],
+                  "name": "trustCase_subjectType_subjectId_idx_34976a96",
+                  "prefix": "trustCase_subjectType_subjectId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "type",
+                    "status"
+                  ],
+                  "name": "trustCase_type_status_idx_f045f361",
+                  "prefix": "trustCase_type_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "trustCaseDecision": {
+              "columns": {
+                "actorId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "caseId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadataJson": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "outcome": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "caseId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseDecision"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseDecision"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId",
+                    "createdAt"
+                  ],
+                  "name": "trustCaseDecision_actorId_createdAt_idx_0e9f1adf",
+                  "prefix": "trustCaseDecision_actorId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "trustCaseDecision_actorId_idx_a58f6b4b",
+                  "prefix": "trustCaseDecision_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId",
+                    "createdAt"
+                  ],
+                  "name": "trustCaseDecision_caseId_createdAt_idx_18fcd752",
+                  "prefix": "trustCaseDecision_caseId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId"
+                  ],
+                  "name": "trustCaseDecision_caseId_idx_f7093793",
+                  "prefix": "trustCaseDecision_caseId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "trustCaseEvidence": {
+              "checks": [
+                {
+                  "expression": "\"evidenceType\" IN ('ATTACHMENT', 'MESSAGE', 'TASK', 'CONTRACT', 'PAYMENT', 'REVIEW', 'VERIFICATION', 'MEDIA', 'OTHER')",
+                  "name": "trustCaseEvidence_evidenceType_check_2bca2397",
+                  "prefix": "trustCaseEvidence_evidenceType_check"
+                }
+              ],
+              "columns": {
+                "attachedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "caseId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "evidenceType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseEvidenceType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadataJson": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "referenceId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "referenceType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "storageRef": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "caseId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseEvidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "attachedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseEvidence"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "attachedById"
+                  ],
+                  "name": "trustCaseEvidence_attachedById_idx_7edd7a0f",
+                  "prefix": "trustCaseEvidence_attachedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId",
+                    "createdAt"
+                  ],
+                  "name": "trustCaseEvidence_caseId_createdAt_idx_18fcd752",
+                  "prefix": "trustCaseEvidence_caseId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId"
+                  ],
+                  "name": "trustCaseEvidence_caseId_idx_f7093793",
+                  "prefix": "trustCaseEvidence_caseId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "referenceType",
+                    "referenceId"
+                  ],
+                  "name": "trustCaseEvidence_referenceType_referenceId_idx_d11658f3",
+                  "prefix": "trustCaseEvidence_referenceType_referenceId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "trustCaseHistory": {
+              "checks": [
+                {
+                  "expression": "\"action\" IN ('CREATE', 'ASSIGN', 'REASSIGN', 'EVIDENCE_ADDED', 'DECISION', 'ACTION_APPLIED', 'RESOLVED', 'CLOSED')",
+                  "name": "trustCaseHistory_action_check_7dc2b9ee",
+                  "prefix": "trustCaseHistory_action_check"
+                },
+                {
+                  "expression": "\"fromStatus\" IN ('OPEN', 'ASSIGNED', 'IN_REVIEW', 'RESOLVED', 'CLOSED')",
+                  "name": "trustCaseHistory_fromStatus_check_1e79a118",
+                  "prefix": "trustCaseHistory_fromStatus_check"
+                },
+                {
+                  "expression": "\"toStatus\" IN ('OPEN', 'ASSIGNED', 'IN_REVIEW', 'RESOLVED', 'CLOSED')",
+                  "name": "trustCaseHistory_toStatus_check_b7ca53c6",
+                  "prefix": "trustCaseHistory_toStatus_check"
+                }
+              ],
+              "columns": {
+                "action": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseAction",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "actorId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "caseId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "fromStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "metadataJson": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "toStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "TrustCaseStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "caseId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCase"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "trustCaseHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId",
+                    "createdAt"
+                  ],
+                  "name": "trustCaseHistory_actorId_createdAt_idx_0e9f1adf",
+                  "prefix": "trustCaseHistory_actorId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "trustCaseHistory_actorId_idx_a58f6b4b",
+                  "prefix": "trustCaseHistory_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId",
+                    "createdAt"
+                  ],
+                  "name": "trustCaseHistory_caseId_createdAt_idx_18fcd752",
+                  "prefix": "trustCaseHistory_caseId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "caseId"
+                  ],
+                  "name": "trustCaseHistory_caseId_idx_f7093793",
+                  "prefix": "trustCaseHistory_caseId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "user": {
               "checks": [
                 {
@@ -14867,6 +16473,52 @@
                 "EXPIRY"
               ]
             },
+            "TrustCaseAction": {
+              "kind": "valueSet",
+              "values": [
+                "CREATE",
+                "ASSIGN",
+                "REASSIGN",
+                "EVIDENCE_ADDED",
+                "DECISION",
+                "ACTION_APPLIED",
+                "RESOLVED",
+                "CLOSED"
+              ]
+            },
+            "TrustCaseEvidenceType": {
+              "kind": "valueSet",
+              "values": [
+                "ATTACHMENT",
+                "MESSAGE",
+                "TASK",
+                "CONTRACT",
+                "PAYMENT",
+                "REVIEW",
+                "VERIFICATION",
+                "MEDIA",
+                "OTHER"
+              ]
+            },
+            "TrustCaseStatus": {
+              "kind": "valueSet",
+              "values": [
+                "OPEN",
+                "ASSIGNED",
+                "IN_REVIEW",
+                "RESOLVED",
+                "CLOSED"
+              ]
+            },
+            "TrustCaseType": {
+              "kind": "valueSet",
+              "values": [
+                "REPORT",
+                "DISPUTE",
+                "MODERATION",
+                "RISK"
+              ]
+            },
             "UserRole": {
               "kind": "valueSet",
               "values": [
@@ -14918,10 +16570,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3b4be8d8955f3a678df8f6e3a8b9bf0a8134b8266d3fb687d9d12819c5d76879"
+    "storageHash": "29495399a54712054fdf2883680caf2c7832743ab066c135b411b6793e8f367a"
   },
   "execution": {
-    "executionHash": "59603f5dbb5d506a671b910ab089e11814cd0f8fcaf68a53e5844d0d25887f7f",
+    "executionHash": "2f12f8b319e872116031b715bf0c71c2925a70dbec16057819d3650a9b4f926f",
     "mutations": {
       "defaults": [
         {
@@ -15685,6 +17337,65 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "tokenWallet"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "trustCase"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "trustCase"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "trustCaseDecision"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "trustCaseEvidence"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "trustCaseHistory"
           }
         },
         {
