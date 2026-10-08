@@ -57,7 +57,7 @@ export class TaskApplicationService {
 
     const created = await db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
-      const lockPlan = tx.raw.sql`
+      const lockPlan = db.raw.sql`
         SELECT "id", "clientId", "status"
         FROM "Task"
         WHERE "id" = ${taskId}

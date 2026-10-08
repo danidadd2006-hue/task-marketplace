@@ -11,7 +11,10 @@ describe('PublicTasksController', () => {
     const discovery = {
       discoverTasks: vi.fn().mockResolvedValue({ items: [], page: 1, pageSize: 20, hasMore: false }),
     };
-    const controller = new PublicTasksController(discovery as never);
+    const details = {
+      getTaskDetails: vi.fn(),
+    };
+    const controller = new PublicTasksController(discovery as never, details as never);
 
     await controller.discoverTasks({});
 

@@ -88,7 +88,7 @@ export class PaymentProviderEventService {
       }
 
       const paymentTable = tx.sql.public.payment;
-      const paymentPlan = tx.raw.sql`
+      const paymentPlan = db.raw.sql`
         SELECT
           "id",
           "taskId",
@@ -214,7 +214,7 @@ export class PaymentProviderEventService {
 
       if (event.type === 'FUNDING_SUCCEEDED') {
         const taskTable = tx.sql.public.task;
-        const taskPlan = tx.raw.sql`
+        const taskPlan = db.raw.sql`
           SELECT "id", "status", "currency"
           FROM "Task"
           WHERE "id" = ${payment.taskId}
@@ -358,22 +358,24 @@ export class PaymentProviderEventService {
     tx: any,
     event: NormalizedPaymentProviderEvent,
   ): Promise<Record<string, unknown> | null> {
-    const eventTable = tx.sql.public.paymentProviderEvent;
     const eventId = randomUUID();
-    const plan = tx.raw.sql`
-      INSERT INTO "PaymentProviderEvent"
-        ("id", "provider", "providerEventId", "type", "paymentId", "providerRef", "metadata")
-      VALUES
-        (${eventId}, ${event.provider}, ${event.providerEventId}, ${event.type},
-         ${event.paymentId}, ${event.providerRef}, ${event.metadata})
-      ON CONFLICT ("provider", "providerEventId") DO NOTHING
-      RETURNING "id", "paymentId"
-    `.returnsRow({
-      id: eventTable.columns.id,
-      paymentId: eventTable.columns.paymentId,
-    }).build();
 
-    const inserted = await tx.query(plan);
-    return inserted[0] ?? null;
+    try {
+      return await tx.orm.public.PaymentProviderEvent.create({
+        id: eventId,
+        provider: event.provider,
+        providerEventId: event.providerEventId,
+        type: event.type,
+        paymentId: event.paymentId,
+        providerRef: event.providerRef ?? null,
+        metadata: event.metadata ?? null,
+      });
+    } catch (error) {
+      const sqlError = error as { sqlState?: string; cause?: { sqlState?: string } };
+      if (sqlError.sqlState === '23505' || sqlError.cause?.sqlState === '23505') {
+        return null;
+      }
+      throw error;
+    }
   }
 }

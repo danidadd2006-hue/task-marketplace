@@ -59,7 +59,7 @@ export class PaymentFundingService {
     // external provider call is made until this transaction has committed.
     const intent = await db.transaction(async (tx) => {
       const taskTable = tx.sql.public.task;
-      const taskPlan = tx.raw.sql`
+      const taskPlan = db.raw.sql`
         SELECT "id", "clientId", "status", "currency"
         FROM "Task"
         WHERE "id" = ${taskId}

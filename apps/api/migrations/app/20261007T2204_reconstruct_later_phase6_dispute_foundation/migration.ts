@@ -19,7 +19,7 @@ export default class M extends Migration<Start, End> {
       this.addColumn({
         schema: 'public',
         table: 'dispute',
-        column: col('category', 'text', { notNull: true, default: { kind: 'literal', value: 'OTHER' } }),
+        column: col('category', 'text', { notNull: true, default: { kind: 'literal', value: 'OTHER' } as any }),
       }),
       this.addColumn({
         schema: 'public',

@@ -45,7 +45,7 @@ export class TaskWorkerSelectionService {
       const taskTable = tx.sql.public.task;
       const applicationTable = tx.sql.public.application;
 
-      const taskLockPlan = tx.raw.sql`
+      const taskLockPlan = db.raw.sql`
         SELECT "id", "clientId", "status"
         FROM "Task"
         WHERE "id" = ${taskId}
@@ -73,7 +73,7 @@ export class TaskWorkerSelectionService {
         throw new BadRequestException('Task is not accepting worker selection');
       }
 
-      const applicationLockPlan = tx.raw.sql`
+      const applicationLockPlan = db.raw.sql`
         SELECT "id", "taskId", "workerId", "status", "proposedPrice"
         FROM "Application"
         WHERE "id" = ${applicationId}

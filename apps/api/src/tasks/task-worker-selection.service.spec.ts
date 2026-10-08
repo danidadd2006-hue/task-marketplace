@@ -31,6 +31,13 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../prisma/db.js', () => ({
   db: {
     transaction: mocks.transaction,
+    raw: {
+      sql: vi.fn(() => ({
+        returnsRow: vi.fn(() => ({
+          build: vi.fn(() => 'lock-plan'),
+        })),
+      })),
+    },
   },
 }));
 
