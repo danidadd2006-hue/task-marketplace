@@ -20,6 +20,7 @@ vi.mock('../prisma/db.js', () => ({
 }));
 
 import { NotFoundException } from '@nestjs/common';
+import { PublicTaskDetailsResponseDto } from './dto/public-task-details-response.dto.js';
 import { PublicTaskDetailsService } from './public-task-details.service.js';
 
 const queryChain = () => ({
@@ -28,6 +29,44 @@ const queryChain = () => ({
   include: mocks.include,
   first: mocks.first,
 });
+
+const publicTask = {
+  id: 'task-id',
+  title: 'Move a sofa',
+  description: 'Move a sofa',
+  type: 'PHYSICAL' as const,
+  duration: 'SHORT_TERM' as const,
+  status: 'PUBLISHED' as const,
+  currency: 'KES',
+  budgetMin: '50',
+  budgetMax: '100',
+  expectedCompletionAt: new Date('2026-10-20T10:00:00.000Z'),
+  requirements: 'Bring a suitable vehicle',
+  createdAt: new Date('2026-10-05T10:00:00.000Z'),
+  updatedAt: new Date('2026-10-05T10:00:00.000Z'),
+  category: { id: 'category-id', name: 'Moving' },
+  requirementsList: [
+    {
+      id: 'requirement-id',
+      taskId: 'task-id',
+      name: 'Vehicle',
+      value: 'Suitable vehicle',
+      createdAt: new Date('2026-10-05T10:00:00.000Z'),
+      updatedAt: new Date('2026-10-05T10:00:00.000Z'),
+    },
+  ],
+  attachments: [
+    {
+      id: 'attachment-id',
+      taskId: 'task-id',
+      fileName: 'instructions.pdf',
+      fileType: 'application/pdf',
+      fileSize: 1234,
+      createdAt: new Date('2026-10-05T10:00:00.000Z'),
+      updatedAt: new Date('2026-10-05T10:00:00.000Z'),
+    },
+  ],
+};
 
 describe('PublicTaskDetailsService', () => {
   const service = new PublicTaskDetailsService();
@@ -42,17 +81,23 @@ describe('PublicTaskDetailsService', () => {
     mocks.first.mockResolvedValue(null);
   });
 
-  it('loads only publicly visible tasks', async () => {
-    mocks.first.mockResolvedValue({
-      id: 'task-id',
-      title: 'Move a sofa',
-      status: 'PUBLISHED',
-      category: { id: 'category-id', name: 'Moving' },
-      requirementsList: [],
-      attachments: [],
-    });
+  it.each(['PUBLISHED', 'RECEIVING_APPLICATIONS'] as const)(
+    'retrieves a %s task through the public contract',
+    async (status) => {
+      mocks.first.mockResolvedValue({ ...publicTask, status });
 
-    const result = await service.getTaskDetails('task-id');
+      const result = await service.getTaskDetails('task-id');
+
+      expect(result).toBeInstanceOf(PublicTaskDetailsResponseDto);
+      expect(result.status).toBe(status);
+      expect(result.id).toBe('task-id');
+    },
+  );
+
+  it('loads only publicly visible tasks', async () => {
+    mocks.first.mockResolvedValue(publicTask);
+
+    await service.getTaskDetails('task-id');
 
     const statusPredicate = mocks.where.mock.calls[0]?.[0];
     expect(statusPredicate).toEqual(expect.any(Function));
@@ -63,13 +108,15 @@ describe('PublicTaskDetailsService', () => {
       'PUBLISHED',
       'RECEIVING_APPLICATIONS',
     ]);
-
     expect(mocks.where).toHaveBeenCalledWith({ id: 'task-id' });
-    expect(result.id).toBe('task-id');
   });
 
-  it('returns the public detail projection without ownership, exact location, or private attachment URLs', async () => {
-    const publicTask = {
+  it('maps the ORM projection into the dedicated public response contract', async () => {
+    mocks.first.mockResolvedValue(publicTask);
+
+    const result = await service.getTaskDetails('task-id');
+
+    expect(result).toEqual({
       id: 'task-id',
       title: 'Move a sofa',
       description: 'Move a sofa',
@@ -79,43 +126,63 @@ describe('PublicTaskDetailsService', () => {
       currency: 'KES',
       budgetMin: '50',
       budgetMax: '100',
-      expectedCompletionAt: null,
+      expectedCompletionAt: '2026-10-20T10:00:00.000Z',
       requirements: 'Bring a suitable vehicle',
       createdAt: '2026-10-05T10:00:00.000Z',
       updatedAt: '2026-10-05T10:00:00.000Z',
       category: { id: 'category-id', name: 'Moving' },
-      requirementsList: [],
-      attachments: [],
-    };
+      requirementsList: [
+        {
+          id: 'requirement-id',
+          taskId: 'task-id',
+          name: 'Vehicle',
+          value: 'Suitable vehicle',
+          createdAt: '2026-10-05T10:00:00.000Z',
+          updatedAt: '2026-10-05T10:00:00.000Z',
+        },
+      ],
+      attachments: [
+        {
+          id: 'attachment-id',
+          taskId: 'task-id',
+          fileName: 'instructions.pdf',
+          fileType: 'application/pdf',
+          fileSize: 1234,
+          createdAt: '2026-10-05T10:00:00.000Z',
+          updatedAt: '2026-10-05T10:00:00.000Z',
+        },
+      ],
+    });
 
-    mocks.first.mockResolvedValue(publicTask);
+    expect(result).toBeInstanceOf(PublicTaskDetailsResponseDto);
+  });
+
+  it('keeps private ownership, exact location, coordinates, and attachment URLs out of the response', async () => {
+    mocks.first.mockResolvedValue({
+      ...publicTask,
+      clientId: 'private-client-id',
+      locationDescription: '123 Exact Street',
+      latitude: '0.123',
+      longitude: '36.456',
+      attachments: [
+        {
+          ...publicTask.attachments[0],
+          fileUrl: 'https://private.example/file',
+        },
+      ],
+    });
 
     const result = await service.getTaskDetails('task-id');
 
-    expect(mocks.select).toHaveBeenCalledWith(
-      'id',
-      'title',
-      'description',
-      'type',
-      'duration',
-      'status',
-      'currency',
-      'budgetMin',
-      'budgetMax',
-      'expectedCompletionAt',
-      'requirements',
-      'createdAt',
-      'updatedAt',
-    );
-    expect(mocks.include).toHaveBeenCalledTimes(3);
-    expect(result).toEqual(publicTask);
     expect(result).not.toHaveProperty('clientId');
     expect(result).not.toHaveProperty('locationDescription');
-    expect(result.attachments[0]).toBeUndefined();
+    expect(result).not.toHaveProperty('latitude');
+    expect(result).not.toHaveProperty('longitude');
+    expect(result.attachments[0]).not.toHaveProperty('fileUrl');
   });
 
-  it('does not reveal private or nonexistent tasks', async () => {
-    await expect(service.getTaskDetails('private-or-missing')).rejects.toBeInstanceOf(
+  it('does not reveal non-public or nonexistent tasks', async () => {
+    await expect(service.getTaskDetails('missing-task')).rejects.toBeInstanceOf(
       NotFoundException,
     );
 
