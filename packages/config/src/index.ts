@@ -1,0 +1,1 @@
+﻿export interface AppEnvironment{apiBaseUrl:string;appName:string} export function getAppEnvironment(apiBaseUrl=""):AppEnvironment{return{apiBaseUrl:apiBaseUrl.replace(/\/$/,""),appName:"Task Marketplace"}}

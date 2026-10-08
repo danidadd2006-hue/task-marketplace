@@ -111,6 +111,8 @@ function makeService() {
   return new PaymentProviderEventService({
     initiateFunding: vi.fn(),
     reconcileFunding: vi.fn(),
+    initiateTokenPurchase: vi.fn(),
+    reconcileTokenPurchase: vi.fn(),
     normalizeWebhook: mocks.normalizeWebhook,
     initiatePayout: vi.fn(),
     reconcilePayout: vi.fn(),

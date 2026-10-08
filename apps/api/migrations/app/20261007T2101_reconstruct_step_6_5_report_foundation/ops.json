@@ -1,0 +1,581 @@
+[
+  {
+    "id": "column.public.report.activeKey",
+    "label": "Add column \"activeKey\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "activeKey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"activeKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "activeKey"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"activeKey\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"activeKey\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"activeKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "activeKey"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.category",
+    "label": "Add column \"category\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "category",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"category\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "category"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"category\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"category\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"category\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "category"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.targetId",
+    "label": "Add column \"targetId\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetId",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetId\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"targetId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.targetType",
+    "label": "Add column \"targetType\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetType",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetType\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetType"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetType\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"targetType\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetType\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetType"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.trustCaseId",
+    "label": "Add column \"trustCaseId\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "trustCaseId",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"trustCaseId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "trustCaseId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"trustCaseId\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"trustCaseId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"trustCaseId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "trustCaseId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.report.report_category_check_024ea8fd",
+    "label": "Add check constraint \"report_category_check_024ea8fd\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "report_category_check_024ea8fd",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_category_check_024ea8fd\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_category_check_024ea8fd",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"report_category_check_024ea8fd\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_category_check_024ea8fd\" CHECK (\"category\" IN ('CONTENT', 'CONDUCT', 'SAFETY', 'TRANSACTION', 'PRIVACY', 'AUTHENTICITY', 'OTHER'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_category_check_024ea8fd\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_category_check_024ea8fd",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.report.report_targetType_check_829377f7",
+    "label": "Add check constraint \"report_targetType_check_829377f7\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "report_targetType_check_829377f7",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_targetType_check_829377f7\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_targetType_check_829377f7",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"report_targetType_check_829377f7\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_targetType_check_829377f7\" CHECK (\"targetType\" IN ('USER', 'TASK', 'MESSAGE', 'REVIEW'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_targetType_check_829377f7\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_targetType_check_829377f7",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.report.report_trustCaseId_key",
+    "label": "Add unique constraint on \"report\" (trustCaseId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "report_trustCaseId_key",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_trustCaseId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"report_trustCaseId_key\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_trustCaseId_key\" UNIQUE (\"trustCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_trustCaseId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.report.report_activeKey_key",
+    "label": "Add unique constraint on \"report\" (activeKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "report_activeKey_key",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_activeKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_activeKey_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"report_activeKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_activeKey_key\" UNIQUE (\"activeKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_activeKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_activeKey_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_reporterId_createdAt_idx_468b5f4f",
+    "label": "Create index \"report_reporterId_createdAt_idx_468b5f4f\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_reporterId_createdAt_idx_468b5f4f",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_reporterId_createdAt_idx_468b5f4f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_reporterId_createdAt_idx_468b5f4f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_reporterId_createdAt_idx_468b5f4f\"",
+        "sql": "CREATE INDEX \"report_reporterId_createdAt_idx_468b5f4f\" ON \"public\".\"report\" (\"reporterId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_reporterId_createdAt_idx_468b5f4f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_reporterId_createdAt_idx_468b5f4f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_status_createdAt_idx_58610442",
+    "label": "Create index \"report_status_createdAt_idx_58610442\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_status_createdAt_idx_58610442",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_status_createdAt_idx_58610442\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"report_status_createdAt_idx_58610442\" ON \"public\".\"report\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_status_createdAt_idx_58610442\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_status_createdAt_idx_58610442\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_targetType_targetId_status_idx_f4be9279",
+    "label": "Create index \"report_targetType_targetId_status_idx_f4be9279\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_targetType_targetId_status_idx_f4be9279",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_targetType_targetId_status_idx_f4be9279\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_targetType_targetId_status_idx_f4be9279\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_targetType_targetId_status_idx_f4be9279\"",
+        "sql": "CREATE INDEX \"report_targetType_targetId_status_idx_f4be9279\" ON \"public\".\"report\" (\"targetType\", \"targetId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_targetType_targetId_status_idx_f4be9279\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_targetType_targetId_status_idx_f4be9279\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.report.report_reporterId_fkey",
+    "label": "Add foreign key \"report_reporterId_fkey\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "report_reporterId_fkey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"report_reporterId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_reporterId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"report_reporterId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"report\"\nADD CONSTRAINT \"report_reporterId_fkey\"\nFOREIGN KEY (\"reporterId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"report_reporterId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_reporterId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.report.report_trustCaseId_fkey",
+    "label": "Add foreign key \"report_trustCaseId_fkey\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "report_trustCaseId_fkey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"report_trustCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"report_trustCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"report\"\nADD CONSTRAINT \"report_trustCaseId_fkey\"\nFOREIGN KEY (\"trustCaseId\")\nREFERENCES \"public\".\"trustCase\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"report_trustCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  }
+]

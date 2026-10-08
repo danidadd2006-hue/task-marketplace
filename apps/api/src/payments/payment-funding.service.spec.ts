@@ -128,6 +128,8 @@ function makeService() {
   return new PaymentFundingService({
     initiateFunding: mocks.provider,
     reconcileFunding: mocks.reconcileFunding,
+    initiateTokenPurchase: vi.fn(),
+    reconcileTokenPurchase: vi.fn(),
     normalizeWebhook: vi.fn(),
     initiatePayout: vi.fn(),
     reconcilePayout: vi.fn(),

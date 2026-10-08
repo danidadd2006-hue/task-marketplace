@@ -24,6 +24,7 @@ describe('JwtStrategy.validate', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    process.env['JWT_ACCESS_SECRET'] = 'test-secret';
     strategy = new JwtStrategy();
   });
 
@@ -72,6 +73,7 @@ describe('JwtStrategy.validate', () => {
       userId: 'user-id',
       email: 'user@example.com',
       roles: ['CLIENT', 'WORKER'],
+      status: 'ACTIVE',
     });
   });
 

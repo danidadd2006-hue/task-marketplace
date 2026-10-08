@@ -2,10 +2,20 @@ import { UnauthorizedException } from '@nestjs/common';
 import { describe, beforeEach, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-  transaction: vi.fn(), first: vi.fn(), userFirst: vi.fn(), tokenCreate: vi.fn(), execute: vi.fn(), update: vi.fn(), where: vi.fn(), build: vi.fn(),
+  transaction: vi.fn(), first: vi.fn(), userFirst: vi.fn(), userWhere: vi.fn(), tokenCreate: vi.fn(), execute: vi.fn(), update: vi.fn(), where: vi.fn(), build: vi.fn(),
 }));
 
-vi.mock('../prisma/db.js', () => ({ db: { transaction: mocks.transaction } }));
+vi.mock('../prisma/db.js', () => ({
+  db: {
+    orm: {
+      public: {
+        User: { where: mocks.userWhere },
+        RefreshToken: { create: mocks.tokenCreate },
+      },
+    },
+    transaction: mocks.transaction,
+  },
+}));
 import { AuthService } from './auth.service.js';
 
 const source = { id: 'source-id', userId: 'user-id', tokenHash: 'hash', expiresAt: '2099-01-01T00:00:00.000Z', revokedAt: null };
@@ -76,6 +86,7 @@ describe('AuthService.register and login', () => {
     vi.spyOn(service, 'verifyPassword').mockResolvedValue(true);
     jwt.signAsync.mockResolvedValue('access-token');
     mocks.userFirst.mockResolvedValue({ ...user, passwordHash: 'hash' });
+    mocks.userWhere.mockReturnValue({ first: mocks.userFirst });
     mocks.transaction.mockImplementation(async (callback) => callback({
       orm: { public: {
         User: { create: vi.fn().mockResolvedValue({ id: 'new-user', email: 'new@example.com' }) },

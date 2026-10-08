@@ -88,7 +88,7 @@ function setupTransaction() {
       raw: {
         sql: vi.fn(() => ({
           returnsRow: vi.fn(() => ({
-            build: vi.fn((name) => name),
+            build: vi.fn(() => 'lock-plan'),
           })),
         })),
       },
@@ -243,6 +243,10 @@ describe('TaskWorkerSelectionService.selectWorker', () => {
 
     mocks.userFirst.mockResolvedValue(worker);
     mocks.roleFirst.mockResolvedValueOnce(undefined);
+    mocks.query.mockReset();
+    mocks.query
+      .mockResolvedValueOnce([task])
+      .mockResolvedValueOnce([application]);
 
     await expect(service.selectWorker(client, 'task-id', 'application-id'))
       .rejects.toBeInstanceOf(BadRequestException);

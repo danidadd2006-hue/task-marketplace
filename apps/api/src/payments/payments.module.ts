@@ -19,6 +19,7 @@ import { RefundProviderEventService } from './refund-provider-event.service.js';
 import { RefundProviderEventController } from './refund-provider-event.controller.js';
 import { RefundStateService } from './refund-state.service.js';
 import { CancellationRefundAccountingService } from './cancellation-refund-accounting.service.js';
+import { TokenPurchaseProviderEventService } from './token-purchase-provider-event.service.js';
 import { NotificationModule } from '../notifications/notification.module.js';
 
 @Module({
@@ -40,6 +41,7 @@ import { NotificationModule } from '../notifications/notification.module.js';
     RefundProviderService,
     RefundProviderEventService,
     CancellationRefundAccountingService,
+    TokenPurchaseProviderEventService,
     {
       provide: PAYMENT_PROVIDER,
       useFactory: () =>
@@ -48,6 +50,10 @@ import { NotificationModule } from '../notifications/notification.module.js';
           : new PendingPaymentProvider(),
     },
   ],
-  exports: [RefundProviderService, CancellationRefundAccountingService],
+  exports: [
+    PAYMENT_PROVIDER,
+    RefundProviderService,
+    CancellationRefundAccountingService,
+  ],
 })
 export class PaymentsModule {}

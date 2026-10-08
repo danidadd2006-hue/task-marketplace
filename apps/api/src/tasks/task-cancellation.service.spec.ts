@@ -119,14 +119,10 @@ function setup(taskOverride = task, payment: typeof fundedPayment | null = funde
   mocks.contractUpdate.mockResolvedValue({ id: contract.id, status: 'CANCELLED' });
   mocks.auditCreate.mockResolvedValue({});
   mocks.penaltyFirst.mockResolvedValue(null);
-  mocks.penaltyCreate.mockResolvedValue({
+  mocks.penaltyCreate.mockImplementation(async (input) => ({
     id: 'penalty-id',
-    sequenceNumber: 1,
-    banDurationDays: 3,
-    rollingPeriodAnchorAt: '2026-10-06T12:00:00.000Z',
-    banStartedAt: '2026-10-06T12:00:00.000Z',
-    banEndsAt: '2026-10-09T12:00:00.000Z',
-  });
+    ...input,
+  }));
 }
 
 describe('TaskCancellationService', () => {
@@ -231,17 +227,17 @@ describe('TaskCancellationService', () => {
     expect(result.cancellation.category).toBe('PRE_WORK_FIRST_DAY');
   });
 
-  it('calculates short-job second-day allocation as 10/10/80', async () => {
+  it('charges only the 10% cancellation fee on a 3-day job after the first day', async () => {
     vi.setSystemTime(new Date('2026-10-02T12:00:00.000Z'));
     setup();
     const shortContract = { ...contract, agreedDurationDays: 3 };
     mocks.query.mockReset();
     mocks.query.mockResolvedValueOnce([task]).mockResolvedValueOnce([shortContract]).mockResolvedValueOnce([fundedPayment]);
     const result = await service.cancelTask(client, 'task-id');
-    expect(result.cancellation.workerPercentage).toBe('10');
-    expect(result.cancellation.workerAmount).toBe('10');
+    expect(result.cancellation.workerPercentage).toBe('0');
+    expect(result.cancellation.workerAmount).toBe('0');
     expect(result.cancellation.cancellationFee).toBe('10');
-    expect(result.cancellation.clientRefund).toBe('80');
+    expect(result.cancellation.clientRefund).toBe('90');
   });
 
   it('calculates long-job allocation proportionally and preserves the total', async () => {
@@ -264,16 +260,18 @@ describe('TaskCancellationService', () => {
     expect(result.cancellation.clientRefund).toBe('40');
   });
 
-  it('uses extension full refund once extensionStartedAt has begun', async () => {
+  it('refunds 90% to the client and sends 10% to the platform after an extension starts', async () => {
     setup();
     const extensionContract = { ...contract, extensionStartedAt: '2026-10-05T00:00:00.000Z' };
     mocks.query.mockReset();
     mocks.query.mockResolvedValueOnce([task]).mockResolvedValueOnce([extensionContract]).mockResolvedValueOnce([fundedPayment]);
     const result = await service.cancelTask(client, 'task-id');
     expect(result.cancellation.category).toBe('EXTENSION');
+    expect(result.cancellation.workerPercentage).toBe('0');
     expect(result.cancellation.workerAmount).toBe('0');
-    expect(result.cancellation.cancellationFee).toBe('0');
-    expect(result.cancellation.clientRefund).toBe('100');
+    expect(result.cancellation.cancellationFee).toBe('10');
+    expect(result.cancellation.clientRefund).toBe('90');
+    expect(result.cancellation.calculationBasis).toBe('EXTENSION_90_PERCENT_REFUND');
   });
 
   it('requires an explicit refund choice for expiry', async () => {
@@ -306,66 +304,85 @@ describe('TaskCancellationService', () => {
     await expect(service.cancelTask(client, 'task-id')).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('creates first worker penalty as a 3-day penalty', async () => {
+  it('records the first worker cancellation as a warning with no ban', async () => {
     const result = await service.cancelTask(worker, 'task-id');
     expect(mocks.penaltyCreate).toHaveBeenCalledWith(expect.objectContaining({
       workerId: 'worker-id',
       sequenceNumber: 1,
-      banDurationDays: 3,
+      banDurationDays: 0,
       cancellationId: 'cancellation-id',
     }));
+    expect(result.workerPenalty?.sequenceNumber).toBe(1);
+    expect(result.workerPenalty?.banDurationDays).toBe(0);
+    expect(mocks.auditCreate).toHaveBeenCalledWith(expect.objectContaining({
+      entityType: 'WorkerCancellation',
+      entityId: 'cancellation-id',
+      details: expect.stringContaining('WARNING'),
+    }));
+  });
+
+  it('gives a 3-day ban on the second worker cancellation within 30 days', async () => {
+    mocks.penaltyFirst.mockResolvedValueOnce({
+      sequenceNumber: 1,
+      banDurationDays: 0,
+      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
+      warningIssuedAt: '2026-10-01T00:00:00.000Z',
+    });
+    const result = await service.cancelTask(worker, 'task-id');
+    expect(result.workerPenalty?.sequenceNumber).toBe(2);
     expect(result.workerPenalty?.banDurationDays).toBe(3);
-  });
-
-  it('escalates worker penalties to 5 then 7 days and never above 7', async () => {
-    setup();
-    mocks.penaltyFirst.mockResolvedValueOnce({
-      sequenceNumber: 1,
-      banDurationDays: 3,
-      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
-    });
-    await service.cancelTask(worker, 'task-id');
-    expect(mocks.penaltyCreate.mock.calls[0][0]).toEqual(expect.objectContaining({
-      sequenceNumber: 2,
-      banDurationDays: 5,
-    }));
-
-    setup();
-    mocks.penaltyFirst.mockResolvedValueOnce({
-      sequenceNumber: 2,
-      banDurationDays: 5,
-      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
-    });
-    await service.cancelTask(worker, 'task-id');
-    expect(mocks.penaltyCreate.mock.calls[0][0]).toEqual(expect.objectContaining({
-      sequenceNumber: 3,
-      banDurationDays: 7,
-    }));
-
-    setup();
-    mocks.penaltyFirst.mockResolvedValueOnce({
-      sequenceNumber: 3,
-      banDurationDays: 7,
-      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
-    });
-    await service.cancelTask(worker, 'task-id');
-    expect(mocks.penaltyCreate.mock.calls[0][0]).toEqual(expect.objectContaining({
-      sequenceNumber: 3,
-      banDurationDays: 7,
-    }));
-  });
-
-  it('resets the worker penalty sequence after the rolling month', async () => {
-    mocks.penaltyFirst.mockResolvedValueOnce({
-      sequenceNumber: 3,
-      banDurationDays: 7,
-      rollingPeriodAnchorAt: '2026-08-01T00:00:00.000Z',
-    });
-    await service.cancelTask(worker, 'task-id');
     expect(mocks.penaltyCreate).toHaveBeenCalledWith(expect.objectContaining({
-      sequenceNumber: 1,
+      sequenceNumber: 2,
       banDurationDays: 3,
     }));
+  });
+
+  it('gives a 5-day ban on the third worker cancellation within 30 days', async () => {
+    mocks.penaltyFirst.mockResolvedValueOnce({
+      sequenceNumber: 2,
+      banDurationDays: 3,
+      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
+      warningIssuedAt: '2026-10-01T00:00:00.000Z',
+    });
+    const result = await service.cancelTask(worker, 'task-id');
+    expect(result.workerPenalty?.sequenceNumber).toBe(3);
+    expect(result.workerPenalty?.banDurationDays).toBe(5);
+  });
+
+  it('gives a 7-day ban on the fourth and every later worker cancellation within 30 days', async () => {
+    mocks.penaltyFirst.mockResolvedValueOnce({
+      sequenceNumber: 3,
+      banDurationDays: 5,
+      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
+      warningIssuedAt: '2026-10-01T00:00:00.000Z',
+    });
+    const fourth = await service.cancelTask(worker, 'task-id');
+    expect(fourth.workerPenalty?.sequenceNumber).toBe(4);
+    expect(fourth.workerPenalty?.banDurationDays).toBe(7);
+
+    setup();
+    mocks.penaltyFirst.mockResolvedValueOnce({
+      sequenceNumber: 4,
+      banDurationDays: 7,
+      rollingPeriodAnchorAt: '2026-10-01T00:00:00.000Z',
+      warningIssuedAt: '2026-10-01T00:00:00.000Z',
+    });
+    const later = await service.cancelTask(worker, 'task-id');
+    expect(later.workerPenalty?.sequenceNumber).toBe(4);
+    expect(later.workerPenalty?.banDurationDays).toBe(7);
+  });
+
+  it('resets the worker cancellation sequence after one month without a cancellation', async () => {
+    vi.setSystemTime(new Date('2026-11-07T12:00:00.000Z'));
+    mocks.penaltyFirst.mockResolvedValueOnce({
+      sequenceNumber: 4,
+      banDurationDays: 7,
+      rollingPeriodAnchorAt: '2026-10-01T12:00:00.000Z',
+      warningIssuedAt: '2026-10-01T12:00:00.000Z',
+    });
+    const result = await service.cancelTask(worker, 'task-id');
+    expect(result.workerPenalty?.sequenceNumber).toBe(1);
+    expect(result.workerPenalty?.banDurationDays).toBe(0);
   });
 
   it('does not create a worker penalty for client cancellation', async () => {

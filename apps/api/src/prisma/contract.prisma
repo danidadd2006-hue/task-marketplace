@@ -41,11 +41,17 @@ model User {
   payoutDestinations PayoutDestination[]
   payoutsAsWorker   Payout[] @relation("WorkerPayouts")
   cancellationsAsActor Cancellation[] @relation("CancellationActors")
+  disputesRaised Dispute[] @relation("DisputeRaisers")
+  disputesResolved Dispute[] @relation("DisputeResolutionActors")
   workerCancellationPenalties WorkerCancellationPenalty[] @relation("WorkerCancellationPenalties")
   notifications Notification[]
   notificationPreferences NotificationPreference[]
   pushDevices PushDevice[]
+  tokenWallet TokenWallet?
+  tokenTransactions TokenTransaction[]
+  tokenPurchases TokenPurchase[]
   notificationDeliveryAttempts NotificationDeliveryAttempt[] @relation("NotificationAttemptRecipients")
+  reportsSubmitted Report[] @relation("ReportReporters")
   reviewsGiven      Review[] @relation("ReviewReviewer")
   reviewsReceived   Review[] @relation("ReviewReviewee")
   verifications     Verification[] @relation("VerificationSubject")
@@ -236,6 +242,7 @@ model Task {
   cancellations         Cancellation[]
   conversations         Conversation[]
   notifications         Notification[]
+  disputes              Dispute[] @relation("TaskDisputes")
 
   @@index([clientId])
   @@index([categoryId])
@@ -335,7 +342,6 @@ enum CancellationStage {
 
 enum CancellationCategory {
   PRE_WORK_FIRST_DAY
-  SHORT_JOB_SECOND_DAY
   LONG_JOB_ELAPSED
   EXTENSION
   EXPIRY_REFUND
@@ -345,9 +351,8 @@ enum CancellationCategory {
 enum CancellationCalculationBasis {
   NO_FINANCIAL_ALLOCATION
   FIRST_DAY_FULL_REFUND
-  SHORT_JOB_FIXED_ALLOCATION
   LONG_JOB_ELAPSED_ALLOCATION
-  EXTENSION_FULL_REFUND
+  EXTENSION_90_PERCENT_REFUND
   EXPIRY_FULL_REFUND
   ADMINISTRATIVE
 }
@@ -392,6 +397,7 @@ model Contract {
   conversations Conversation[]
   notifications Notification[]
   reviews      Review[]
+  disputes     Dispute[] @relation("ContractDisputes")
 
   @@index([workerId])
   @@index([status])
@@ -542,7 +548,7 @@ model WorkerCancellationPenalty {
 
   @@index([workerId, createdAt], map: "wcp_worker_created_idx")
   @@index([workerId, rollingPeriodAnchorAt], map: "wcp_worker_period_idx")
-  @@check(expression: "\"sequenceNumber\" >= 1 AND \"sequenceNumber\" <= 3", name: "worker_cancellation_penalty_sequence_check")
+  @@check(expression: "\"sequenceNumber\" >= 1 AND \"sequenceNumber\" <= 4", name: "worker_cancellation_penalty_sequence_check")
 }
 
 model Payment {
@@ -571,6 +577,7 @@ model Payment {
   cancellations Cancellation[]
   refunds      Refund[]
   notifications Notification[]
+  disputes     Dispute[] @relation("PaymentDisputes")
 
   @@index([taskId])
   @@index([contractId])
@@ -696,6 +703,61 @@ model TokenPackage {
   updatedAt   temporal.updatedAtString()
 
   @@index([active])
+}
+
+enum TokenPurchaseStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum TokenPurchaseProviderEventType {
+  PURCHASE_SUCCEEDED
+  PURCHASE_FAILED
+  PURCHASE_CANCELLED
+}
+
+model TokenPurchase {
+  id             String              @id @default(uuid())
+  userId         String
+  tokenPackageId String
+  tokenAmount    Int
+  amount         Decimal
+  currency       String
+  status         TokenPurchaseStatus @default(PENDING)
+  provider       String?
+  providerRef    String?
+  paidAt         TimestamptzString?
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  user           User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  providerEvents TokenPurchaseProviderEvent[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@unique([provider, providerRef])
+}
+
+model TokenPurchaseProviderEvent {
+  id              String                         @id @default(uuid())
+  provider        String
+  providerEventId String
+  type            TokenPurchaseProviderEventType
+  tokenPurchaseId String
+  providerRef     String?
+  metadata        String?
+  processedAt     TimestamptzString              @default(now())
+  createdAt       TimestamptzString              @default(now())
+
+  tokenPurchase TokenPurchase @relation(fields: [tokenPurchaseId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, providerEventId])
+  @@index([tokenPurchaseId])
+  @@index([type])
+  @@index([processedAt])
 }
 model Review {
   id                   String     @id @default(uuid())
@@ -858,29 +920,52 @@ enum DisputeStatus {
 }
 
 model Dispute {
-  id          String        @id @default(uuid())
-  taskId      String
-  paymentId   String?
-  raisedById  String
-  reason      String
-  description String
-  status      DisputeStatus @default(OPEN)
-  resolution  String?
-  createdAt   TimestamptzString @default(now())
-  updatedAt   temporal.updatedAtString()
+  id                       String        @id @default(uuid())
+  taskId                   String
+  contractId               String
+  paymentId                String?
+  raisedById               String
+  category                 String        @default("OTHER")
+  reason                   String
+  description              String
+  status                   DisputeStatus @default(OPEN)
+  resolution               String?
+  resolutionCode           String?
+  resolutionReason         String?
+  resolutionActorId        String?
+  resolutionAt             TimestamptzString?
+  relatedFinancialActionRef String?
+  trustCaseId              String        @unique
+  activeKey                String?       @unique
+  createdAt                TimestamptzString @default(now())
+  updatedAt                temporal.updatedAtString()
+
+  task                     Task          @relation("TaskDisputes", fields: [taskId], references: [id], onDelete: Restrict)
+  contract                 Contract      @relation("ContractDisputes", fields: [contractId], references: [id], onDelete: Restrict)
+  payment                  Payment?      @relation("PaymentDisputes", fields: [paymentId], references: [id], onDelete: Restrict)
+  raisedBy                 User          @relation("DisputeRaisers", fields: [raisedById], references: [id], onDelete: Restrict)
+  resolutionActor          User?         @relation("DisputeResolutionActors", fields: [resolutionActorId], references: [id], onDelete: Restrict)
+  trustCase                TrustCase     @relation(fields: [trustCaseId], references: [id], onDelete: Restrict)
+  evidence                 DisputeEvidence[]
 
   @@index([taskId])
+  @@index([contractId])
   @@index([paymentId])
   @@index([raisedById])
   @@index([status])
+  @@index([status, createdAt])
 }
 
 model DisputeEvidence {
   id          String   @id @default(uuid())
   disputeId   String
   fileUrl     String?
+  referenceType String?
+  referenceId String?
   description String?
   createdAt   TimestamptzString @default(now())
+
+  dispute     Dispute  @relation(fields: [disputeId], references: [id], onDelete: Restrict)
 
   @@index([disputeId])
 }
@@ -891,24 +976,51 @@ enum ReportStatus {
   DISMISSED
 }
 
-model Report {
-  id          String       @id @default(uuid())
-  reporterId  String
-  reportedUserId String?
-  taskId      String?
-  messageId   String?
-  reason      String
-  description String
-  status      ReportStatus @default(OPEN)
-  resolution  String?
-  createdAt   TimestamptzString @default(now())
-  updatedAt   temporal.updatedAtString()
+enum ReportTargetType {
+  USER
+  TASK
+  MESSAGE
+  REVIEW
+}
 
-  @@index([reporterId])
+enum ReportCategory {
+  CONTENT
+  CONDUCT
+  SAFETY
+  TRANSACTION
+  PRIVACY
+  AUTHENTICITY
+  OTHER
+}
+
+model Report {
+  id             String           @id @default(uuid())
+  reporterId     String
+  targetType     ReportTargetType
+  targetId       String
+  category       ReportCategory
+  reportedUserId String?
+  taskId         String?
+  messageId      String?
+  reason         String
+  description    String
+  status         ReportStatus     @default(OPEN)
+  resolution     String?
+  trustCaseId    String           @unique
+  activeKey      String?          @unique
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  reporter       User             @relation("ReportReporters", fields: [reporterId], references: [id], onDelete: Restrict)
+  trustCase      TrustCase        @relation(fields: [trustCaseId], references: [id], onDelete: Restrict)
+
+  @@index([reporterId, createdAt])
+  @@index([targetType, targetId, status])
   @@index([reportedUserId])
   @@index([taskId])
   @@index([messageId])
   @@index([status])
+  @@index([status, createdAt])
 }
 enum VerificationStatus {
   PENDING
@@ -1071,16 +1183,41 @@ model TrustCase {
   updatedAt        temporal.updatedAtString()
 
   creator          User              @relation("TrustCaseCreators", fields: [createdById], references: [id], onDelete: Restrict)
+  report           Report?
+  dispute          Dispute?
   assignee         User?             @relation("TrustCaseAssignees", fields: [assignedToId], references: [id], onDelete: Restrict)
   closer           User?             @relation("TrustCaseClosers", fields: [closedById], references: [id], onDelete: Restrict)
   evidence         TrustCaseEvidence[]
   history          TrustCaseHistory[]
   decisions        TrustCaseDecision[]
+  riskSignals       RiskSignal[]
 
   @@index([type, status])
   @@index([subjectType, subjectId])
   @@index([createdById, createdAt])
   @@index([assignedToId, status])
+}
+
+model RiskSignal {
+  id                  String          @id @default(uuid())
+  signalType          String
+  subjectType         String
+  subjectId           String
+  sourceDomain        String
+  sourceReference     String
+  severity            String
+  observedAt          TimestamptzString
+  metadataJson        String?
+  deduplicationKey    String?         @unique(map: "riskSignal_deduplicationKey_key")
+  trustCaseId         String?
+  createdAt           TimestamptzString @default(now())
+
+  trustCase           TrustCase?      @relation(fields: [trustCaseId], references: [id], onDelete: Restrict)
+
+  @@index([subjectType, subjectId, observedAt])
+  @@index([signalType, severity, observedAt])
+  @@index([sourceDomain, sourceReference])
+  @@index([trustCaseId, createdAt])
 }
 
 model TrustCaseEvidence {

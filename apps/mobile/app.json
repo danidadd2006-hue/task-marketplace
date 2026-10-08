@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Task Marketplace",
+    "slug": "task-marketplace",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "taskmarketplace",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}

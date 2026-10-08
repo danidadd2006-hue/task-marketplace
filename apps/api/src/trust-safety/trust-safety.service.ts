@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { AuditService } from '../audit/audit.service.js';
-import { db } from '../prisma/db.js';
+import { db, type Tx } from '../prisma/db.js';
 import type {
   TrustCaseActor,
   TrustCaseCreateInput,
@@ -54,43 +54,54 @@ export class TrustSafetyService {
 
   async createCase(actor: TrustCaseActor, input: TrustCaseCreateInput) {
     await this.requireActiveUser(actor);
+    this.validateCaseCreateInput(input);
+    return db.transaction(async (tx) => this.createCaseInTransaction(tx, actor, input));
+  }
+
+  async createCaseInTransaction(tx: Tx, actor: TrustCaseActor, input: TrustCaseCreateInput) {
+    const user = await tx.orm.public.User.where({ id: actor.userId }).first();
+    if (!user || user.status !== 'ACTIVE') {
+      throw new ForbiddenException('Account is not active');
+    }
+    this.validateCaseCreateInput(input);
+
+    const trustCase = await tx.orm.public.TrustCase.create({
+      type: input.type,
+      category: input.category ?? null,
+      status: 'OPEN',
+      subjectType: input.subjectType,
+      subjectId: input.subjectId,
+      createdById: actor.userId,
+      assignedToId: null,
+      assignedAt: null,
+      resolvedAt: null,
+      closedAt: null,
+      closedById: null,
+      resolutionCode: null,
+      resolutionReason: null,
+      revision: 0,
+    });
+
+    await tx.orm.public.TrustCaseHistory.create({
+      caseId: trustCase.id,
+      actorId: actor.userId,
+      action: 'CREATE',
+      fromStatus: null,
+      toStatus: 'OPEN',
+      reason: input.reason?.trim() || null,
+      metadataJson: null,
+    });
+
+    return trustCase;
+  }
+
+  private validateCaseCreateInput(input: TrustCaseCreateInput) {
     if (!['REPORT', 'DISPUTE', 'MODERATION', 'RISK'].includes(input.type)) {
       throw new BadRequestException('Invalid case type');
     }
     if (!input.subjectType.trim() || !input.subjectId.trim()) {
       throw new ConflictException('Case subject reference is required');
     }
-
-    return db.transaction(async (tx) => {
-      const trustCase = await tx.orm.public.TrustCase.create({
-        type: input.type,
-        category: input.category ?? null,
-        status: 'OPEN',
-        subjectType: input.subjectType,
-        subjectId: input.subjectId,
-        createdById: actor.userId,
-        assignedToId: null,
-        assignedAt: null,
-        resolvedAt: null,
-        closedAt: null,
-        closedById: null,
-        resolutionCode: null,
-        resolutionReason: null,
-        revision: 0,
-      });
-
-      await tx.orm.public.TrustCaseHistory.create({
-        caseId: trustCase.id,
-        actorId: actor.userId,
-        action: 'CREATE',
-        fromStatus: null,
-        toStatus: 'OPEN',
-        reason: null,
-        metadataJson: null,
-      });
-
-      return trustCase;
-    });
   }
 
   async assignCase(actor: TrustCaseActor, caseId: string, assigneeId: string) {

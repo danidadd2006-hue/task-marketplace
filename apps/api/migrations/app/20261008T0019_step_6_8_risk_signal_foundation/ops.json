@@ -1,0 +1,488 @@
+[
+  {
+    "id": "table.riskSignal",
+    "label": "Create table \"riskSignal\"",
+    "summary": "Creates table \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"riskSignal\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"riskSignal\"",
+        "sql": "CREATE TABLE \"public\".\"riskSignal\" (\n  \"id\" text NOT NULL,\n  \"signalType\" text NOT NULL,\n  \"subjectType\" text NOT NULL,\n  \"subjectId\" text NOT NULL,\n  \"sourceDomain\" text NOT NULL,\n  \"sourceReference\" text NOT NULL,\n  \"severity\" text NOT NULL,\n  \"observedAt\" timestamptz NOT NULL,\n  \"metadataJson\" text,\n  \"deduplicationKey\" text,\n  \"trustCaseId\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"riskSignal\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "primaryKey.riskSignal.riskSignal_pkey",
+    "label": "Add primary key on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "primaryKey",
+        "name": "riskSignal_pkey",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure primary key \"riskSignal_pkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_pkey",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add primary key \"riskSignal_pkey\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\" ADD CONSTRAINT \"riskSignal_pkey\" PRIMARY KEY (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify primary key \"riskSignal_pkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_pkey",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.riskSignal.riskSignal_deduplicationKey_key",
+    "label": "Add unique constraint on \"riskSignal\" (deduplicationKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "riskSignal_deduplicationKey_key",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"riskSignal_deduplicationKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_deduplicationKey_key",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"riskSignal_deduplicationKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\" ADD CONSTRAINT \"riskSignal_deduplicationKey_key\" UNIQUE (\"deduplicationKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"riskSignal_deduplicationKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_deduplicationKey_key",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.riskSignal.riskSignal_severity_check",
+    "label": "Add check constraint \"riskSignal_severity_check\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "riskSignal_severity_check",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"riskSignal_severity_check\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_severity_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"riskSignal_severity_check\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\" ADD CONSTRAINT \"riskSignal_severity_check\" CHECK (\"severity\" IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"riskSignal_severity_check\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_severity_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.riskSignal.riskSignal_subjectType_check",
+    "label": "Add check constraint \"riskSignal_subjectType_check\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "riskSignal_subjectType_check",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"riskSignal_subjectType_check\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_subjectType_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"riskSignal_subjectType_check\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\" ADD CONSTRAINT \"riskSignal_subjectType_check\" CHECK (\"subjectType\" IN ('USER', 'TASK', 'APPLICATION', 'CONTRACT', 'PAYMENT', 'PAYOUT', 'TOKEN_TRANSACTION', 'CONVERSATION', 'MESSAGE', 'REVIEW', 'VERIFICATION'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"riskSignal_subjectType_check\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_subjectType_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.riskSignal.riskSignal_sourceDomain_check",
+    "label": "Add check constraint \"riskSignal_sourceDomain_check\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "riskSignal_sourceDomain_check",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"riskSignal_sourceDomain_check\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_sourceDomain_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"riskSignal_sourceDomain_check\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\" ADD CONSTRAINT \"riskSignal_sourceDomain_check\" CHECK (\"sourceDomain\" IN ('ACCOUNT', 'PAYMENT', 'MARKETPLACE', 'TOKENS', 'REVIEWS', 'MESSAGING', 'VERIFICATION'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"riskSignal_sourceDomain_check\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_sourceDomain_check",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.riskSignal.riskSignal_subjectType_subjectId_observedAt_idx_f119982b",
+    "label": "Create index \"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "riskSignal_subjectType_subjectId_observedAt_idx_f119982b",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\"",
+        "sql": "CREATE INDEX \"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\" ON \"public\".\"riskSignal\" (\"subjectType\", \"subjectId\", \"observedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_subjectType_subjectId_observedAt_idx_f119982b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.riskSignal.riskSignal_signalType_severity_observedAt_idx_dbf21d7d",
+    "label": "Create index \"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "riskSignal_signalType_severity_observedAt_idx_dbf21d7d",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\"",
+        "sql": "CREATE INDEX \"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\" ON \"public\".\"riskSignal\" (\"signalType\", \"severity\", \"observedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_signalType_severity_observedAt_idx_dbf21d7d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.riskSignal.riskSignal_sourceDomain_sourceReference_idx_d73e55a2",
+    "label": "Create index \"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "riskSignal_sourceDomain_sourceReference_idx_d73e55a2",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\"",
+        "sql": "CREATE INDEX \"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\" ON \"public\".\"riskSignal\" (\"sourceDomain\", \"sourceReference\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_sourceDomain_sourceReference_idx_d73e55a2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.riskSignal.riskSignal_trustCaseId_createdAt_idx_b9a7034f",
+    "label": "Create index \"riskSignal_trustCaseId_createdAt_idx_b9a7034f\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "riskSignal_trustCaseId_createdAt_idx_b9a7034f",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"riskSignal_trustCaseId_createdAt_idx_b9a7034f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_trustCaseId_createdAt_idx_b9a7034f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"riskSignal_trustCaseId_createdAt_idx_b9a7034f\"",
+        "sql": "CREATE INDEX \"riskSignal_trustCaseId_createdAt_idx_b9a7034f\" ON \"public\".\"riskSignal\" (\"trustCaseId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"riskSignal_trustCaseId_createdAt_idx_b9a7034f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_trustCaseId_createdAt_idx_b9a7034f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.riskSignal.riskSignal_trustCaseId_idx_b2894b73",
+    "label": "Create index \"riskSignal_trustCaseId_idx_b2894b73\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "riskSignal_trustCaseId_idx_b2894b73",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"riskSignal_trustCaseId_idx_b2894b73\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_trustCaseId_idx_b2894b73\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"riskSignal_trustCaseId_idx_b2894b73\"",
+        "sql": "CREATE INDEX \"riskSignal_trustCaseId_idx_b2894b73\" ON \"public\".\"riskSignal\" (\"trustCaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"riskSignal_trustCaseId_idx_b2894b73\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"riskSignal_trustCaseId_idx_b2894b73\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.riskSignal.riskSignal_trustCaseId_fkey",
+    "label": "Add foreign key \"riskSignal_trustCaseId_fkey\" on \"riskSignal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "riskSignal_trustCaseId_fkey",
+        "table": "riskSignal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"riskSignal_trustCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_trustCaseId_fkey",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"riskSignal_trustCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"riskSignal\"\nADD CONSTRAINT \"riskSignal_trustCaseId_fkey\"\nFOREIGN KEY (\"trustCaseId\")\nREFERENCES \"public\".\"trustCase\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"riskSignal_trustCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "riskSignal_trustCaseId_fkey",
+          "public",
+          "\"public\".\"riskSignal\""
+        ]
+      }
+    ]
+  }
+]

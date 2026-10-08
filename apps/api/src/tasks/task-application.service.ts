@@ -10,6 +10,7 @@ import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { db } from '../prisma/db.js';
 import { CreateTaskApplicationDto } from './dto/create-task-application.dto.js';
 import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
+import { TokensService } from '../tokens/tokens.service.js';
 
 const ELIGIBLE_TASK_STATUSES = ['PUBLISHED', 'RECEIVING_APPLICATIONS'] as const;
 
@@ -33,7 +34,10 @@ function isUniqueViolation(error: unknown): boolean {
 
 @Injectable()
 export class TaskApplicationService {
-  constructor(@Optional() private readonly notificationDomainEventService?: NotificationDomainEventService) {}
+  constructor(
+    private readonly tokensService: TokensService,
+    @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
+  ) {}
 
   async submitApplication(
     worker: AuthenticatedUser,
@@ -92,6 +96,21 @@ export class TaskApplicationService {
         throw new ConflictException('You have already applied to this task');
       }
 
+      const currentWorkerPenalty = await tx.orm.public.WorkerCancellationPenalty
+        .where({ workerId: worker.userId })
+        .orderBy([(penalty) => penalty.createdAt.desc()])
+        .first();
+
+      if (
+        currentWorkerPenalty &&
+        new Date(currentWorkerPenalty.banEndsAt).getTime() > Date.now()
+      ) {
+        throw new ForbiddenException(
+          'Worker application access is temporarily banned until ' +
+          currentWorkerPenalty.banEndsAt,
+        );
+      }
+
       let application;
       try {
         application = await tx.orm.public.Application.create({
@@ -110,6 +129,12 @@ export class TaskApplicationService {
         }
         throw error;
       }
+
+      await this.tokensService.spendForApplicationInTransaction(
+        tx,
+        worker.userId,
+        application.id,
+      );
 
       for (const attachment of dto.attachments ?? []) {
         await tx.orm.public.ApplicationAttachment.create({

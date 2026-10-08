@@ -1,0 +1,23 @@
+﻿:root { color-scheme: light; --tm-bg:#fff; --tm-fg:#171717; --tm-muted:#6b7280; --tm-border:#e5e7eb; --tm-panel:#fafafa; --tm-accent:#111827; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--tm-bg); color:var(--tm-fg); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+button,input,textarea,select { font:inherit; }
+a { color:inherit; }
+.tm-shell { min-height:100vh; }
+.tm-header { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:64px; padding:0 28px; border-bottom:1px solid var(--tm-border); background:#fff; }
+.tm-brand { font-weight:650; letter-spacing:-.02em; text-decoration:none; }
+.tm-nav { display:flex; gap:18px; overflow:auto; }
+.tm-nav a { color:var(--tm-muted); text-decoration:none; white-space:nowrap; font-size:14px; }
+.tm-nav a:hover,.tm-nav a:focus-visible { color:var(--tm-fg); }
+.tm-main { width:min(1180px,calc(100% - 40px)); margin:0 auto; padding:56px 0 80px; }
+.tm-card { border:1px solid var(--tm-border); border-radius:12px; background:var(--tm-panel); padding:24px; }
+.tm-grid { display:grid; gap:16px; }
+.tm-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 18px; border:1px solid #111827; border-radius:8px; background:#111827; color:#fff; text-decoration:none; cursor:pointer; }
+.tm-button.secondary { background:#fff; color:#111827; border-color:var(--tm-border); }
+.tm-muted { color:var(--tm-muted); }
+.tm-logo { font-weight:750; letter-spacing:-.045em; }
+.tm-logo-stage { display:grid; place-items:center; min-height:100vh; background:#fff; }
+.tm-logo-mark { animation:tm-logo-in 2.4s cubic-bezier(.22,1,.36,1) both; }
+@keyframes tm-logo-in { 0%{opacity:0;transform:translateY(10px) scale(.985)} 25%{opacity:1} 100%{opacity:1;transform:translateY(0) scale(1)} }
+@media (max-width:720px){ .tm-header{padding:0 18px}.tm-nav{gap:12px}.tm-main{width:min(100% - 28px,1180px);padding-top:36px} }
+@media (prefers-reduced-motion:reduce){ .tm-logo-mark{animation:none} }

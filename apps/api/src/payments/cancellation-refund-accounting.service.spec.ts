@@ -232,14 +232,36 @@ describe('CancellationRefundAccountingService — Phase 4 Step 4.4I', () => {
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('preserves the existing COMMISSION by only querying/creating the targeted accounting type', async () => {
+  it('reverses the normal completion commission when a funded task is cancelled', async () => {
     const service = new CancellationRefundAccountingService();
-    const tx = txFor({ queryResults: [baseRefund, basePayment, baseCancellation] });
+    const tx = txFor();
+    mocks.ledgerFirst
+      .mockResolvedValueOnce({
+        id: 'commission-id',
+        amount: '10',
+        currency: 'KES',
+        type: 'COMMISSION',
+      })
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined);
 
-    await service.recordRefundInTransaction(tx, 'refund-id');
+    await service.recordCancellationFeeInTransaction(tx, 'cancellation-id');
 
-    expect(mocks.ledgerCreate).not.toHaveBeenCalledWith(expect.objectContaining({
-      type: 'COMMISSION',
+    expect(mocks.ledgerCreate).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      paymentId: 'payment-id',
+      taskId: 'task-id',
+      type: 'ADJUSTMENT',
+      amount: '-10',
+      currency: 'KES',
+      reference: 'cancellation:cancellation-id:commission-reversal',
+    }));
+    expect(mocks.ledgerCreate).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      paymentId: 'payment-id',
+      taskId: 'task-id',
+      type: 'CANCELLATION_FEE',
+      amount: '10',
+      currency: 'KES',
+      reference: 'cancellation:cancellation-id:fee',
     }));
   });
 

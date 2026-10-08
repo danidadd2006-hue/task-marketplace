@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { describe, expect, it } from 'vitest';
@@ -25,7 +26,7 @@ describe('CreateTaskApplicationDto', () => {
       proposedPrice: 50,
       estimatedCompletionAt: 'not-a-date',
       message: '',
-      attachments: [{ fileUrl: 'not-a-url' }],
+      attachments: [{ fileUrl: 'not url' }],
     });
     const errors = await validate(dto);
 

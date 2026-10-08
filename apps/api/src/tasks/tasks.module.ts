@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PaymentsModule } from '../payments/payments.module.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { PublicTasksController } from './public-tasks.controller.js';
+import { PublicTaskDetailsService } from './public-task-details.service.js';
 import { TaskDiscoveryService } from './task-discovery.service.js';
 import { TaskLifecycleService } from './task-lifecycle.service.js';
 import { TaskApplicationService } from './task-application.service.js';
@@ -15,9 +16,10 @@ import { TaskCancellationController } from './task-cancellation.controller.js';
 import { TasksController } from './tasks.controller.js';
 import { TasksService } from './tasks.service.js';
 import { NotificationModule } from '../notifications/notification.module.js';
+import { TokensModule } from '../tokens/tokens.module.js';
 
 @Module({
-  imports: [AuthModule, PaymentsModule, NotificationModule],
+  imports: [AuthModule, PaymentsModule, NotificationModule, TokensModule],
   controllers: [
     TasksController,
     PublicTasksController,
@@ -30,6 +32,7 @@ import { NotificationModule } from '../notifications/notification.module.js';
     TasksService,
     TaskLifecycleService,
     TaskDiscoveryService,
+    PublicTaskDetailsService,
     TaskApplicationService,
     TaskWorkerSelectionService,
     TaskCompletionService,

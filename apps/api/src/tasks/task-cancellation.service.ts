@@ -68,12 +68,12 @@ type PenaltyRow = {
   rollingPeriodAnchorAt: string;
   banStartedAt: string;
   banEndsAt: string;
+  warningIssuedAt: string | null;
 };
 
 type CancellationAllocation = {
   category:
     | 'PRE_WORK_FIRST_DAY'
-    | 'SHORT_JOB_SECOND_DAY'
     | 'LONG_JOB_ELAPSED'
     | 'EXTENSION'
     | 'EXPIRY_REFUND'
@@ -81,9 +81,8 @@ type CancellationAllocation = {
   calculationBasis:
     | 'NO_FINANCIAL_ALLOCATION'
     | 'FIRST_DAY_FULL_REFUND'
-    | 'SHORT_JOB_FIXED_ALLOCATION'
     | 'LONG_JOB_ELAPSED_ALLOCATION'
-    | 'EXTENSION_FULL_REFUND'
+    | 'EXTENSION_90_PERCENT_REFUND'
     | 'EXPIRY_FULL_REFUND'
     | 'ADMINISTRATIVE';
   financialClassification: 'NO_FINANCIAL_ACTION' | 'FULL_REFUND' | 'PARTIAL_REFUND';
@@ -357,6 +356,9 @@ export class TaskCancellationService {
               banEndsAt: penalty.banEndsAt,
             }
           : null,
+        workerWarning: actorType === 'WORKER' && penalty?.sequenceNumber === 1
+          ? 'You have reached one worker cancellation. A second cancellation within 30 days triggers a 3-day worker ban.'
+          : null,
       };
     });
 
@@ -441,9 +443,9 @@ export class TaskCancellationService {
     if (contract.extensionStartedAt) {
       const extensionStartedAt = new Date(contract.extensionStartedAt);
       if (cancellationAt.getTime() >= extensionStartedAt.getTime()) {
-        return this.fullRefundAllocation(
+        return this.partialRefundAllocation(
           'EXTENSION',
-          'EXTENSION_FULL_REFUND',
+          'EXTENSION_90_PERCENT_REFUND',
           payment.amount,
         );
       }
@@ -465,25 +467,19 @@ export class TaskCancellationService {
       );
     }
 
+    const fee = multiplyDecimal(payment.amount, 10n, 100n);
+
     if (contract.agreedDurationDays <= 3) {
-      const workerAmount = multiplyDecimal(payment.amount, 10n, 100n);
-      const fee = multiplyDecimal(payment.amount, 10n, 100n);
-      const refund = subtractDecimals(
-        subtractDecimals(payment.amount, workerAmount),
-        fee,
-      );
       return {
-        category: 'SHORT_JOB_SECOND_DAY',
-        calculationBasis: 'SHORT_JOB_FIXED_ALLOCATION',
+        category: 'LONG_JOB_ELAPSED',
+        calculationBasis: 'LONG_JOB_ELAPSED_ALLOCATION',
         financialClassification: 'PARTIAL_REFUND',
-        workerPercentage: '10',
-        workerAmount,
+        workerPercentage: '0',
+        workerAmount: '0',
         cancellationFee: fee,
-        clientRefund: refund,
-        elapsedApplicableSeconds: BigInt(
-          Math.max(0, Math.floor((cancellationAt.getTime() - firstDayBoundary.getTime()) / 1000)),
-        ),
-        applicableDurationSeconds: BigInt(contract.agreedDurationDays) * 86_400n,
+        clientRefund: subtractDecimals(payment.amount, fee),
+        elapsedApplicableSeconds: null,
+        applicableDurationSeconds: null,
       };
     }
 
@@ -507,7 +503,6 @@ export class TaskCancellationService {
           workerPercentageNumerator,
           applicableDurationSeconds * 100n,
         );
-    const fee = multiplyDecimal(payment.amount, 10n, 100n);
     const refund = subtractDecimals(
       subtractDecimals(payment.amount, workerAmount),
       fee,
@@ -527,8 +522,8 @@ export class TaskCancellationService {
   }
 
   private fullRefundAllocation(
-    category: 'PRE_WORK_FIRST_DAY' | 'EXTENSION' | 'EXPIRY_REFUND',
-    calculationBasis: 'FIRST_DAY_FULL_REFUND' | 'EXTENSION_FULL_REFUND' | 'EXPIRY_FULL_REFUND',
+    category: 'PRE_WORK_FIRST_DAY' | 'EXPIRY_REFUND',
+    calculationBasis: 'FIRST_DAY_FULL_REFUND' | 'EXPIRY_FULL_REFUND',
     amount: string,
   ): CancellationAllocation {
     return {
@@ -544,12 +539,31 @@ export class TaskCancellationService {
     };
   }
 
+  private partialRefundAllocation(
+    category: 'EXTENSION',
+    calculationBasis: 'EXTENSION_90_PERCENT_REFUND',
+    amount: string,
+  ): CancellationAllocation {
+    const cancellationFee = multiplyDecimal(amount, 10n, 100n);
+    return {
+      category,
+      calculationBasis,
+      financialClassification: 'PARTIAL_REFUND',
+      workerPercentage: '0',
+      workerAmount: '0',
+      cancellationFee,
+      clientRefund: subtractDecimals(amount, cancellationFee),
+      elapsedApplicableSeconds: null,
+      applicableDurationSeconds: null,
+    };
+  }
+
   private async createWorkerPenalty(
     tx: Tx,
     workerId: string,
     cancellationId: string,
     cancellationAt: Date,
-  ): Promise<PenaltyRow> {
+  ): Promise<PenaltyRow | null> {
     const previous = await tx.orm.public.WorkerCancellationPenalty
       .where({ workerId })
       .orderBy([(penalty) => penalty.createdAt.desc()])
@@ -561,16 +575,24 @@ export class TaskCancellationService {
       new Date(previous.rollingPeriodAnchorAt).getTime() >= resetBoundary.getTime();
 
     const sequenceNumber = withinRollingPeriod
-      ? Math.min(3, previous!.sequenceNumber + 1)
+      ? Math.min(previous!.sequenceNumber + 1, 4)
       : 1;
-    const banDurationDays = sequenceNumber === 1 ? 3 : sequenceNumber === 2 ? 5 : 7;
+
+    const banDurationDays = sequenceNumber === 1
+      ? 0
+      : sequenceNumber === 2
+        ? 3
+        : sequenceNumber === 3
+          ? 5
+          : 7;
+
     const rollingPeriodAnchorAt = withinRollingPeriod
       ? previous!.rollingPeriodAnchorAt
       : cancellationAt.toISOString();
     const banStartedAt = cancellationAt;
     const banEndsAt = addDays(banStartedAt, banDurationDays);
 
-    return await tx.orm.public.WorkerCancellationPenalty.create({
+    const penalty = await tx.orm.public.WorkerCancellationPenalty.create({
       workerId,
       cancellationId,
       rollingPeriodAnchorAt,
@@ -578,8 +600,20 @@ export class TaskCancellationService {
       banDurationDays,
       banStartedAt: banStartedAt.toISOString(),
       banEndsAt: banEndsAt.toISOString(),
-      warningIssuedAt: null,
+      warningIssuedAt: sequenceNumber === 1 ? cancellationAt.toISOString() : (previous?.warningIssuedAt ?? null),
     }) as PenaltyRow;
+
+    if (sequenceNumber === 1) {
+      await tx.orm.public.AuditLog.create({
+        userId: workerId,
+        action: 'UPDATE',
+        entityType: 'WorkerCancellation',
+        entityId: cancellationId,
+        details: 'WARNING: worker cancellation count reached one; the second cancellation within the 30-day reset window triggers a 3-day worker ban.',
+      });
+    }
+
+    return penalty;
   }
 
   private async lockTask(tx: Tx, taskId: string): Promise<TaskRow | null> {

@@ -1,0 +1,26 @@
+{
+  "name": "@task-marketplace/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "typecheck": "tsc --noEmit",
+    "build": "expo export --platform web"
+  },
+  "dependencies": {
+    "@task-marketplace/config": "*",
+    "@task-marketplace/types": "*",
+    "@task-marketplace/utils": "*",
+    "expo": "latest",
+    "expo-secure-store": "~57.0.4",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.4",
+    "typescript": "~6.0.3"
+  }
+}

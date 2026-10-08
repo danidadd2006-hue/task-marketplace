@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   applicationCreate: vi.fn(),
   attachmentCreate: vi.fn(),
   applicationProjection: vi.fn(),
+  workerPenaltyFirst: vi.fn(),
   transaction: vi.fn(),
   taskColumns: {
     id: 'task-id-column',
@@ -57,6 +58,9 @@ const dto = {
 };
 
 const notificationEvents = { applicationCreated: vi.fn() };
+const tokensService = {
+  spendForApplicationInTransaction: vi.fn(),
+};
 
 const submittedApplication = {
   id: 'application-id',
@@ -106,6 +110,13 @@ function setupTransaction() {
           ApplicationAttachment: {
             create: mocks.attachmentCreate,
           },
+          WorkerCancellationPenalty: {
+            where: vi.fn(() => ({
+              orderBy: vi.fn(() => ({
+                first: mocks.workerPenaltyFirst,
+              })),
+            })),
+          },
         },
       },
     }),
@@ -113,7 +124,10 @@ function setupTransaction() {
 }
 
 describe('TaskApplicationService.submitApplication', () => {
-  const service = new TaskApplicationService(notificationEvents as never);
+  const service = new TaskApplicationService(
+    tokensService as never,
+    notificationEvents as never,
+  );
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -128,7 +142,11 @@ describe('TaskApplicationService.submitApplication', () => {
       ...submittedApplication,
       attachments: [{ id: 'application-attachment-id' }],
     });
+    mocks.workerPenaltyFirst.mockResolvedValue(null);
     notificationEvents.applicationCreated.mockResolvedValue(undefined);
+    tokensService.spendForApplicationInTransaction.mockResolvedValue({
+      id: 'token-transaction-id',
+    });
   });
 
   it('allows an authenticated WORKER to apply to a PUBLISHED task', async () => {
@@ -137,6 +155,11 @@ describe('TaskApplicationService.submitApplication', () => {
     expect(notificationEvents.applicationCreated).toHaveBeenCalledWith('application-id');
 
     expect(result.status).toBe('SUBMITTED');
+    expect(tokensService.spendForApplicationInTransaction).toHaveBeenCalledWith(
+      expect.anything(),
+      'worker-id',
+      'application-id',
+    );
     expect(mocks.applicationCreate).toHaveBeenCalledWith(expect.objectContaining({
       taskId: 'task-id',
       workerId: 'worker-id',
@@ -198,6 +221,19 @@ describe('TaskApplicationService.submitApplication', () => {
       await expect(service.submitApplication(worker, 'task-id', dto))
         .rejects.toBeInstanceOf(BadRequestException);
     }
+  });
+
+  it('rejects a worker whose cancellation ban is still active', async () => {
+    mocks.workerPenaltyFirst.mockResolvedValue({
+      banEndsAt: '2099-01-01T00:00:00.000Z',
+      sequenceNumber: 2,
+      banDurationDays: 3,
+    });
+
+    await expect(service.submitApplication(worker, 'task-id', dto))
+      .rejects.toBeInstanceOf(ForbiddenException);
+    expect(mocks.applicationCreate).not.toHaveBeenCalled();
+    expect(tokensService.spendForApplicationInTransaction).not.toHaveBeenCalled();
   });
 
   it('rejects a duplicate before insert', async () => {

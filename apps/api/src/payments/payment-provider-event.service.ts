@@ -9,6 +9,7 @@ import { Inject } from '@nestjs/common';
 import { db } from '../prisma/db.js';
 import { Optional } from '@nestjs/common';
 import { NotificationDomainEventService } from '../notifications/notification-domain-event.service.js';
+import { TokenPurchaseProviderEventService } from './token-purchase-provider-event.service.js';
 import {
   PAYMENT_PROVIDER,
   type NormalizedPaymentProviderEvent,
@@ -41,6 +42,7 @@ export class PaymentProviderEventService {
     @Inject(PAYMENT_PROVIDER)
     private readonly paymentProvider: PaymentProvider,
     @Optional() private readonly notificationDomainEventService?: NotificationDomainEventService,
+    @Optional() private readonly tokenPurchaseProviderEventService?: TokenPurchaseProviderEventService,
   ) {}
 
   async processWebhook(input: {
@@ -51,6 +53,19 @@ export class PaymentProviderEventService {
     // No payment mutation occurs before the provider adapter has verified the
     // raw request and re-queried the provider for authoritative transaction data.
     const event = await this.paymentProvider.normalizeWebhook(input);
+
+    if (event.tokenPurchaseId) {
+      if (!this.tokenPurchaseProviderEventService) {
+        throw new ConflictException(
+          'Token purchase provider-event service is not configured',
+        );
+      }
+
+      return this.tokenPurchaseProviderEventService.processNormalizedEvent(
+        event,
+      );
+    }
+
     return this.processNormalizedEvent(event);
   }
 

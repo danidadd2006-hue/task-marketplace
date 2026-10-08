@@ -26,6 +26,53 @@ export class CancellationRefundAccountingService {
       throw new ConflictException('Cancellation/payment accounting relationships are inconsistent');
     }
 
+    const commission = await tx.orm.public.LedgerEntry.where({
+      paymentId: payment.id,
+      type: 'COMMISSION',
+    }).first();
+
+    if (commission) {
+      const commissionReversalReference = `cancellation:${cancellation.id}:commission-reversal`;
+      const existingCommissionReversal = await tx.orm.public.LedgerEntry.where({
+        paymentId: payment.id,
+        type: 'ADJUSTMENT',
+        reference: commissionReversalReference,
+      }).first();
+
+      if (!existingCommissionReversal) {
+        const commissionReversal = await tx.orm.public.LedgerEntry.create({
+          paymentId: payment.id,
+          taskId: cancellation.taskId,
+          userId: null,
+          type: 'ADJUSTMENT',
+          amount: `-${commission.amount}`,
+          currency: cancellation.currency,
+          description: 'Reversal of the normal completion commission because the task was cancelled',
+          reference: commissionReversalReference,
+        });
+
+        await tx.orm.public.AuditLog.create({
+          action: 'PAYMENT',
+          entityType: 'LedgerEntry',
+          entityId: commissionReversal.id,
+          details: JSON.stringify({
+            event: 'COMMISSION_REVERSED_ON_CANCELLATION',
+            ledgerEntryId: commissionReversal.id,
+            originalCommissionLedgerEntryId: commission.id,
+            paymentId: payment.id,
+            cancellationId: cancellation.id,
+            amount: commission.amount,
+            currency: cancellation.currency,
+            idempotent: false,
+          }),
+        });
+      }
+    }
+
+    if (cancellation.cancellationFee === '0') {
+      return { status: 'NO_FEE' as const, ledgerEntryId: null };
+    }
+
     const reference = `cancellation:${cancellation.id}:fee`;
     const existing = await tx.orm.public.LedgerEntry.where({
       paymentId: payment.id,

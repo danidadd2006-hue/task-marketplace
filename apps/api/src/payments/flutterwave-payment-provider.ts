@@ -112,6 +112,118 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
     };
   }
 
+  async initiateTokenPurchase(input: {
+    purchaseId: string;
+    amount: string;
+    currency: string;
+    customerEmail?: string;
+    tokenAmount: number;
+  }) {
+    const secretKey = process.env['FLUTTERWAVE_SECRET_KEY'];
+    const redirectUrl = process.env['FLUTTERWAVE_REDIRECT_URL'];
+
+    if (!secretKey || !redirectUrl) {
+      throw new ServiceUnavailableException(
+        'Flutterwave payment configuration is not available',
+      );
+    }
+
+    if (!/^\d+(?:\.\d+)?$/.test(input.amount.trim())) {
+      throw new BadRequestException(
+        'Flutterwave token purchase amount is invalid',
+      );
+    }
+
+    if (!input.customerEmail) {
+      throw new BadRequestException(
+        'Customer email is required for Flutterwave checkout',
+      );
+    }
+
+    const response = await fetch(`${API_BASE_URL}/payments`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: Number(input.amount),
+        tx_ref: `token_${input.purchaseId}`,
+        currency: input.currency,
+        redirect_url: redirectUrl,
+        payment_options:
+          'card, banktransfer, account, mpesa, mobilemoneyghana, mobilemoneyuganda, mobilemoneyrwanda, mobilemoneyzambia, mobilemoneytanzania, mobilemoneyxaf, mobilemoneyxof, ussd, opay, nqr, fawrypay',
+        configuration: {
+          session_duration: 1440,
+          max_retry_attempt: 5,
+        },
+        customer: {
+          email: input.customerEmail,
+        },
+        meta: {
+          token_purchase_id: input.purchaseId,
+          token_amount: String(input.tokenAmount),
+        },
+      }),
+    });
+
+    const payload = await this.parseResponse(response);
+
+    if (!response.ok || payload.status !== 'success' || !payload.data?.link) {
+      throw new ServiceUnavailableException(
+        payload.message || 'Flutterwave token checkout could not be created',
+      );
+    }
+
+    return {
+      status: 'PENDING' as const,
+      provider: PROVIDER,
+      providerRef: payload.data.tx_ref ?? `token_${input.purchaseId}`,
+      checkoutUrl: payload.data.link,
+    };
+  }
+
+  async reconcileTokenPurchase(input: {
+    purchaseId: string;
+    providerRef?: string | null;
+    amount: string;
+    currency: string;
+  }) {
+    const reference = input.providerRef || `token_${input.purchaseId}`;
+    const transactions = await this.listTransactionsByReference(reference);
+
+    const transaction = transactions.find(
+      (candidate) => this.stringValue(candidate['tx_ref']) === reference,
+    );
+
+    if (!transaction) return { status: 'NOT_FOUND' as const };
+
+    const amount = this.stringValue(transaction['amount']);
+    const currency = this.stringValue(transaction['currency']);
+
+    if (!amount || !currency) {
+      throw new ServiceUnavailableException(
+        'Flutterwave token reconciliation is missing amount or currency',
+      );
+    }
+
+    if (
+      this.normaliseMoney(amount) !== this.normaliseMoney(input.amount) ||
+      currency.trim().toUpperCase() !== input.currency.trim().toUpperCase()
+    ) {
+      throw new BadRequestException(
+        'Flutterwave token transaction does not match the local purchase',
+      );
+    }
+
+    return {
+      status: 'FOUND' as const,
+      provider: PROVIDER,
+      providerRef: reference,
+      checkoutUrl: null,
+    };
+  }
+
   async reconcileFunding(input: {
     paymentId: string;
     providerRef?: string | null;
@@ -249,13 +361,18 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
       );
     }
 
+    const tokenPurchaseId = txRef.startsWith('token_')
+      ? txRef.slice('token_'.length)
+      : null;
+
     return {
       provider: PROVIDER,
       providerEventId,
       type,
-      // tx_ref is the marketplace Payment.id in this adapter, so the core
-      // service can resolve the payment without provider-specific lookup logic.
-      paymentId: txRef,
+      // Token purchase references are namespaced with token_ so the shared
+      // provider webhook boundary can route them without ambiguity.
+      paymentId: tokenPurchaseId ?? txRef,
+      tokenPurchaseId,
       providerRef: txRef,
       amount,
       currency,
@@ -772,5 +889,21 @@ export class FlutterwavePaymentProvider implements PaymentProvider {
     return typeof value === 'string' || typeof value === 'number'
       ? String(value)
       : undefined;
+  }
+
+  private normaliseMoney(value: string): string {
+    const normalized = value.trim();
+    if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
+      throw new BadRequestException('Provider amount is not a valid decimal');
+    }
+
+    const [wholeRaw, fractionRaw = ''] = normalized.split('.');
+    let whole = wholeRaw;
+    let fraction = fractionRaw;
+
+    while (whole.length > 1 && whole.startsWith('0')) whole = whole.slice(1);
+    while (fraction.endsWith('0')) fraction = fraction.slice(0, -1);
+
+    return `${whole}.${fraction || '0'}`;
   }
 }

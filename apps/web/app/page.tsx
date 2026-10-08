@@ -1,0 +1,2 @@
+﻿import Link from "next/link";
+export default function Welcome(){return <main className="splash"><div className="hero"><div className="logo">Task Marketplace</div><p className="muted">An international marketplace centred on tasks.</p><div className="actions"><Link className="button" href="/home">Explore the marketplace</Link><Link className="button secondary" href="/login">Sign in</Link></div></div></main>}

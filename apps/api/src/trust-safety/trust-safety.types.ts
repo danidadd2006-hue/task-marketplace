@@ -7,6 +7,7 @@ export interface TrustCaseCreateInput {
   category?: string;
   subjectType: string;
   subjectId: string;
+  reason?: string;
 }
 
 export interface TrustCaseEvidenceInput {

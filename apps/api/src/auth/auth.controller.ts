@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RefreshDto } from './dto/refresh.dto.js';
+import type { AuthenticatedUser } from './authenticated-user.js';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -33,7 +34,13 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getMe(@Req() request: { user: { userId: string; email: string } }) {
-    return request.user;
+  getMe(@Req() request: { user: AuthenticatedUser }) {
+    const user = request.user;
+    return {
+      userId: user.userId,
+      email: user.email,
+      roles: user.roles,
+      status: user.status,
+    };
   }
 }

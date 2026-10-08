@@ -66,6 +66,7 @@ const openCase = {
 function tx() {
   return {
     orm: { public: {
+      User: { where: mocks.userWhere },
       TrustCase: { create: mocks.caseCreate, where: mocks.caseWhere },
       TrustCaseHistory: { create: mocks.historyCreate },
       TrustCaseEvidence: { create: mocks.evidenceCreate },

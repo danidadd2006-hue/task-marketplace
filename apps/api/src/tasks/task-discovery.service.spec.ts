@@ -73,10 +73,10 @@ describe('TaskDiscoveryService', () => {
     const predicate = mocks.where.mock.calls[0]?.[0];
     expect(predicate).toEqual(expect.any(Function));
 
-    const statusField = { in: vi.fn() };
+    const statusField = { status: { in: vi.fn() } };
     predicate(statusField);
 
-    expect(statusField.in).toHaveBeenCalledWith([
+    expect(statusField.status.in).toHaveBeenCalledWith([
       'PUBLISHED',
       'RECEIVING_APPLICATIONS',
     ]);
@@ -93,7 +93,7 @@ describe('TaskDiscoveryService', () => {
       'DISPUTED',
       'EXPIRED',
     ]) {
-      expect(statusField.in.mock.calls[0][0]).not.toContain(excluded);
+      expect(statusField.status.in.mock.calls[0][0]).not.toContain(excluded);
     }
   });
 
@@ -187,10 +187,10 @@ describe('TaskDiscoveryService', () => {
     } as PublicTaskFeedQueryDto & { status: string });
 
     const predicate = mocks.where.mock.calls[0]?.[0];
-    const statusField = { in: vi.fn() };
+    const statusField = { status: { in: vi.fn() } };
     predicate(statusField);
 
-    expect(statusField.in).toHaveBeenCalledWith([
+    expect(statusField.status.in).toHaveBeenCalledWith([
       'PUBLISHED',
       'RECEIVING_APPLICATIONS',
     ]);

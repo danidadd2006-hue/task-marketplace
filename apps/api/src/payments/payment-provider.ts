@@ -23,6 +23,7 @@ export type NormalizedPaymentProviderEvent = {
   amount: string;
   currency: string;
   metadata: string | null;
+  tokenPurchaseId?: string | null;
 };
 
 export type NormalizedRefundProviderResult = {
@@ -72,6 +73,36 @@ export interface PaymentProvider {
     providerRef: string | null;
     checkoutUrl: string | null;
   }>;
+
+  initiateTokenPurchase(input: {
+    purchaseId: string;
+    amount: string;
+    currency: string;
+    customerEmail?: string;
+    tokenAmount: number;
+  }): Promise<{
+    status: 'PENDING';
+    provider: string | null;
+    providerRef: string | null;
+    checkoutUrl: string | null;
+  }>;
+
+  reconcileTokenPurchase(input: {
+    purchaseId: string;
+    providerRef?: string | null;
+    amount: string;
+    currency: string;
+  }): Promise<
+    | {
+        status: 'FOUND';
+        provider: string;
+        providerRef: string;
+        checkoutUrl: string | null;
+      }
+    | {
+        status: 'NOT_FOUND';
+      }
+  >;
 
   reconcileFunding(input: {
     paymentId: string;
@@ -150,6 +181,31 @@ export interface PaymentProvider {
 export class PendingPaymentProvider implements PaymentProvider {
   payoutProviderName(): string | null {
     return null;
+  }
+
+  async initiateTokenPurchase(): Promise<{
+    status: 'PENDING';
+    provider: string | null;
+    providerRef: string | null;
+    checkoutUrl: string | null;
+  }> {
+    throw new ServiceUnavailableException(
+      'Payment provider token purchase initiation is not configured',
+    );
+  }
+
+  async reconcileTokenPurchase(): Promise<
+    | {
+        status: 'FOUND';
+        provider: string;
+        providerRef: string;
+        checkoutUrl: string | null;
+      }
+    | {
+        status: 'NOT_FOUND';
+      }
+  > {
+    return { status: 'NOT_FOUND' };
   }
 
   async initiateFunding(): Promise<{

@@ -7,7 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@task-marketplace/api"
+    "dev": "npm run dev --workspace=@task-marketplace/api",
+    "dev:web": "npm run dev --workspace=@task-marketplace/web",
+    "dev:mobile": "npm run start --workspace=@task-marketplace/mobile",
+    "dev:admin": "npm run dev --workspace=@task-marketplace/admin",
+    "typecheck:clients": "npm run typecheck --workspace=@task-marketplace/web && npm run typecheck --workspace=@task-marketplace/mobile && npm run typecheck --workspace=@task-marketplace/admin"
   },
   "description": "",
   "main": "index.js",
@@ -17,5 +21,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "@neon/config": "^1.8.4"
+  },
+  "devDependencies": {
+    "react-native": "^0.86.3"
+  }
 }
