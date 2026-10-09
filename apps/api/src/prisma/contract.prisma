@@ -107,6 +107,7 @@ model Country {
   regions     Region[]
   cities      City[]
   userLocations UserLocation[]
+  taskLocations TaskLocation[]
 
   createdAt   TimestamptzString @default(now())
   updatedAt   temporal.updatedAtString()
@@ -120,6 +121,7 @@ model Region {
   country     Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
   cities      City[]
   userLocations UserLocation[]
+  taskLocations TaskLocation[]
 
   createdAt   TimestamptzString @default(now())
   updatedAt   temporal.updatedAtString()
@@ -136,6 +138,7 @@ model City {
   country     Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
   region      Region?  @relation(fields: [regionId], references: [id], onDelete: SetNull)
   userLocations UserLocation[]
+  taskLocations TaskLocation[]
 
   createdAt   TimestamptzString @default(now())
   updatedAt   temporal.updatedAtString()
@@ -243,12 +246,34 @@ model Task {
   conversations         Conversation[]
   notifications         Notification[]
   disputes              Dispute[] @relation("TaskDisputes")
+  location              TaskLocation?
 
   @@index([clientId])
   @@index([categoryId])
   @@index([status])
   @@index([type, duration])
 }
+model TaskLocation {
+  id          String   @id @default(uuid())
+  taskId      String   @unique
+  countryId   String
+  regionId    String?
+  cityId      String?
+  area        String?
+
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  country     Country  @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  region      Region?  @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  city        City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([countryId])
+  @@index([regionId])
+  @@index([cityId])
+}
+
 model TaskRequirement {
   id        String   @id @default(uuid())
   taskId    String

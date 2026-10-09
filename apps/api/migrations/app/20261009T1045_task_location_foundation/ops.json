@@ -1,0 +1,368 @@
+[
+  {
+    "id": "table.taskLocation",
+    "label": "Create table \"taskLocation\"",
+    "summary": "Creates table \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"taskLocation\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"taskLocation\"",
+        "sql": "CREATE TABLE \"public\".\"taskLocation\" (\n  \"area\" text,\n  \"cityId\" text,\n  \"countryId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"regionId\" text,\n  \"taskId\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"taskLocation\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.taskLocation.taskLocation_taskId_key",
+    "label": "Add unique constraint on \"taskLocation\" (taskId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "taskLocation_taskId_key",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"taskLocation_taskId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_taskId_key",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"taskLocation_taskId_key\"",
+        "sql": "ALTER TABLE \"public\".\"taskLocation\" ADD CONSTRAINT \"taskLocation_taskId_key\" UNIQUE (\"taskId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"taskLocation_taskId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_taskId_key",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.taskLocation.taskLocation_cityId_idx_1ab1b247",
+    "label": "Create index \"taskLocation_cityId_idx_1ab1b247\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "taskLocation_cityId_idx_1ab1b247",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"taskLocation_cityId_idx_1ab1b247\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_cityId_idx_1ab1b247\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"taskLocation_cityId_idx_1ab1b247\"",
+        "sql": "CREATE INDEX \"taskLocation_cityId_idx_1ab1b247\" ON \"public\".\"taskLocation\" (\"cityId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"taskLocation_cityId_idx_1ab1b247\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_cityId_idx_1ab1b247\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.taskLocation.taskLocation_countryId_idx_27b43b27",
+    "label": "Create index \"taskLocation_countryId_idx_27b43b27\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "taskLocation_countryId_idx_27b43b27",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"taskLocation_countryId_idx_27b43b27\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_countryId_idx_27b43b27\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"taskLocation_countryId_idx_27b43b27\"",
+        "sql": "CREATE INDEX \"taskLocation_countryId_idx_27b43b27\" ON \"public\".\"taskLocation\" (\"countryId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"taskLocation_countryId_idx_27b43b27\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_countryId_idx_27b43b27\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.taskLocation.taskLocation_regionId_idx_f44e49e6",
+    "label": "Create index \"taskLocation_regionId_idx_f44e49e6\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "taskLocation_regionId_idx_f44e49e6",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"taskLocation_regionId_idx_f44e49e6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_regionId_idx_f44e49e6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"taskLocation_regionId_idx_f44e49e6\"",
+        "sql": "CREATE INDEX \"taskLocation_regionId_idx_f44e49e6\" ON \"public\".\"taskLocation\" (\"regionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"taskLocation_regionId_idx_f44e49e6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"taskLocation_regionId_idx_f44e49e6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.taskLocation.taskLocation_taskId_fkey",
+    "label": "Add foreign key \"taskLocation_taskId_fkey\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "taskLocation_taskId_fkey",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"taskLocation_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_taskId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"taskLocation_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"taskLocation\"\nADD CONSTRAINT \"taskLocation_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"taskLocation_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_taskId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.taskLocation.taskLocation_countryId_fkey",
+    "label": "Add foreign key \"taskLocation_countryId_fkey\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "taskLocation_countryId_fkey",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"taskLocation_countryId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_countryId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"taskLocation_countryId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"taskLocation\"\nADD CONSTRAINT \"taskLocation_countryId_fkey\"\nFOREIGN KEY (\"countryId\")\nREFERENCES \"public\".\"country\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"taskLocation_countryId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_countryId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.taskLocation.taskLocation_regionId_fkey",
+    "label": "Add foreign key \"taskLocation_regionId_fkey\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "taskLocation_regionId_fkey",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"taskLocation_regionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_regionId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"taskLocation_regionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"taskLocation\"\nADD CONSTRAINT \"taskLocation_regionId_fkey\"\nFOREIGN KEY (\"regionId\")\nREFERENCES \"public\".\"region\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"taskLocation_regionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_regionId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.taskLocation.taskLocation_cityId_fkey",
+    "label": "Add foreign key \"taskLocation_cityId_fkey\" on \"taskLocation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "taskLocation_cityId_fkey",
+        "table": "taskLocation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"taskLocation_cityId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_cityId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"taskLocation_cityId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"taskLocation\"\nADD CONSTRAINT \"taskLocation_cityId_fkey\"\nFOREIGN KEY (\"cityId\")\nREFERENCES \"public\".\"city\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"taskLocation_cityId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "taskLocation_cityId_fkey",
+          "public",
+          "\"public\".\"taskLocation\""
+        ]
+      }
+    ]
+  }
+]

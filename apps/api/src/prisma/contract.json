@@ -144,6 +144,10 @@
       "model": "TaskAttachment",
       "namespace": "public"
     },
+    "taskLocation": {
+      "model": "TaskLocation",
+      "namespace": "public"
+    },
     "taskRequirement": {
       "model": "TaskRequirement",
       "namespace": "public"
@@ -2220,6 +2224,21 @@
                   "namespace": "public"
                 }
               },
+              "taskLocations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "cityId"
+                  ]
+                },
+                "to": {
+                  "model": "TaskLocation",
+                  "namespace": "public"
+                }
+              },
               "userLocations": {
                 "cardinality": "1:N",
                 "on": {
@@ -2803,6 +2822,21 @@
                 },
                 "to": {
                   "model": "Region",
+                  "namespace": "public"
+                }
+              },
+              "taskLocations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "countryId"
+                  ]
+                },
+                "to": {
+                  "model": "TaskLocation",
                   "namespace": "public"
                 }
               },
@@ -6208,6 +6242,21 @@
                   "namespace": "public"
                 }
               },
+              "taskLocations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "regionId"
+                  ]
+                },
+                "to": {
+                  "model": "TaskLocation",
+                  "namespace": "public"
+                }
+              },
               "userLocations": {
                 "cardinality": "1:N",
                 "on": {
@@ -7050,6 +7099,21 @@
                   "namespace": "public"
                 }
               },
+              "location": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
+                },
+                "to": {
+                  "model": "TaskLocation",
+                  "namespace": "public"
+                }
+              },
               "notifications": {
                 "cardinality": "1:N",
                 "on": {
@@ -7256,6 +7320,158 @@
               },
               "namespaceId": "public",
               "table": "taskAttachment"
+            }
+          },
+          "TaskLocation": {
+            "fields": {
+              "area": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "cityId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "countryId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "regionId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "taskId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "city": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "cityId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "City",
+                  "namespace": "public"
+                }
+              },
+              "country": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "countryId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Country",
+                  "namespace": "public"
+                }
+              },
+              "region": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "regionId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Region",
+                  "namespace": "public"
+                }
+              },
+              "task": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Task",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "area": {
+                  "column": "area"
+                },
+                "cityId": {
+                  "column": "cityId"
+                },
+                "countryId": {
+                  "column": "countryId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "regionId": {
+                  "column": "regionId"
+                },
+                "taskId": {
+                  "column": "taskId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "taskLocation"
             }
           },
           "TaskRequirement": {
@@ -15611,6 +15827,162 @@
               },
               "uniques": []
             },
+            "taskLocation": {
+              "columns": {
+                "area": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "cityId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "countryId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "regionId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "taskId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "taskId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "taskLocation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "task"
+                  }
+                },
+                {
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "countryId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "taskLocation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "country"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "regionId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "taskLocation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "region"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "cityId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "taskLocation"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "city"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "cityId"
+                  ],
+                  "name": "taskLocation_cityId_idx_1ab1b247",
+                  "prefix": "taskLocation_cityId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "countryId"
+                  ],
+                  "name": "taskLocation_countryId_idx_27b43b27",
+                  "prefix": "taskLocation_countryId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "regionId"
+                  ],
+                  "name": "taskLocation_regionId_idx_f44e49e6",
+                  "prefix": "taskLocation_regionId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "taskId"
+                  ]
+                }
+              ]
+            },
             "taskRequirement": {
               "columns": {
                 "createdAt": {
@@ -18401,10 +18773,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "73717cc6361a988b93a352af5ee6b85bb47b9936258f25092f1fa97d8543c473"
+    "storageHash": "644253e42c2cf55c552dea0302b896dabf316f79467fd7ed21a32c3b61ee62e5"
   },
   "execution": {
-    "executionHash": "6e434d11e3f4af0ca5e3b9de02f1d08d1480799ee8580fa9b10244ad63005a1d",
+    "executionHash": "5b908519929eea29c3f356a4729b0b32c5dec47de8006dbed0112b7bddc4924e",
     "mutations": {
       "defaults": [
         {
@@ -19090,6 +19462,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "taskAttachment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "taskLocation"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "taskLocation"
           }
         },
         {
