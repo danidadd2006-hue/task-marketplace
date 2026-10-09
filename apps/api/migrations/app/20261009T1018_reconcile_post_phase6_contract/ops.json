@@ -1,0 +1,2270 @@
+[
+  {
+    "id": "dropCheckConstraint.cancellation.cancellation_calculationBasis_check_7be19a77",
+    "label": "Drop check constraint \"cancellation_calculationBasis_check_7be19a77\" on \"cancellation\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cancellation_calculationBasis_check_7be19a77",
+        "table": "cancellation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cancellation_calculationBasis_check_7be19a77\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_calculationBasis_check_7be19a77",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"cancellation_calculationBasis_check_7be19a77\"",
+        "sql": "ALTER TABLE \"public\".\"cancellation\" DROP CONSTRAINT \"cancellation_calculationBasis_check_7be19a77\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cancellation_calculationBasis_check_7be19a77\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_calculationBasis_check_7be19a77",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.cancellation.cancellation_category_check_ba2a6cb9",
+    "label": "Drop check constraint \"cancellation_category_check_ba2a6cb9\" on \"cancellation\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cancellation_category_check_ba2a6cb9",
+        "table": "cancellation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cancellation_category_check_ba2a6cb9\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_category_check_ba2a6cb9",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"cancellation_category_check_ba2a6cb9\"",
+        "sql": "ALTER TABLE \"public\".\"cancellation\" DROP CONSTRAINT \"cancellation_category_check_ba2a6cb9\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cancellation_category_check_ba2a6cb9\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_category_check_ba2a6cb9",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.workerCancellationPenalty.worker_cancellation_penalty_sequence_check_937b68e9",
+    "label": "Drop check constraint \"worker_cancellation_penalty_sequence_check_937b68e9\" on \"workerCancellationPenalty\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "worker_cancellation_penalty_sequence_check_937b68e9",
+        "table": "workerCancellationPenalty"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"worker_cancellation_penalty_sequence_check_937b68e9\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "worker_cancellation_penalty_sequence_check_937b68e9",
+          "public",
+          "\"public\".\"workerCancellationPenalty\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"worker_cancellation_penalty_sequence_check_937b68e9\"",
+        "sql": "ALTER TABLE \"public\".\"workerCancellationPenalty\" DROP CONSTRAINT \"worker_cancellation_penalty_sequence_check_937b68e9\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"worker_cancellation_penalty_sequence_check_937b68e9\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "worker_cancellation_penalty_sequence_check_937b68e9",
+          "public",
+          "\"public\".\"workerCancellationPenalty\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.tokenPurchase",
+    "label": "Create table \"tokenPurchase\"",
+    "summary": "Creates table \"tokenPurchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"tokenPurchase\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"tokenPurchase\"",
+        "sql": "CREATE TABLE \"public\".\"tokenPurchase\" (\n  \"amount\" numeric NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currency\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"paidAt\" timestamptz,\n  \"provider\" text,\n  \"providerRef\" text,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"tokenAmount\" int4 NOT NULL,\n  \"tokenPackageId\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"tokenPurchase_status_check_2a508822\" CHECK (\"status\" IN ('PENDING', 'PAID', 'FAILED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"tokenPurchase\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.tokenPurchaseProviderEvent",
+    "label": "Create table \"tokenPurchaseProviderEvent\"",
+    "summary": "Creates table \"tokenPurchaseProviderEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"tokenPurchaseProviderEvent\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"tokenPurchaseProviderEvent\"",
+        "sql": "CREATE TABLE \"public\".\"tokenPurchaseProviderEvent\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"metadata\" text,\n  \"processedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"provider\" text NOT NULL,\n  \"providerEventId\" text NOT NULL,\n  \"providerRef\" text,\n  \"tokenPurchaseId\" text NOT NULL,\n  \"type\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"tokenPurchaseProviderEvent_type_check_25461a12\" CHECK (\"type\" IN ('PURCHASE_SUCCEEDED', 'PURCHASE_FAILED', 'PURCHASE_CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"tokenPurchaseProviderEvent\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.activeKey",
+    "label": "Add column \"activeKey\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "activeKey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"activeKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "activeKey"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"activeKey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"activeKey\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"activeKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "activeKey"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.category",
+    "label": "Add column \"category\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "category",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"category\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "category"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"category\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"category\" text DEFAULT 'OTHER' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"category\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "category"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.relatedFinancialActionRef",
+    "label": "Add column \"relatedFinancialActionRef\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "relatedFinancialActionRef",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"relatedFinancialActionRef\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "relatedFinancialActionRef"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"relatedFinancialActionRef\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"relatedFinancialActionRef\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"relatedFinancialActionRef\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "relatedFinancialActionRef"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.resolutionActorId",
+    "label": "Add column \"resolutionActorId\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolutionActorId",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolutionActorId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionActorId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolutionActorId\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"resolutionActorId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolutionActorId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionActorId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.resolutionAt",
+    "label": "Add column \"resolutionAt\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolutionAt",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolutionAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolutionAt\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"resolutionAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolutionAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.resolutionCode",
+    "label": "Add column \"resolutionCode\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolutionCode",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolutionCode\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionCode"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolutionCode\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"resolutionCode\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolutionCode\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionCode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.resolutionReason",
+    "label": "Add column \"resolutionReason\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolutionReason",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolutionReason\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionReason"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolutionReason\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"resolutionReason\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolutionReason\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "resolutionReason"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.disputeEvidence.referenceId",
+    "label": "Add column \"referenceId\" to \"disputeEvidence\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "referenceId",
+        "table": "disputeEvidence"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"referenceId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "disputeEvidence",
+          "referenceId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"referenceId\"",
+        "sql": "ALTER TABLE \"public\".\"disputeEvidence\" ADD COLUMN \"referenceId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"referenceId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "disputeEvidence",
+          "referenceId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.disputeEvidence.referenceType",
+    "label": "Add column \"referenceType\" to \"disputeEvidence\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "referenceType",
+        "table": "disputeEvidence"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"referenceType\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "disputeEvidence",
+          "referenceType"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"referenceType\"",
+        "sql": "ALTER TABLE \"public\".\"disputeEvidence\" ADD COLUMN \"referenceType\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"referenceType\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "disputeEvidence",
+          "referenceType"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.activeKey",
+    "label": "Add column \"activeKey\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "activeKey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"activeKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "activeKey"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"activeKey\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"activeKey\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"activeKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "activeKey"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.contractId",
+    "label": "Add column \"contractId\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "contractId",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"contractId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "contractId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"contractId\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"contractId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"contractId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "contractId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.dispute.trustCaseId",
+    "label": "Add column \"trustCaseId\" to \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "trustCaseId",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"trustCaseId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "trustCaseId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"trustCaseId\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD COLUMN \"trustCaseId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"trustCaseId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "dispute",
+          "trustCaseId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.category",
+    "label": "Add column \"category\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "category",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"category\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "category"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"category\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"category\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"category\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "category"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.targetId",
+    "label": "Add column \"targetId\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetId",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetId\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"targetId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.targetType",
+    "label": "Add column \"targetType\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "targetType",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"targetType\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetType"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"targetType\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"targetType\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"targetType\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "targetType"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.report.trustCaseId",
+    "label": "Add column \"trustCaseId\" to \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "trustCaseId",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"trustCaseId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "trustCaseId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"trustCaseId\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD COLUMN \"trustCaseId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"trustCaseId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "report",
+          "trustCaseId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.cancellation.cancellation_calculationBasis_check_63b63c02",
+    "label": "Add check constraint \"cancellation_calculationBasis_check_63b63c02\" on \"cancellation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cancellation_calculationBasis_check_63b63c02",
+        "table": "cancellation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cancellation_calculationBasis_check_63b63c02\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_calculationBasis_check_63b63c02",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"cancellation_calculationBasis_check_63b63c02\"",
+        "sql": "ALTER TABLE \"public\".\"cancellation\" ADD CONSTRAINT \"cancellation_calculationBasis_check_63b63c02\" CHECK (\"calculationBasis\" IN ('NO_FINANCIAL_ALLOCATION', 'FIRST_DAY_FULL_REFUND', 'LONG_JOB_ELAPSED_ALLOCATION', 'EXTENSION_90_PERCENT_REFUND', 'EXPIRY_FULL_REFUND', 'ADMINISTRATIVE'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cancellation_calculationBasis_check_63b63c02\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_calculationBasis_check_63b63c02",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.cancellation.cancellation_category_check_f844bb84",
+    "label": "Add check constraint \"cancellation_category_check_f844bb84\" on \"cancellation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cancellation_category_check_f844bb84",
+        "table": "cancellation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cancellation_category_check_f844bb84\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_category_check_f844bb84",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"cancellation_category_check_f844bb84\"",
+        "sql": "ALTER TABLE \"public\".\"cancellation\" ADD CONSTRAINT \"cancellation_category_check_f844bb84\" CHECK (\"category\" IN ('PRE_WORK_FIRST_DAY', 'LONG_JOB_ELAPSED', 'EXTENSION', 'EXPIRY_REFUND', 'ADMINISTRATIVE'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cancellation_category_check_f844bb84\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cancellation_category_check_f844bb84",
+          "public",
+          "\"public\".\"cancellation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.dispute.dispute_activeKey_key",
+    "label": "Add unique constraint on \"dispute\" (activeKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "dispute_activeKey_key",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"dispute_activeKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_activeKey_key",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"dispute_activeKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD CONSTRAINT \"dispute_activeKey_key\" UNIQUE (\"activeKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"dispute_activeKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_activeKey_key",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.dispute.dispute_trustCaseId_key",
+    "label": "Add unique constraint on \"dispute\" (trustCaseId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "dispute_trustCaseId_key",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"dispute_trustCaseId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_trustCaseId_key",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"dispute_trustCaseId_key\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\" ADD CONSTRAINT \"dispute_trustCaseId_key\" UNIQUE (\"trustCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"dispute_trustCaseId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_trustCaseId_key",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.report.report_category_check_024ea8fd",
+    "label": "Add check constraint \"report_category_check_024ea8fd\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "report_category_check_024ea8fd",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_category_check_024ea8fd\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_category_check_024ea8fd",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"report_category_check_024ea8fd\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_category_check_024ea8fd\" CHECK (\"category\" IN ('CONTENT', 'CONDUCT', 'SAFETY', 'TRANSACTION', 'PRIVACY', 'AUTHENTICITY', 'OTHER'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_category_check_024ea8fd\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_category_check_024ea8fd",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.report.report_targetType_check_829377f7",
+    "label": "Add check constraint \"report_targetType_check_829377f7\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "report_targetType_check_829377f7",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_targetType_check_829377f7\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_targetType_check_829377f7",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"report_targetType_check_829377f7\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_targetType_check_829377f7\" CHECK (\"targetType\" IN ('USER', 'TASK', 'MESSAGE', 'REVIEW'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_targetType_check_829377f7\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_targetType_check_829377f7",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.report.report_activeKey_key",
+    "label": "Add unique constraint on \"report\" (activeKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "report_activeKey_key",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_activeKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_activeKey_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"report_activeKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_activeKey_key\" UNIQUE (\"activeKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_activeKey_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_activeKey_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.report.report_trustCaseId_key",
+    "label": "Add unique constraint on \"report\" (trustCaseId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "report_trustCaseId_key",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"report_trustCaseId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"report_trustCaseId_key\"",
+        "sql": "ALTER TABLE \"public\".\"report\" ADD CONSTRAINT \"report_trustCaseId_key\" UNIQUE (\"trustCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"report_trustCaseId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_key",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.tokenPurchase.tokenPurchase_provider_providerRef_key",
+    "label": "Add unique constraint on \"tokenPurchase\" (provider, providerRef)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "tokenPurchase_provider_providerRef_key",
+        "table": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"tokenPurchase_provider_providerRef_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchase_provider_providerRef_key",
+          "public",
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"tokenPurchase_provider_providerRef_key\"",
+        "sql": "ALTER TABLE \"public\".\"tokenPurchase\" ADD CONSTRAINT \"tokenPurchase_provider_providerRef_key\" UNIQUE (\"provider\", \"providerRef\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"tokenPurchase_provider_providerRef_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchase_provider_providerRef_key",
+          "public",
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.tokenPurchaseProviderEvent.tokenPurchaseProviderEvent_provider_providerEventId_key",
+    "label": "Add unique constraint on \"tokenPurchaseProviderEvent\" (provider, providerEventId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "tokenPurchaseProviderEvent_provider_providerEventId_key",
+        "table": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"tokenPurchaseProviderEvent_provider_providerEventId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchaseProviderEvent_provider_providerEventId_key",
+          "public",
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"tokenPurchaseProviderEvent_provider_providerEventId_key\"",
+        "sql": "ALTER TABLE \"public\".\"tokenPurchaseProviderEvent\" ADD CONSTRAINT \"tokenPurchaseProviderEvent_provider_providerEventId_key\" UNIQUE (\"provider\", \"providerEventId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"tokenPurchaseProviderEvent_provider_providerEventId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchaseProviderEvent_provider_providerEventId_key",
+          "public",
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.workerCancellationPenalty.worker_cancellation_penalty_sequence_check_788d9c27",
+    "label": "Add check constraint \"worker_cancellation_penalty_sequence_check_788d9c27\" on \"workerCancellationPenalty\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "worker_cancellation_penalty_sequence_check_788d9c27",
+        "table": "workerCancellationPenalty"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"worker_cancellation_penalty_sequence_check_788d9c27\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "worker_cancellation_penalty_sequence_check_788d9c27",
+          "public",
+          "\"public\".\"workerCancellationPenalty\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"worker_cancellation_penalty_sequence_check_788d9c27\"",
+        "sql": "ALTER TABLE \"public\".\"workerCancellationPenalty\" ADD CONSTRAINT \"worker_cancellation_penalty_sequence_check_788d9c27\" CHECK (\"sequenceNumber\" >= 1 AND \"sequenceNumber\" <= 4)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"worker_cancellation_penalty_sequence_check_788d9c27\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "worker_cancellation_penalty_sequence_check_788d9c27",
+          "public",
+          "\"public\".\"workerCancellationPenalty\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.dispute.dispute_contractId_idx_102708cf",
+    "label": "Create index \"dispute_contractId_idx_102708cf\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "dispute_contractId_idx_102708cf",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"dispute_contractId_idx_102708cf\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_contractId_idx_102708cf\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"dispute_contractId_idx_102708cf\"",
+        "sql": "CREATE INDEX \"dispute_contractId_idx_102708cf\" ON \"public\".\"dispute\" (\"contractId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"dispute_contractId_idx_102708cf\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_contractId_idx_102708cf\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.dispute.dispute_resolutionActorId_idx_14eda2aa",
+    "label": "Create index \"dispute_resolutionActorId_idx_14eda2aa\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "dispute_resolutionActorId_idx_14eda2aa",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"dispute_resolutionActorId_idx_14eda2aa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_resolutionActorId_idx_14eda2aa\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"dispute_resolutionActorId_idx_14eda2aa\"",
+        "sql": "CREATE INDEX \"dispute_resolutionActorId_idx_14eda2aa\" ON \"public\".\"dispute\" (\"resolutionActorId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"dispute_resolutionActorId_idx_14eda2aa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_resolutionActorId_idx_14eda2aa\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.dispute.dispute_status_createdAt_idx_58610442",
+    "label": "Create index \"dispute_status_createdAt_idx_58610442\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "dispute_status_createdAt_idx_58610442",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"dispute_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_status_createdAt_idx_58610442\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"dispute_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"dispute_status_createdAt_idx_58610442\" ON \"public\".\"dispute\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"dispute_status_createdAt_idx_58610442\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"dispute_status_createdAt_idx_58610442\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_reporterId_createdAt_idx_468b5f4f",
+    "label": "Create index \"report_reporterId_createdAt_idx_468b5f4f\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_reporterId_createdAt_idx_468b5f4f",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_reporterId_createdAt_idx_468b5f4f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_reporterId_createdAt_idx_468b5f4f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_reporterId_createdAt_idx_468b5f4f\"",
+        "sql": "CREATE INDEX \"report_reporterId_createdAt_idx_468b5f4f\" ON \"public\".\"report\" (\"reporterId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_reporterId_createdAt_idx_468b5f4f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_reporterId_createdAt_idx_468b5f4f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_status_createdAt_idx_58610442",
+    "label": "Create index \"report_status_createdAt_idx_58610442\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_status_createdAt_idx_58610442",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_status_createdAt_idx_58610442\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"report_status_createdAt_idx_58610442\" ON \"public\".\"report\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_status_createdAt_idx_58610442\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_status_createdAt_idx_58610442\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.report.report_targetType_targetId_status_idx_f4be9279",
+    "label": "Create index \"report_targetType_targetId_status_idx_f4be9279\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "report_targetType_targetId_status_idx_f4be9279",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"report_targetType_targetId_status_idx_f4be9279\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_targetType_targetId_status_idx_f4be9279\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"report_targetType_targetId_status_idx_f4be9279\"",
+        "sql": "CREATE INDEX \"report_targetType_targetId_status_idx_f4be9279\" ON \"public\".\"report\" (\"targetType\", \"targetId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"report_targetType_targetId_status_idx_f4be9279\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"report_targetType_targetId_status_idx_f4be9279\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchase.tokenPurchase_createdAt_idx_9575dbd7",
+    "label": "Create index \"tokenPurchase_createdAt_idx_9575dbd7\" on \"tokenPurchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchase_createdAt_idx_9575dbd7",
+        "table": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchase_createdAt_idx_9575dbd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchase_createdAt_idx_9575dbd7\"",
+        "sql": "CREATE INDEX \"tokenPurchase_createdAt_idx_9575dbd7\" ON \"public\".\"tokenPurchase\" (\"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchase_createdAt_idx_9575dbd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchase.tokenPurchase_status_idx_e98638ab",
+    "label": "Create index \"tokenPurchase_status_idx_e98638ab\" on \"tokenPurchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchase_status_idx_e98638ab",
+        "table": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchase_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchase_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"tokenPurchase_status_idx_e98638ab\" ON \"public\".\"tokenPurchase\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchase_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchase.tokenPurchase_userId_idx_a489d58a",
+    "label": "Create index \"tokenPurchase_userId_idx_a489d58a\" on \"tokenPurchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchase_userId_idx_a489d58a",
+        "table": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchase_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchase_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"tokenPurchase_userId_idx_a489d58a\" ON \"public\".\"tokenPurchase\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchase_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchase_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchaseProviderEvent.tokenPurchaseProviderEvent_processedAt_idx_e83f4a54",
+    "label": "Create index \"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\" on \"tokenPurchaseProviderEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchaseProviderEvent_processedAt_idx_e83f4a54",
+        "table": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\"",
+        "sql": "CREATE INDEX \"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\" ON \"public\".\"tokenPurchaseProviderEvent\" (\"processedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_processedAt_idx_e83f4a54\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchaseProviderEvent.tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53",
+    "label": "Create index \"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\" on \"tokenPurchaseProviderEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53",
+        "table": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\"",
+        "sql": "CREATE INDEX \"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\" ON \"public\".\"tokenPurchaseProviderEvent\" (\"tokenPurchaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_tokenPurchaseId_idx_b68a9c53\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.tokenPurchaseProviderEvent.tokenPurchaseProviderEvent_type_idx_b6b604ea",
+    "label": "Create index \"tokenPurchaseProviderEvent_type_idx_b6b604ea\" on \"tokenPurchaseProviderEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "tokenPurchaseProviderEvent_type_idx_b6b604ea",
+        "table": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"tokenPurchaseProviderEvent_type_idx_b6b604ea\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_type_idx_b6b604ea\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"tokenPurchaseProviderEvent_type_idx_b6b604ea\"",
+        "sql": "CREATE INDEX \"tokenPurchaseProviderEvent_type_idx_b6b604ea\" ON \"public\".\"tokenPurchaseProviderEvent\" (\"type\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"tokenPurchaseProviderEvent_type_idx_b6b604ea\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"tokenPurchaseProviderEvent_type_idx_b6b604ea\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_contractId_fkey",
+    "label": "Add foreign key \"dispute_contractId_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_contractId_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_contractId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_contractId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_contractId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_contractId_fkey\"\nFOREIGN KEY (\"contractId\")\nREFERENCES \"public\".\"contract\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_contractId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_contractId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_paymentId_fkey",
+    "label": "Add foreign key \"dispute_paymentId_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_paymentId_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_paymentId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_paymentId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_paymentId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_paymentId_fkey\"\nFOREIGN KEY (\"paymentId\")\nREFERENCES \"public\".\"payment\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_paymentId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_paymentId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_raisedById_fkey",
+    "label": "Add foreign key \"dispute_raisedById_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_raisedById_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_raisedById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_raisedById_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_raisedById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_raisedById_fkey\"\nFOREIGN KEY (\"raisedById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_raisedById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_raisedById_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_resolutionActorId_fkey",
+    "label": "Add foreign key \"dispute_resolutionActorId_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_resolutionActorId_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_resolutionActorId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_resolutionActorId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_resolutionActorId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_resolutionActorId_fkey\"\nFOREIGN KEY (\"resolutionActorId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_resolutionActorId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_resolutionActorId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_taskId_fkey",
+    "label": "Add foreign key \"dispute_taskId_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_taskId_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_taskId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_taskId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.dispute.dispute_trustCaseId_fkey",
+    "label": "Add foreign key \"dispute_trustCaseId_fkey\" on \"dispute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "dispute_trustCaseId_fkey",
+        "table": "dispute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"dispute_trustCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_trustCaseId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"dispute_trustCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"dispute\"\nADD CONSTRAINT \"dispute_trustCaseId_fkey\"\nFOREIGN KEY (\"trustCaseId\")\nREFERENCES \"public\".\"trustCase\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"dispute_trustCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "dispute_trustCaseId_fkey",
+          "public",
+          "\"public\".\"dispute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.disputeEvidence.disputeEvidence_disputeId_fkey",
+    "label": "Add foreign key \"disputeEvidence_disputeId_fkey\" on \"disputeEvidence\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "disputeEvidence_disputeId_fkey",
+        "table": "disputeEvidence"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"disputeEvidence_disputeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disputeEvidence_disputeId_fkey",
+          "public",
+          "\"public\".\"disputeEvidence\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"disputeEvidence_disputeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"disputeEvidence\"\nADD CONSTRAINT \"disputeEvidence_disputeId_fkey\"\nFOREIGN KEY (\"disputeId\")\nREFERENCES \"public\".\"dispute\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"disputeEvidence_disputeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disputeEvidence_disputeId_fkey",
+          "public",
+          "\"public\".\"disputeEvidence\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.report.report_reporterId_fkey",
+    "label": "Add foreign key \"report_reporterId_fkey\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "report_reporterId_fkey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"report_reporterId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_reporterId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"report_reporterId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"report\"\nADD CONSTRAINT \"report_reporterId_fkey\"\nFOREIGN KEY (\"reporterId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"report_reporterId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_reporterId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.report.report_trustCaseId_fkey",
+    "label": "Add foreign key \"report_trustCaseId_fkey\" on \"report\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "report_trustCaseId_fkey",
+        "table": "report"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"report_trustCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"report_trustCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"report\"\nADD CONSTRAINT \"report_trustCaseId_fkey\"\nFOREIGN KEY (\"trustCaseId\")\nREFERENCES \"public\".\"trustCase\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"report_trustCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "report_trustCaseId_fkey",
+          "public",
+          "\"public\".\"report\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.tokenPurchase.tokenPurchase_userId_fkey",
+    "label": "Add foreign key \"tokenPurchase_userId_fkey\" on \"tokenPurchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "tokenPurchase_userId_fkey",
+        "table": "tokenPurchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"tokenPurchase_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchase_userId_fkey",
+          "public",
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"tokenPurchase_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"tokenPurchase\"\nADD CONSTRAINT \"tokenPurchase_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"tokenPurchase_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchase_userId_fkey",
+          "public",
+          "\"public\".\"tokenPurchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.tokenPurchaseProviderEvent.tokenPurchaseProviderEvent_tokenPurchaseId_fkey",
+    "label": "Add foreign key \"tokenPurchaseProviderEvent_tokenPurchaseId_fkey\" on \"tokenPurchaseProviderEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "tokenPurchaseProviderEvent_tokenPurchaseId_fkey",
+        "table": "tokenPurchaseProviderEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"tokenPurchaseProviderEvent_tokenPurchaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchaseProviderEvent_tokenPurchaseId_fkey",
+          "public",
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"tokenPurchaseProviderEvent_tokenPurchaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"tokenPurchaseProviderEvent\"\nADD CONSTRAINT \"tokenPurchaseProviderEvent_tokenPurchaseId_fkey\"\nFOREIGN KEY (\"tokenPurchaseId\")\nREFERENCES \"public\".\"tokenPurchase\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"tokenPurchaseProviderEvent_tokenPurchaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "tokenPurchaseProviderEvent_tokenPurchaseId_fkey",
+          "public",
+          "\"public\".\"tokenPurchaseProviderEvent\""
+        ]
+      }
+    ]
+  }
+]
