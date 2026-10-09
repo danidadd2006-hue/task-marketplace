@@ -6,6 +6,13 @@ export type TaskType = "PHYSICAL" | "VIRTUAL";
 export type TaskDuration = "SHORT_TERM" | "LONG_TERM";
 export type PublicTaskStatus = "PUBLISHED" | "RECEIVING_APPLICATIONS";
 
+export interface PublicTaskLocation {
+  country: { id: string; name: string; code: string };
+  region: { id: string; name: string } | null;
+  city: { id: string; name: string } | null;
+  area: string | null;
+}
+
 export interface PublicTaskDetails {
   id: string;
   title: string;
@@ -20,6 +27,7 @@ export interface PublicTaskDetails {
   requirements: string | null;
   createdAt: string;
   updatedAt: string;
+  location: PublicTaskLocation | null;
   category: {
     id: string;
     name: string;
