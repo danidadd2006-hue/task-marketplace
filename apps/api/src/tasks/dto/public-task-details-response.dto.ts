@@ -16,6 +16,12 @@ export class PublicTaskDetailsResponseDto {
   requirements!: string | null;
   createdAt!: string;
   updatedAt!: string;
+  location!: {
+    country: { id: string; name: string; code: string };
+    region: { id: string; name: string } | null;
+    city: { id: string; name: string } | null;
+    area: string | null;
+  } | null;
   category!: {
     id: string;
     name: string;
