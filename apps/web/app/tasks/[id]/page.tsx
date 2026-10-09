@@ -30,14 +30,20 @@ const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [task, setTask] = useState<PublicTaskDetails | null>(null);
-  const [error, setError] = useState<string | null>(null);\n  const [taskId, setTaskId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetch(apiBase + "/api/v1/tasks/" + params.id)
+    let active = true;
+    void params.then(({ id }) => {
+      if (active) setTaskId(id);
+      return fetch(apiBase + "/api/v1/tasks/" + id);
+    })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error("Task not found")))
-      .then(setTask)
-      .catch((reason: Error) => setError(reason.message));
-  }, [taskId]);
+      .then((data: PublicTaskDetails) => { if (active) setTask(data); })
+      .catch((reason: Error) => { if (active) setError(reason.message); });
+    return () => { active = false; };
+  }, [params]);
 
   return (
     <main className="main">

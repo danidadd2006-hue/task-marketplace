@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useAdminAuth } from "../../lib/auth";
+import { useAdminAuth } from "../../../lib/auth";
 
 type Task={id:string;title:string;description:string;currency:string;budgetMin:string|null;budgetMax:string|null;status:string};
 
