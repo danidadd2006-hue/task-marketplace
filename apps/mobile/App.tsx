@@ -158,5 +158,8 @@ const styles = StyleSheet.create({
   error:{color:"#991b1b",lineHeight:22},
   grid:{marginTop:24,gap:12},
   card:{borderWidth:1,borderColor:"#e5e7eb",borderRadius:10,padding:18,backgroundColor:"#fafafa"},
-  cardText:{fontSize:16,fontWeight:"600",color:"#171717"},\n  cardMeta:{fontSize:14,fontWeight:"600",color:"#171717",marginTop:8},\n  body:{fontSize:15,color:"#171717",lineHeight:23,marginTop:10},\n  section:{fontSize:19,fontWeight:"700",color:"#171717",marginTop:24,marginBottom:4}
+  cardText:{fontSize:16,fontWeight:"600",color:"#171717"},
+  cardMeta:{fontSize:14,fontWeight:"600",color:"#171717",marginTop:8},
+  body:{fontSize:15,color:"#171717",lineHeight:23,marginTop:10},
+  section:{fontSize:19,fontWeight:"700",color:"#171717",marginTop:24,marginBottom:4}
 });
