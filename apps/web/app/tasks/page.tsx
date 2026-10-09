@@ -11,7 +11,7 @@ export default function Page() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    void fetch("/api/v1/tasks/feed")
+    void fetch((process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000") + "/api/v1/tasks/feed")
       .then((response) => response.ok ? response.json() : Promise.reject(new Error("Unable to load tasks")))
       .then((value) => setTasks(Array.isArray(value) ? value : value.tasks ?? []))
       .catch(() => setTasks([]))
