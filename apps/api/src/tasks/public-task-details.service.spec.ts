@@ -44,6 +44,7 @@ const publicTask = {
   requirements: 'Bring a suitable vehicle',
   createdAt: new Date('2026-10-05T10:00:00.000Z'),
   updatedAt: new Date('2026-10-05T10:00:00.000Z'),
+  location: { country: { id: 'country-id', name: 'Kenya', code: 'KE' }, region: { id: 'region-id', name: 'Sample Region' }, city: { id: 'city-id', name: 'Sample City' }, area: 'Sample Area' },
   category: { id: 'category-id', name: 'Moving' },
   requirementsList: [
     {
@@ -130,6 +131,7 @@ describe('PublicTaskDetailsService', () => {
       requirements: 'Bring a suitable vehicle',
       createdAt: '2026-10-05T10:00:00.000Z',
       updatedAt: '2026-10-05T10:00:00.000Z',
+      location: { country: { id: 'country-id', name: 'Kenya', code: 'KE' }, region: { id: 'region-id', name: 'Sample Region' }, city: { id: 'city-id', name: 'Sample City' }, area: 'Sample Area' },
       category: { id: 'category-id', name: 'Moving' },
       requirementsList: [
         {
