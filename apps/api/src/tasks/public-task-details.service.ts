@@ -18,6 +18,12 @@ type PublicTaskDetailsRecord = {
   requirements: string | null;
   createdAt: unknown;
   updatedAt: unknown;
+  location: {
+    country: { id: string; name: string; code: string };
+    region: { id: string; name: string } | null;
+    city: { id: string; name: string } | null;
+    area: string | null;
+  } | null;
   category: {
     id: string;
     name: string;
@@ -85,6 +91,13 @@ export class PublicTaskDetailsService {
       .include('category', (category) =>
         category.select('id', 'name'),
       )
+      .include('location', (location) =>
+        location
+          .include('country', (country) => country.select('id', 'name', 'code'))
+          .include('region', (region) => region.select('id', 'name'))
+          .include('city', (city) => city.select('id', 'name'))
+          .select('area'),
+      )
       .include('requirementsList', (requirement) =>
         requirement.select(
           'id',
@@ -130,6 +143,7 @@ export class PublicTaskDetailsService {
       requirements: task.requirements,
       createdAt: toIsoString(task.createdAt),
       updatedAt: toIsoString(task.updatedAt),
+      location: task.location,
       category: {
         id: task.category.id,
         name: task.category.name,
