@@ -138,6 +138,7 @@ describe('TaskDiscoveryService', () => {
       status: 'PUBLISHED',
       budgetMin: '50',
       budgetMax: '100',
+      currency: 'KES',
       expectedCompletionAt: null,
       createdAt: '2026-10-05T10:00:00.000Z',
       category: { id: 'category-id', name: 'Moving' },
@@ -155,6 +156,7 @@ describe('TaskDiscoveryService', () => {
       'status',
       'budgetMin',
       'budgetMax',
+      'currency',
       'expectedCompletionAt',
       'createdAt',
     );
