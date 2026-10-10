@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
@@ -17,7 +17,10 @@ export class TasksController {
   ) {}
 
   @Post()
-  createTask(@Req() request: { user: AuthenticatedUser }, body: CreateTaskDto) {
+  createTask(
+    @Req() request: { user: AuthenticatedUser },
+    @Body() body: CreateTaskDto,
+  ) {
     return this.tasksService.createTask(request.user, body);
   }
 

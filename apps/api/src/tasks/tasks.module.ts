@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { PaymentsModule } from '../payments/payments.module.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { PublicTasksController } from './public-tasks.controller.js';
+import { PublicCategoriesController } from './public-categories.controller.js';
+import { PublicCategoriesService } from './public-categories.service.js';
 import { PublicTaskDetailsService } from './public-task-details.service.js';
 import { TaskDiscoveryService } from './task-discovery.service.js';
 import { TaskLifecycleService } from './task-lifecycle.service.js';
@@ -23,6 +25,7 @@ import { TokensModule } from '../tokens/tokens.module.js';
   controllers: [
     TasksController,
     PublicTasksController,
+    PublicCategoriesController,
     TaskApplicationsController,
     TaskWorkerSelectionController,
     TaskCompletionController,
@@ -33,6 +36,7 @@ import { TokensModule } from '../tokens/tokens.module.js';
     TaskLifecycleService,
     TaskDiscoveryService,
     PublicTaskDetailsService,
+    PublicCategoriesService,
     TaskApplicationService,
     TaskWorkerSelectionService,
     TaskCompletionService,

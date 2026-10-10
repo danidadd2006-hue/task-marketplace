@@ -22,6 +22,7 @@ export class TaskDiscoveryService {
         'status',
         'budgetMin',
         'budgetMax',
+        'currency',
         'expectedCompletionAt',
         'createdAt',
       )
