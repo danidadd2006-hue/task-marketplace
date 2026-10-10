@@ -9,7 +9,8 @@ type Task={id:string;title:string;description:string;type:string;duration:string
 export default function Page({params}:{params:Promise<{id:string}>}){
   const {api,authorized}=useAdminAuth();
   const [task,setTask]=useState<Task|null>(null);
-  const [error,setError]=useState<string|null>(null);\n  const [taskId,setTaskId]=useState<string|null>(null);
+  const [error,setError]=useState<string|null>(null);
+  const [taskId,setTaskId]=useState<string|null>(null);
   useEffect(()=>{void params.then(({id})=>setTaskId(id));},[params]);
   useEffect(()=>{if(!authorized||!taskId)return;void api<Task>("/api/v1/tasks/"+taskId).then(setTask).catch(e=>setError(e instanceof Error?e.message:"Task not found."));},[api,authorized,taskId]);
   const location=task?.location?[task.location.area,task.location.city?.name,task.location.region?.name,task.location.country.name].filter(Boolean).join(", "):null;
