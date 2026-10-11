@@ -17,9 +17,11 @@ The earlier audit report described a state before the latest Step 7.3 commit. Th
 - Web and mobile feeds represent API request failures separately from successful empty results and provide retry controls.
 - Effective roles are read from `/api/v1/auth/me` through the existing shared authentication client; UI actions check CLIENT and WORKER independently, allowing dual-role accounts.
 
-## Remaining contract limitation
+## Application-history reconciliation
 
-There is no application-history endpoint in the current API controllers. The Web Applications page and Mobile Applications screen therefore direct workers to discover tasks and submit an application from task details; they do not claim to show submitted-application history. Adding a history endpoint would be an API contract expansion and should be evaluated against the master specification before implementation.
+The Master Specification's Applications section requires workers to apply and clients to inspect applications, and it defines the application lifecycle; it does not explicitly require a worker-facing endpoint to retrieve the worker's own submitted-application list. The development handoff mentions application history as an input to recommendations, not as a retrieval endpoint. However, a detailed earlier marketplace requirements artifact (`Pasted markdown(3).md`, section 9, “Application Submission and Lifecycle”) explicitly lists a worker-facing “view own applications” endpoint. That is a conflicting/older requirements artifact and cannot safely be dismissed as nonexistent.
+
+The current API has application submission and client-side task application inspection, but no worker application-history endpoint. The Web Applications page and Mobile Applications screen therefore direct workers to task details and do not fabricate history. Do not add a new endpoint solely to make those screens look complete. **This requirement reconciliation remains a blocker** until the project treats the earlier “view own applications” requirement as superseded or confirms it remains in scope; if retained, the minimum compatible contract is an authenticated worker-scoped list of that worker's applications, with identity derived from the authenticated session and no client-supplied worker ID.
 
 ## Verification scope
 
