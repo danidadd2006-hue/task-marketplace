@@ -160,6 +160,73 @@ function TaskCreate() {
   </View>;
 }
 
+type WorkerApplication = {
+  id: string;
+  proposedPrice: string;
+  estimatedCompletionAt: string | null;
+  message: string | null;
+  qualifications: string | null;
+  questions: string | null;
+  status: string;
+  createdAt: string;
+  task: { id: string; title: string; status: string; currency: string; createdAt: string };
+  attachments: { id: string; fileName: string | null; fileType: string | null; fileSize: number | null; createdAt: string }[];
+};
+type WorkerApplicationPage = { items: WorkerApplication[]; page: number; pageSize: number; hasMore: boolean };
+
+function ApplicationHistory({ onBrowseTasks }: { onBrowseTasks: () => void }) {
+  const { api, user } = useAuth();
+  const [items, setItems] = useState<WorkerApplication[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load(requestedPage = 1, append = false) {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await api<WorkerApplicationPage>("/api/v1/applications/me?page=" + requestedPage + "&pageSize=20");
+      setItems(current => append ? [...current, ...result.items] : result.items);
+      setPage(result.page);
+      setHasMore(result.hasMore);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to load your applications.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (user?.roles.includes("WORKER")) void load(1, false);
+  }, [api, user?.roles]);
+
+  if (!user?.roles.includes("WORKER")) {
+    return <View><Text style={styles.title}>Applications</Text><Text style={styles.muted}>A WORKER role is required to view and submit applications.</Text></View>;
+  }
+
+  return <View>
+    <Text style={styles.title}>Applications</Text>
+    <Text style={styles.muted}>Your submitted proposals and their current statuses.</Text>
+    {error ? <View><Text accessibilityRole="alert" style={styles.error}>{error}</Text><Pressable accessibilityRole="button" onPress={() => void load(1, false)}><Text style={styles.link}>Retry</Text></Pressable></View> : null}
+    {loading && items.length === 0 ? <Text style={styles.muted}>Loading applications…</Text> : null}
+    {!loading && !error && items.length === 0 ? <Text style={styles.muted}>You have not submitted any applications yet.</Text> : null}
+    {items.map(application => <View key={application.id} style={styles.card}>
+      <Text style={styles.cardText}>{application.task.title}</Text>
+      <Text style={styles.muted}>Application: {application.status.replace(/_/g, " ")} · Task: {application.task.status.replace(/_/g, " ")}</Text>
+      <Text style={styles.cardMeta}>Proposed price: {application.proposedPrice} {application.task.currency}</Text>
+      <Text style={styles.muted}>Submitted {new Date(application.createdAt).toLocaleString()}</Text>
+      {application.estimatedCompletionAt ? <Text style={styles.body}>Estimated completion: {new Date(application.estimatedCompletionAt).toLocaleDateString()}</Text> : null}
+      {application.message ? <Text style={styles.body}>{application.message}</Text> : null}
+      {application.qualifications ? <Text style={styles.muted}>Qualifications: {application.qualifications}</Text> : null}
+      {application.questions ? <Text style={styles.muted}>Questions: {application.questions}</Text> : null}
+      {application.attachments.length ? <Text style={styles.muted}>Attachments: {application.attachments.map(file => file.fileName ?? file.fileType ?? "Attachment").join(", ")}</Text> : null}
+    </View>)}
+    {hasMore ? <Pressable accessibilityRole="button" disabled={loading} onPress={() => void load(page + 1, true)} style={styles.primary}><Text style={styles.primaryText}>{loading ? "Loading…" : "Load more applications"}</Text></Pressable> : null}
+    <Pressable accessibilityRole="button" onPress={onBrowseTasks} style={styles.primary}><Text style={styles.primaryText}>Browse tasks</Text></Pressable>
+  </View>;
+}
+
 function AuthenticatedShell() {
   const { user, logout } = useAuth();
   const [screen, setScreen] = useState<Screen>("home");
@@ -168,7 +235,7 @@ function AuthenticatedShell() {
   const navigate = (next: Screen) => setScreen(next);
   return <SafeAreaView style={styles.safe}><View style={styles.header}><Text style={styles.brandSmall}>Task Marketplace</Text><Pressable accessibilityRole="button" onPress={() => void logout()}><Text style={styles.link}>Log out</Text></Pressable></View>
     <ScrollView contentContainerStyle={styles.content}>
-      {screen === "tasks" ? <TaskFeed onSelect={openTask} /> : screen === "details" && taskId ? <TaskDetails taskId={taskId} onBack={() => setScreen("tasks")} /> : screen === "create" ? <TaskCreate /> : screen === "applications" ? <View><Text style={styles.title}>Applications</Text><Text style={styles.muted}>Choose a public task and submit your proposal from its details page. The API verifies your worker role and eligibility.</Text><Pressable onPress={() => navigate("tasks")} style={styles.primary}><Text style={styles.primaryText}>Browse tasks</Text></Pressable></View> : <>
+      {screen === "tasks" ? <TaskFeed onSelect={openTask} /> : screen === "details" && taskId ? <TaskDetails taskId={taskId} onBack={() => setScreen("tasks")} /> : screen === "create" ? <TaskCreate /> : screen === "applications" ? <ApplicationHistory onBrowseTasks={() => navigate("tasks")} /> : <>
         <Text style={styles.title}>Home</Text><Text style={styles.muted}>{user?.email}</Text>
         <Text style={styles.muted}>The API remains authoritative for permissions and business rules.</Text>
         <View style={styles.grid}>

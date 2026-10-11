@@ -19,13 +19,24 @@ The earlier audit report described a state before the latest Step 7.3 commit. Th
 
 ## Application-history reconciliation
 
-The Master Specification's Applications section requires workers to apply and clients to inspect applications, and it defines the application lifecycle; it does not explicitly require a worker-facing endpoint to retrieve the worker's own submitted-application list. The development handoff mentions application history as an input to recommendations, not as a retrieval endpoint. However, a detailed earlier marketplace requirements artifact (`Pasted markdown(3).md`, section 9, “Application Submission and Lifecycle”) explicitly lists a worker-facing “view own applications” endpoint. That is a conflicting/older requirements artifact and cannot safely be dismissed as nonexistent.
+The Master Specification's Applications section requires workers to apply and clients to inspect applications, and it defines the application lifecycle; the development handoff also mentions application history as an input to recommendations. A detailed earlier marketplace requirements artifact (`Pasted markdown(3).md`, section 9, “Application Submission and Lifecycle”) explicitly lists a worker-facing “view own applications” endpoint. To reconcile these sources without discarding the more specific requirement, Step 7.3 now implements that read contract.
 
-The current API has application submission and client-side task application inspection, but no worker application-history endpoint. The Web Applications page and Mobile Applications screen therefore direct workers to task details and do not fabricate history. Do not add a new endpoint solely to make those screens look complete. **This requirement reconciliation remains a blocker** until the project treats the earlier “view own applications” requirement as superseded or confirms it remains in scope; if retained, the minimum compatible contract is an authenticated worker-scoped list of that worker's applications, with identity derived from the authenticated session and no client-supplied worker ID.
+`GET /api/v1/applications/me` returns a paginated list of applications belonging to the authenticated worker. Access requires JWT authentication and the effective `WORKER` role; the worker ID is derived exclusively from the authenticated request, never from query parameters or the request body. Results are deterministically ordered newest-first and include the worker's submitted application fields, safe task summary fields, and attachment metadata (not attachment URLs). Pagination accepts `page` and `pageSize` (1–50, default 20) and returns `items`, `page`, `pageSize`, and `hasMore`. The query uses a `pageSize + 1` look-ahead and does not expose other workers' applications.
+
+The Web Applications page and Mobile Applications screen now consume this endpoint and display application status, task status, proposed price, submission date, optional proposal details, and attachment metadata. Both clients distinguish loading, errors with retry, empty history, and paginated results.
 
 ## Verification scope
 
-The previous report records API tests (563/563), API TypeScript, Web TypeScript/build, Admin TypeScript/build, Mobile TypeScript/Expo export, and `git diff --check` passing at the prior audit checkpoint. This reconciliation does not treat those results as freshly rerun.
+Fresh verification after implementing the application-history contract:
+
+- API TypeScript check: passed.
+- API regression suite: 569 tests passed across 58 test files.
+- New application-history controller/service tests: 4 passed.
+- Web TypeScript check: passed.
+- Web production build: passed with `next build --webpack` (the explicit Webpack mode avoids the previously observed Turbopack/junction-path issue in this Windows worktree).
+- Mobile TypeScript check: passed.
+- Mobile Expo web export: passed.
+- `git diff --check`: passed before commit.
 
 ## Protected state
 
@@ -33,4 +44,4 @@ The previous report records API tests (563/563), API TypeScript, Web TypeScript/
 - No Neon branch, database, or project was modified.
 - Phase 6 and TokenPurchase were not changed.
 - Step 7.4 was not started.
-- This document is an audit addendum, not a claim that new local builds or tests were executed.
+- Verification above was run in an isolated worktree based on PR #9's branch; generated build artifacts remain local and are not committed.

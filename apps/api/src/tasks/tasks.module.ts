@@ -9,6 +9,8 @@ import { TaskDiscoveryService } from './task-discovery.service.js';
 import { TaskLifecycleService } from './task-lifecycle.service.js';
 import { TaskApplicationService } from './task-application.service.js';
 import { TaskApplicationsController } from './task-applications.controller.js';
+import { WorkerApplicationsController } from './worker-applications.controller.js';
+import { WorkerApplicationHistoryService } from './worker-application-history.service.js';
 import { TaskWorkerSelectionService } from './task-worker-selection.service.js';
 import { TaskWorkerSelectionController } from './task-worker-selection.controller.js';
 import { TaskCompletionService } from './task-completion.service.js';
@@ -27,6 +29,7 @@ import { TokensModule } from '../tokens/tokens.module.js';
     PublicTasksController,
     PublicCategoriesController,
     TaskApplicationsController,
+    WorkerApplicationsController,
     TaskWorkerSelectionController,
     TaskCompletionController,
     TaskCancellationController,
@@ -38,6 +41,7 @@ import { TokensModule } from '../tokens/tokens.module.js';
     PublicTaskDetailsService,
     PublicCategoriesService,
     TaskApplicationService,
+    WorkerApplicationHistoryService,
     TaskWorkerSelectionService,
     TaskCompletionService,
     TaskCancellationService,
